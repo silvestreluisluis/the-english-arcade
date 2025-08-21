@@ -261,6 +261,10 @@ function checkAnswers() {
   result.style.textAlign = "center";
   result.style.marginTop = "20px";
   document.body.appendChild(result);
+
+  checkBtn.disable = True;
+  checkBtn.style.opacity = "0.6";
+  checkBtn.style.cursor = "default";
 }
 
     document.getElementById("checkBtn").addEventListener("click", checkAnswers);
