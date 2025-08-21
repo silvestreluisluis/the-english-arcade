@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Crucigrama de Verbos</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f0f0f0;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(14, minmax(20px, 1fr));
+      gap: 2px;
+      max-width: 100%;
+      margin: 0 auto;
+      overflow-x: auto;
+    }
+    .cell-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+    }
+    .cell {
+      background: white;
+      border: 1px solid #ccc;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      font-size: 1.2em;
+      text-transform: uppercase;
+    }
+    .number {
+      font-size: 0.6em;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      color: #555;
+    }
+    input:disabled {
+      background: #ddd;
+    }
+    #clues {
+      max-width: 600px;
+      margin: 30px auto;
+    }
+    .clue-group {
+      margin-bottom: 20px;
+    }
+    .clue-group h3 {
+      margin-bottom: 5px;
+    }
+    #checkBtn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 1em;
+      background: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #checkBtn:hover {
+      background: #005fa3;
+    }
+    .incorrect {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Crucigrama de Verbos en Inglés</h1>
+  <div id="grid"></div>
+  <button id="checkBtn">Checar respuestas</button>
+  <div id="clues">
+    <div class="clue-group">
+      <h3>Horizontales</h3>
+      <ul id="across-clues"></ul>
+    </div>
+    <div class="clue-group">
+      <h3>Verticales</h3>
+      <ul id="down-clues"></ul>
+    </div>
+  </div>
+
+  <script>
+const verbList = `
+run|Correr
+cheat|Engañar
+jump|Brincar
+talk|Hablar
+look|Mirar
+leap|Saltar
+watch|Observar detenidamente
+sit|Sentarse
+shout|Gritar
+play|Jugar
+walk|Caminar
+leave|Salir
+arrive|Llegar
+face|Enfrentar
+dance|Bailar
+`.trim();
+
+const verbs = verbList.split("\n").map(line => {
+  const [word, clue] = line.split("|");
+  return { word: word.trim().toLowerCase(), clue: clue.trim() };
+});
+
+    const gridSize = 14;
+    const grid = Array.from({ length: gridSize }, () =>
+      Array(gridSize).fill(null)
+    );
+
+    const directions = ["across", "down"];
+    const placedWords = [];
+
+    function placeWords() {
+      verbs.sort(() => Math.random() - 0.5);
+      let clueNumber = 1;
+
+      verbs.forEach(({ word, clue }) => {
+        for (let attempt = 0; attempt < 100; attempt++) {
+          const dir = directions[Math.floor(Math.random() * 2)];
+          const row = Math.floor(Math.random() * gridSize);
+          const col = Math.floor(Math.random() * gridSize);
+
+          if (canPlace(word, row, col, dir)) {
+            place(word, row, col, dir, clueNumber, clue);
+            clueNumber++;
+            break;
+          }
+        }
+      });
+    }
+
+    function canPlace(word, row, col, dir) {
+      if (dir === "across") {
+        if (col + word.length > gridSize) return false;
+        for (let i = 0; i < word.length; i++) {
+          if (grid[row][col + i] && grid[row][col + i].letter !== word[i]) {
+            return false;
+          }
+        }
+      } else {
+        if (row + word.length > gridSize) return false;
+        for (let i = 0; i < word.length; i++) {
+          if (grid[row + i][col] && grid[row + i][col].letter !== word[i]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    function place(word, row, col, dir, number, clue) {
+      for (let i = 0; i < word.length; i++) {
+        const r = dir === "across" ? row : row + i;
+        const c = dir === "across" ? col + i : col;
+        grid[r][c] = { letter: word[i], number: i === 0 ? number : null };
+      }
+      placedWords.push({ word, clue, row, col, dir, number });
+    }
+
+    function renderGrid() {
+      const gridDiv = document.getElementById("grid");
+      gridDiv.innerHTML = "";
+
+      for (let r = 0; r < gridSize; r++) {
+        for (let c = 0; c < gridSize; c++) {
+          const cell = grid[r][c];
+          const wrapper = document.createElement("div");
+          wrapper.className = "cell-wrapper";
+
+          const input = document.createElement("input");
+          input.maxLength = 1;
+          input.className = "cell";
+
+          if (cell) {
+            input.dataset.correct = cell.letter.toUpperCase();
+            if (cell.number) {
+              const number = document.createElement("div");
+              number.className = "number";
+              number.textContent = cell.number;
+              wrapper.appendChild(number);
+            }
+          } else {
+            input.disabled = true;
+            input.style.background = "#ddd";
+          }
+
+          wrapper.appendChild(input);
+          gridDiv.appendChild(wrapper);
+        }
+      }
+    }
+
+    function renderClues() {
+      const acrossList = document.getElementById("across-clues");
+      const downList = document.getElementById("down-clues");
+      acrossList.innerHTML = "";
+      downList.innerHTML = "";
+
+      placedWords.forEach(({ clue, dir, number }) => {
+        const li = document.createElement("li");
+        li.textContent = `${number}. ${clue}`;
+        if (dir === "across") {
+          acrossList.appendChild(li);
+        } else {
+          downList.appendChild(li);
+        }
+      });
+    }
+
+function checkAnswers() {
+  const inputs = document.querySelectorAll(".cell");
+  let correctVerbs = 0;
+  let incorrectVerbs = 0;
+
+  // Agrupar inputs por palabra colocada
+  placedWords.forEach(({ word, row, col, dir }) => {
+    let isCorrect = true;
+    for (let i = 0; i < word.length; i++) {
+      const r = dir === "across" ? row : row + i;
+      const c = dir === "across" ? col + i : col;
+      const index = r * gridSize + c;
+      const input = inputs[index];
+      const val = input.value.toUpperCase();
+      const correct = input.dataset.correct;
+
+      if (val !== correct) {
+        isCorrect = false;
+        input.value = correct;
+        input.style.color = "red";
+      } else {
+        input.style.color = "black";
+      }
+      input.disabled = true;
+    }
+    if (isCorrect) {
+      correctVerbs++;
+    } else {
+      incorrectVerbs++;
+    }
+  });
+
+  const result = document.createElement("div");
+  result.innerHTML = `
+    <h3>Resultados:</h3>
+    <p>✅ Verbos correctos: <strong>${correctVerbs}</strong></p>
+    <p>❌ Verbos incorrectos: <strong>${incorrectVerbs}</strong></p>
+  `;
+  result.style.textAlign = "center";
+  result.style.marginTop = "20px";
+  document.body.appendChild(result);
+}
+
+    document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+
+    placeWords();
+    renderGrid();
+    renderClues();
+  </script>
+</body>
+</html>
