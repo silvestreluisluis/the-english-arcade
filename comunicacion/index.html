@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Transductores en Acción</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #e0f7fa, #fce4ec);
+    margin: 0;
+    padding: 20px;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 {
+    text-align: center;
+    color: #00695c;
+    margin-bottom: 5px;
+  }
+  .score {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #004d40;
+  }
+  .definition {
+    max-width: 600px;
+    margin: 10px auto;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #fff3e0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .grid {
+    display: grid;
+    gap: 5px;
+    justify-content: center;
+    margin: 15px 0;
+    width: 100%;
+    max-width: 95vw;
+    grid-auto-columns: minmax(30px, 1fr);
+    overflow-x: auto;
+  }
+  .cell {
+    aspect-ratio: 1 / 1;
+    background-color: #fff;
+    border: 2px solid #00695c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+  input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 22px;
+    background: transparent;
+    color: #00695c;
+    text-transform: uppercase;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #00695c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+  }
+  @media (max-width: 600px) {
+    input {
+      font-size: 5vw;
+    }
+  }
+</style>
+
+</head>
+<body>
+  <h1>Transductores en Acción</h1>
+  <div class="score" id="scoreDisplay">Puntos: 0</div>
+  <div class="definition" id="definitionBox"></div>
+  <div id="gridContainer"></div>
+  <button id="nextBtn">Siguiente</button>
+
+  <script>
+    const terms = [
+      { palabra: "EMISOR", definicion: "Persona o entidad que origina y envía el mensaje." },
+      { palabra: "RECEPTOR", definicion: "Persona o entidad que recibe e interpreta el mensaje." },
+      { palabra: "MENSAJE", definicion: "Información que se transmite entre emisor y receptor." },
+      { palabra: "CANAL", definicion: "Medio físico o digital por el cual se transmite el mensaje." },
+      { palabra: "CODIGO", definicion: "Sistema de signos que permite construir y entender el mensaje." },
+      { palabra: "CONTEXTO", definicion: "Circunstancias que rodean el acto comunicativo." },
+      { palabra: "RETROALIMENTACION", definicion: "Respuesta que el receptor da al emisor." },
+      { palabra: "EMPATIA", definicion: "Capacidad de comprender y compartir los sentimientos del otro." },
+      { palabra: "INCLUSION", definicion: "Actitud que valora y respeta la diversidad en la comunicación." },
+      { palabra: "RESPETO", definicion: "Reconocimiento del valor del otro en el proceso comunicativo." },
+      { palabra: "GESTOS", definicion: "Movimientos corporales que acompañan o sustituyen el lenguaje verbal." },
+      { palabra: "EXPRESION", definicion: "Señales emocionales transmitidas por el rostro." },
+      { palabra: "CORPORAL", definicion: "Comunicación no verbal mediante posturas y movimientos." },
+      { palabra: "BARRERAS", definicion: "Obstáculos que dificultan el intercambio efectivo de información." },
+      { palabra: "FISICAS", definicion: "Interferencias materiales como ruido o distancia." },
+      { palabra: "PSICOLOGICAS", definicion: "Emociones o actitudes que impiden la comunicación clara." },
+      { palabra: "SEMANTICAS", definicion: "Problemas derivados del significado de las palabras." },
+      { palabra: "CULTURALES", definicion: "Diferencias de idioma, costumbres o valores." },
+      { palabra: "FISIOLOGICAS", definicion: "Limitaciones físicas o sensoriales que dificultan la comunicación." }
+    ];
+
+    let palabras = [...terms];
+    let currentIndex = 0;
+    let score = 0;
+
+    const gridContainer = document.getElementById("gridContainer");
+    const definitionBox = document.getElementById("definitionBox");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function mezclar(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function iniciarJuego() {
+      mezclar(palabras);
+      currentIndex = 0;
+      score = 0;
+      scoreDisplay.innerText = `Puntos: ${score}`;
+      nextBtn.style.display = "inline-block";
+      cargarPalabra(currentIndex);
+    }
+
+    function cargarPalabra(index) {
+      gridContainer.innerHTML = "";
+      const term = palabras[index];
+      definitionBox.innerHTML = `<strong>Definición:</strong> ${term.definicion}`;
+      const grid = document.createElement("div");
+      grid.className = "grid";
+      grid.style.gridTemplateColumns = `repeat(${term.palabra.length}, 1fr)`;
+
+      const inputs = [];
+      for (let i = 0; i < term.palabra.length; i++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        const input = document.createElement("input");
+        input.setAttribute("maxlength", "1");
+        input.dataset.index = i;
+        input.addEventListener("input", () => {
+          input.value = input.value.toUpperCase();
+        });
+        inputs.push(input);
+        cell.appendChild(input);
+        grid.appendChild(cell);
+      }
+
+      gridContainer.appendChild(grid);
+
+      nextBtn.onclick = () => {
+        const userInput = inputs.map(i => i.value.toUpperCase());
+        const respuesta = userInput.join("");
+        if (userInput.includes("")) {
+          alert("Completa todas las letras antes de avanzar.");
+          return;
+        }
+        if (respuesta !== term.palabra) {
+          alert("La palabra no es correcta. Intenta de nuevo.");
+          return;
+        }
+        inputs.forEach(i => i.disabled = true);
+        score += 10;
+        scoreDisplay.innerText = `Puntos: ${score}`;
+        currentIndex++;
+        if (currentIndex < palabras.length) {
+          cargarPalabra(currentIndex);
+        } else {
+          gridContainer.innerHTML = "<h2>¡Juego terminado!</h2>";
+          definitionBox.innerHTML = `<strong>Puntaje final:</strong> ${score} puntos`;
+          nextBtn.style.display = "none";
+        }
+      };
+    }
+
+    iniciarJuego();
+  </script>
+</body>
+</html>
+        
