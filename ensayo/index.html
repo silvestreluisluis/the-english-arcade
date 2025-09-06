@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ahorcado: Ensayo</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f0f0f0; }
+    h1 { color: #333; }
+    #canvas { border: 1px solid #333; background: #fff; margin: 20px auto; }
+    #wordDisplay { font-size: 2em; letter-spacing: 10px; margin: 20px; }
+    #letters button { margin: 5px; padding: 10px; font-size: 1em; }
+    #message, #hint, #score { font-size: 1.2em; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<h1>🧠 Ahorcado: Partes del Ensayo</h1>
+<canvas id="canvas" width="200" height="250"></canvas>
+<div id="hint"></div>
+<div id="wordDisplay"></div>
+<div id="letters"></div>
+<div id="message"></div>
+<div id="score"></div>
+
+<script>
+  const palabrasOriginales = [
+    { palabra: "introducción", pista: "Primera parte del ensayo que presenta el tema." },
+    { palabra: "tesis", pista: "Idea principal que se defiende en el ensayo." },
+    { palabra: "argumento", pista: "Razón o evidencia que apoya la tesis." },
+    { palabra: "desarrollo", pista: "Parte donde se explican y conectan los argumentos." },
+    { palabra: "conclusión", pista: "Cierre del ensayo que resume y reafirma la tesis." },
+    { palabra: "coherencia", pista: "Relación lógica entre las ideas del texto." },
+    { palabra: "estructura", pista: "Organización interna del ensayo." },
+    { palabra: "propósito", pista: "Intención comunicativa del autor." },
+    { palabra: "voz", pista: "Estilo y presencia del autor en el texto." },
+    { palabra: "conectores", pista: "Palabras que enlazan ideas y párrafos." }
+  ];
+
+  // Mezclar palabras aleatoriamente
+  const palabras = palabrasOriginales.sort(() => Math.random() - 0.5);
+
+  let index = 0;
+  let palabraActual = palabras[index].palabra;
+  let pistaActual = palabras[index].pista;
+  let display = [];
+  let errores = 0;
+  const maxErrores = 4;
+  let aciertos = 0;
+
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  function dibujarAhorcado(error) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath(); ctx.moveTo(10, 240); ctx.lineTo(190, 240); ctx.stroke(); // base
+    if (error > 0) { ctx.beginPath(); ctx.moveTo(50, 240); ctx.lineTo(50, 20); ctx.stroke(); }
+    if (error > 1) { ctx.beginPath(); ctx.moveTo(50, 20); ctx.lineTo(130, 20); ctx.stroke(); }
+    if (error > 2) { ctx.beginPath(); ctx.moveTo(130, 20); ctx.lineTo(130, 50); ctx.stroke(); }
+    if (error > 3) {
+      ctx.beginPath(); ctx.arc(130, 70, 20, 0, Math.PI * 2); ctx.stroke(); // cabeza
+      ctx.beginPath(); ctx.moveTo(130, 90); ctx.lineTo(130, 150); ctx.stroke(); // cuerpo
+      ctx.beginPath(); ctx.moveTo(130, 100); ctx.lineTo(110, 130); ctx.stroke(); // brazo izq
+      ctx.beginPath(); ctx.moveTo(130, 100); ctx.lineTo(150, 130); ctx.stroke(); // brazo der
+      ctx.beginPath(); ctx.moveTo(130, 150); ctx.lineTo(110, 190); ctx.stroke(); // pierna izq
+      ctx.beginPath(); ctx.moveTo(130, 150); ctx.lineTo(150, 190); ctx.stroke(); // pierna der
+    }
+  }
+
+  function quitarAcentos(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function iniciarJuego() {
+    palabraActual = palabras[index].palabra;
+    pistaActual = palabras[index].pista;
+    display = Array(palabraActual.length).fill("_");
+    errores = 0;
+    document.getElementById("hint").textContent = "💡 Pista: " + pistaActual;
+    document.getElementById("wordDisplay").textContent = display.join(" ");
+    document.getElementById("message").textContent = "";
+    dibujarAhorcado(errores);
+    generarBotones();
+  }
+
+  function generarBotones() {
+    const contenedor = document.getElementById("letters");
+    contenedor.innerHTML = "";
+    "ABCDEFGHIJKLMNÑOPQRSTUVWXYZÁÉÍÓÚ".split("").forEach(letra => {
+      const btn = document.createElement("button");
+      btn.textContent = letra;
+      btn.onclick = () => verificarLetra(letra, btn);
+      contenedor.appendChild(btn);
+    });
+  }
+
+  function verificarLetra(letra, boton) {
+    boton.disabled = true;
+    let acierto = false;
+
+    for (let i = 0; i < palabraActual.length; i++) {
+      if (quitarAcentos(palabraActual[i].toUpperCase()) === quitarAcentos(letra)) {
+        display[i] = palabraActual[i];
+        acierto = true;
+      }
+    }
+
+    document.getElementById("wordDisplay").textContent = display.join(" ");
+
+    if (!acierto) {
+      errores++;
+      dibujarAhorcado(errores);
+    }
+
+    if (display.join("") === palabraActual) {
+      aciertos++;
+      index++;
+      if (index < palabras.length) {
+        setTimeout(() => iniciarJuego(), 1000);
+      } else {
+        mostrarResultadoFinal();
+      }
+    } else if (errores >= maxErrores) {
+      document.getElementById("message").textContent = `💀 Has perdido. La palabra era: ${palabraActual}`;
+      document.getElementById("letters").innerHTML = "";
+      mostrarResultadoFinal();
+    }
+  }
+
+  function mostrarResultadoFinal() {
+    const total = palabras.length;
+    const porcentaje = Math.round((aciertos / total) * 100);
+    let nota = "";
+
+    if (porcentaje === 100) nota = "Excelente 💯";
+    else if (porcentaje >= 80) nota = "Muy bien 👍";
+    else if (porcentaje >= 60) nota = "Bien 👌";
+    else if (porcentaje >= 40) nota = "Regular 🤔";
+    else nota = "Necesitas repasar 📚";
+
+    document.getElementById("score").textContent = `✅ Aciertos: ${aciertos}/${total} — Calificación: ${porcentaje}% (${nota})`;
+  }
+
+  iniciarJuego();
+</script>
+
+</body>
+</html>
