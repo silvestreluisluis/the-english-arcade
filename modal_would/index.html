@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>What Would You Do?</title>
+  <style>
+    body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fff8f0;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+.scene {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+}
+button {
+  margin: 5px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f57c00;
+  color: white;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #e65100;
+}
+#scoreDisplay {
+  font-weight: bold;
+  margin-top: 10px;
+}
+#endMessage {
+  font-size: 1.2em;
+  color: #444;
+  margin-top: 20px;
+  padding: 15px;
+  background: #fff3e0;
+  border-left: 5px solid #f57c00;
+}
+.progress-container {
+  width: 100%;
+  background-color: #ffe0b2;
+  border-radius: 5px;
+  margin: 15px 0;
+}
+.progress-bar {
+  height: 20px;
+  width: 0%;
+  background-color: #fbc02d;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+.vocab-section {
+  margin-top: 40px;
+  background: #ffffff;
+  padding: 20px;
+  border-left: 5px solid #f57c00;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+}
+.vocab-section h3 {
+  margin-top: 0;
+}
+#vocabSearch {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+tr:hover {
+  background-color: #fffde7;
+}
+  </style>
+</head>
+<body>
+
+  <h2>🌟 What Would You Do?</h2>
+  <p>Choose your answer using “would”. Learn vocabulary and make kind choices!</p>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div id="gameArea"></div>
+  <p id="scoreDisplay">Score: 0</p>
+  <div id="endMessage"></div>
+<div class="vocab-section">
+  <h3>📚 Vocabulario — significado</h3>
+  <input type="text" id="vocabSearch" placeholder="Buscar palabra..." />
+
+  <table id="vocabTable">
+    <thead>
+      <tr>
+        <th>Vocabulario</th>
+        <th>Significado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>speed</td><td>ir rápido</td></tr>
+      <tr><td>feed</td><td>dar comida</td></tr>
+      <tr><td>stink</td><td>oler mal</td></tr>
+      <tr><td>bet</td><td>apostar</td></tr>
+      <tr><td>lean</td><td>apoyarse</td></tr>
+      <tr><td>creep</td><td>moverse en silencio</td></tr>
+      <tr><td>kneel</td><td>ponerse de rodillas</td></tr>
+      <tr><td>throw</td><td>lanzar</td></tr>
+      <tr><td>sweep</td><td>barrer</td></tr>
+      <tr><td>drink</td><td>beber</td></tr>
+      <tr><td>act</td><td>actuar</td></tr>
+      <tr><td>add</td><td>añadir</td></tr>
+      <tr><td>ask</td><td>preguntar</td></tr>
+      <tr><td>answer</td><td>responder</td></tr>
+      <tr><td>arrive</td><td>llegar</td></tr>
+      <tr><td>brush</td><td>cepillar</td></tr>
+      <tr><td>belong</td><td>pertenecer</td></tr>
+      <tr><td>beg</td><td>rogar</td></tr>
+      <tr><td>believe</td><td>creer</td></tr>
+      <tr><td>close</td><td>cerrar</td></tr>
+      <tr><td>driver</td><td>conductor</td></tr>
+      <tr><td>dirty</td><td>sucio</td></tr>
+      <tr><td>help</td><td>ayudar</td></tr>
+      <tr><td>sorry</td><td>lo siento</td></tr>
+      <tr><td>quiet</td><td>callado</td></tr>
+      <tr><td>kindly</td><td>amablemente</td></tr>
+      <tr><td>joy</td><td>alegría</td></tr>
+      <tr><td>trash</td><td>basura</td></tr>
+      <tr><td>teacher</td><td>maestro/a</td></tr>
+      <tr><td>homework</td><td>tarea</td></tr>
+      <tr><td>play</td><td>obra de teatro</td></tr>
+      <tr><td>idea</td><td>idea</td></tr>
+      <tr><td>question</td><td>pregunta</td></tr>
+      <tr><td>choice</td><td>elección</td></tr>
+      <tr><td>score</td><td>puntaje</td></tr>
+      <tr><td>scene</td><td>escena</td></tr>
+      <tr><td>progress</td><td>progreso</td></tr>
+      <tr><td>grade</td><td>calificación</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const vocabSearch = document.getElementById("vocabSearch");
+  vocabSearch.addEventListener("keyup", function () {
+    const filter = vocabSearch.value.toLowerCase();
+    const rows = document.querySelectorAll("#vocabTable tbody tr");
+    rows.forEach(row => {
+      const word = row.cells[0].textContent.toLowerCase();
+      const meaning = row.cells[1].textContent.toLowerCase();
+      row.style.display = word.includes(filter) || meaning.includes(filter) ? "" : "none";
+    });
+  });
+</script>
+  <script>
+    const scenes = [
+      { text: "You see a car speeding near children. What would you do?", options: [
+        { text: "I would ask the driver to slow down.", score: 10 },
+        { text: "I would not say anything.", score: -5 }
+      ]},
+      { text: "A hungry dog is outside. What would you do?", options: [
+        { text: "I would feed the dog.", score: 10 },
+        { text: "I would not help it.", score: -5 }
+      ]},
+      { text: "The trash can stinks. What would you do?", options: [
+        { text: "I would clean it.", score: 10 },
+        { text: "Would you leave it dirty?", score: -5 }
+      ]},
+      { text: "Your friend bets you can’t finish your homework. What would you do?", options: [
+        { text: "I would bet I can.", score: 10 },
+        { text: "I would not try.", score: -5 }
+      ]},
+      { text: "An old man leans on a broken chair. What would you do?", options: [
+        { text: "I would help him.", score: 10 },
+        { text: "I would not help.", score: -5 }
+      ]},
+      { text: "You see someone creeping in the hallway. What would you do?", options: [
+        { text: "I would tell a teacher.", score: 10 },
+        { text: "Would you follow them alone?", score: -10 }
+      ]},
+      { text: "A child kneels to pick up a toy. What would you do?", options: [
+        { text: "I would help them.", score: 10 },
+        { text: "I would not help.", score: -10 }
+      ]},
+      { text: "Someone throws trash on the ground. What would you do?", options: [
+        { text: "I would ask them to pick it up.", score: 10 },
+        { text: "I would throw more trash.", score: -10 }
+      ]},
+      { text: "The classroom is dirty. What would you do?", options: [
+        { text: "I would sweep the floor.", score: 10 },
+        { text: "Would you leave it dirty?", score: -5 }
+      ]},
+      { text: "You are offered a strange drink. What would you do?", options: [
+        { text: "I would say no.", score: 10 },
+        { text: "I would drink it.", score: -10 }
+      ]},
+      { text: "You are asked to act in a play. What would you do?", options: [
+        { text: "I would act with joy.", score: 10 },
+        { text: "I would not act.", score: -5 }
+      ]},
+      { text: "Your team needs ideas. What would you do?", options: [
+        { text: "I would add my ideas.", score: 10 },
+        { text: "Would you stay quiet?", score: -5 }
+      ]},
+      { text: "Someone asks you a question. What would you do?", options: [
+        { text: "I would answer kindly.", score: 10 },
+        { text: "I would not answer.", score: -5 }
+      ]},
+      { text: "You arrive late to class. What would you do?", options: [
+        { text: "I would say sorry.", score: 5 },
+        { text: "I would not say anything.", score: -5 }
+      ]},
+      { text: "The door is open. What would you do?", options: [
+        { text: "Would you close it?", score: 10 },
+        { text: "I would leave it open.", score: -5 }
+      ]}
+    ];
+
+    let randomizedScenes = scenes.sort(() => Math.random() - 0.5);
+    let currentScene = 0;
+    let score = 0;
+
+    function showScene() {
+      const scene = randomizedScenes[currentScene];
+      const gameArea = document.getElementById("gameArea");
+      gameArea.innerHTML = `<div class="scene"><p>${scene.text}</p></div>`;
+
+      let shuffledOptions = scene.options.sort(() => Math.random() - 0.5);
+      shuffledOptions.forEach((option) => {
+        const btn = document.createElement("button");
+        btn.textContent = option.text;
+        btn.onclick = () => chooseOption(option.score);
+        gameArea.appendChild(btn);
+      });
+
+      updateProgressBar();
+    }
+
+    function chooseOption(points) {
+      score += points;
+      document.getElementById("scoreDisplay").textContent = "Score: " + score;
+      currentScene++;
+
+      if (currentScene < randomizedScenes.length) {
+        showScene();
+      } else {
+        endGame();
+      }
+    }
+
+    function updateProgressBar() {
+      const progress = ((currentScene) / randomizedScenes.length) * 100;
+      document.getElementById("progressBar").style.width = progress + "%";
+    }
+
+    function endGame() {
+      updateProgressBar();
+      const message = document.getElementById("endMessage");
+      let grade = "";
+
+      if (score >= 130) {
+        grade = "🌟 Excellent! You made kind and smart choices.";
+      } else if (score >= 100) {
+        grade = "👍 Good job! You were helpful and polite.";
+      } else if (score >= 70) {
+        grade = "🙂 Not bad. You can do better next time.";
+      } else {
+        grade = "⚠️ Try again. Think about others and be kind.";
+      }
+
+      message.textContent = `Final Score: ${score} / 150\n${grade}`;
+      document.getElementById("gameArea").innerHTML = "";
+    }
+
+    showScene();
+  </script>
+
+</body>
+</html>
+      
+      
