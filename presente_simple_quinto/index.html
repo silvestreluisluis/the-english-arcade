@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Misiones del Presente Simple</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f0f4ff, #d0e6ff);
+      color: #333;
+      text-align: center;
+      padding: 20px;
+    }
+    .mission-box {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 60%;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 16px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .feedback {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    #score {
+      font-size: 20px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌟 Misiones del Presente Simple 🌟</h1>
+  <div id="progressContainer" style="width: 100%; max-width: 600px; margin: 0 auto 20px;">
+  <div id="progressBar" style="
+    height: 20px;
+    background-color: #d0e6ff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px #aaa;
+  ">
+    <div id="progressFill" style="
+      height: 100%;
+      width: 0%;
+      background-color: #0078d7;
+      transition: width 0.5s ease;
+    "></div>
+  </div>
+  <p id="progressText" style="margin-top: 5px; font-weight: bold;">Progreso: 0%</p>
+</div>
+  <div id="game"></div>
+  <div id="score"></div>
+<script>
+const levels = [
+  {
+    name: "Nivel 1: Verbos comunes",
+    missions: [
+      { type: "positive", sentence: "She (actúa) in the play.", answer: "acts" },
+      { type: "negative", sentence: "I ______ (no agrego) sugar.", answer: "do not add" },
+      { type: "interrogative", sentence: "______ you ask often?", answer: "Do" },
+      { type: "positive", sentence: "They (responden) quickly.", answer: "answer" },
+      { type: "interrogative", sentence: "______ she arrive late?", answer: "Does" }
+    ]
+  },
+  {
+    name: "Nivel 2: Verbos emocionales",
+    missions: [
+      { type: "positive", sentence: "He (suplica) for help.", answer: "begs" },
+      { type: "negative", sentence: "We ______ (no creemos) that.", answer: "do not believe" },
+      { type: "interrogative", sentence: "______ she close the door?", answer: "Does" },
+      { type: "positive", sentence: "I (cocino) pasta.", answer: "cook" },
+      { type: "negative", sentence: "They ______ (no llaman) often.", answer: "do not call" }
+    ]
+  },
+  {
+    name: "Nivel 3: Verbos de movimiento y rutina",
+    missions: [
+      { type: "positive", sentence: "They (bailan) at the festival.", answer: "dance" },
+      { type: "negative", sentence: "She ______ (no se viste) quickly.", answer: "does not dress" },
+      { type: "interrogative", sentence: "______ he die in the story?", answer: "Does" },
+      { type: "positive", sentence: "I (seco) my clothes outside.", answer: "dry" },
+      { type: "interrogative", sentence: "______ you enjoy the concert?", answer: "Do" }
+    ]
+  },
+  {
+    name: "Nivel 4: Verbos irregulares y complejos",
+    missions: [
+      { type: "positive", sentence: "He (bebe) orange juice.", answer: "drinks" },
+      { type: "negative", sentence: "We ______ (no barren) the garage.", answer: "do not sweep" },
+      { type: "interrogative", sentence: "______ she sing in the band?", answer: "Does" },
+      { type: "positive", sentence: "They (cavan) holes for the trees.", answer: "dig" },
+      { type: "negative", sentence: "I ______ (no me caigo) often.", answer: "do not fall" }
+    ]
+  },
+  {
+    name: "Nivel 5: Verbos narrativos y épicos",
+    missions: [
+      { type: "positive", sentence: "She (come) apples every morning.", answer: "eats" },
+      { type: "negative", sentence: "They ______ (no atrapar) the ball.", answer: "do not catch" },
+      { type: "interrogative", sentence: "______ you take the photo?", answer: "Do" },
+      { type: "positive", sentence: "He (cuelga) his coat on the wall.", answer: "hangs" },
+      { type: "interrogative", sentence: "______ she swing at the park?", answer: "Does" }
+    ]
+  }
+];
+
+let currentLevel = 0;
+let currentMission = 0;
+let score = 0;
+
+function updateProgress() {
+  const totalMissions = levels.reduce((sum, lvl) => sum + lvl.missions.length, 0);
+  const completed = levels.slice(0, currentLevel).reduce((sum, lvl) => sum + lvl.missions.length, 0) + currentMission;
+  const percent = Math.round((completed / totalMissions) * 100);
+
+  document.getElementById("progressFill").style.width = percent + "%";
+  document.getElementById("progressText").innerText = `Progreso: ${percent}%`;
+}
+
+function showMission() {
+  const level = levels[currentLevel];
+  const mission = level.missions[currentMission];
+
+  document.getElementById("game").innerHTML = `
+    <div class="mission-box">
+      <h2>${level.name}</h2>
+      <p><strong>Oración ${currentMission + 1}:</strong> ${mission.sentence}</p>
+      <input type="text" id="answerInput" placeholder="Escribe tu respuesta aquí">
+      <br>
+      <button onclick="checkAnswer()">Comprobar</button>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  `;
+}
+function checkAnswer() {
+  const input = document.getElementById("answerInput");
+  const userAnswer = input.value.trim().toLowerCase();
+  const correctAnswer = levels[currentLevel].missions[currentMission].answer.toLowerCase();
+  const feedback = document.getElementById("feedback");
+
+  // Validación: si está vacío, mostrar advertencia y no avanzar
+  if (userAnswer === "") {
+    feedback.innerText = "⚠️ Por favor escribe una respuesta antes de continuar.";
+    input.focus();
+    return; // Detiene la función aquí
+  }
+
+  // Evaluación normal
+  if (userAnswer === correctAnswer) {
+    feedback.innerText = "✅ ¡Correcto!";
+    score++;
+  } else {
+    feedback.innerText = `❌ Incorrecto. La respuesta correcta era: "${levels[currentLevel].missions[currentMission].answer}"`;
+  }
+
+  currentMission++;
+  setTimeout(() => {
+    if (currentMission >= levels[currentLevel].missions.length) {
+      currentLevel++;
+      currentMission = 0;
+    }
+
+    if (currentLevel >= levels.length) {
+      document.getElementById("game").innerHTML = "<h2>🎉 Juego terminado 🎉</h2>";
+      document.getElementById("score").innerText = `Tu calificación final: ${score} / 25`;
+    } else {
+      showMission();
+      updateProgress();
+    }
+  }, 1500);
+}
+
+showMission();
+updateProgress();
+  </script>
+</body>
+</html>
