@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>¿Quién soy yo? – Pronombres</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background-color: #fefae0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #606c38;
+    }
+
+    #game-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .image-box {
+      font-size: 4rem;
+      margin: 10px 0;
+    }
+
+    .riddle {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .options button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      border: none;
+      background-color: #dda15e;
+      color: white;
+      cursor: pointer;
+    }
+
+    .options button:hover {
+      background-color: #bc6c25;
+    }
+
+    #feedback {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+
+    #score, #final-score {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #555;
+    }
+
+    #final-score {
+      font-size: 1.3rem;
+      color: #283618;
+      font-weight: bold;
+    }
+
+    #next-btn, #retry-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #606c38;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #retry-btn {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>¿Quién soy yo? 👀</h1>
+  <div id="game-box">
+    <p><strong>Instrucciones:</strong> Observa el ícono y lee el acertijo. Luego elige el pronombre correcto en inglés. Al hacer clic, escucharás su pronunciación. ¡Buena suerte!</p>
+    <div class="image-box" id="emoji">👩</div>
+    <p class="riddle" id="riddle">Soy una persona que habla de sí misma. ¿Quién soy?</p>
+    <p id="prompt">Elige el pronombre correcto:</p>
+    <div class="options" id="options"></div>
+    <p id="feedback"></p>
+    <p id="score">Puntuación: 0</p>
+    <p id="final-score"></p>
+    <button id="next-btn" onclick="nextItem()">Siguiente</button>
+    <button id="retry-btn" onclick="restartGame()">🔁 Reintentar</button>
+  </div>
+
+  <script>
+    const originalItems = [
+      {
+        emoji: "🧍",
+        pronoun: "I",
+        riddle: "Soy una persona que habla de sí misma. ¿Quién soy?"
+      },
+      {
+        emoji: "👉",
+        pronoun: "you",
+        riddle: "Estoy hablando contigo directamente. ¿Quién eres tú?"
+      },
+      {
+        emoji: "👦",
+        pronoun: "he",
+        riddle: "Es un niño que juega fútbol. ¿Qué pronombre lo representa?"
+      },
+      {
+        emoji: "👩",
+        pronoun: "she",
+        riddle: "Es una niña que baila ballet. ¿Qué pronombre la representa?"
+      },
+      {
+        emoji: "👫",
+        pronoun: "we",
+        riddle: "Tú y yo estamos juntos. ¿Qué pronombre nos incluye?"
+      },
+      {
+        emoji: "🧑‍🤝‍🧑",
+        pronoun: "they",
+        riddle: "Un grupo de personas camina por el parque. ¿Qué pronombre los representa?"
+      }
+    ];
+
+    let items = [];
+    let current = 0;
+    let score = 0;
+    let answered = false;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      speechSynthesis.speak(utterance);
+    }
+
+    function renderItem() {
+      const item = items[current];
+      document.getElementById("emoji").textContent = item.emoji;
+      document.getElementById("riddle").textContent = item.riddle;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("final-score").textContent = "";
+      document.getElementById("retry-btn").style.display = "none";
+      answered = false;
+
+      const options = ["I", "you", "he", "she", "we", "they"];
+      const container = document.getElementById("options");
+      container.innerHTML = "";
+
+      options.forEach(p => {
+        const btn = document.createElement("button");
+        btn.textContent = p;
+        btn.onclick = () => {
+          speak(p);
+          checkAnswer(p);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      if (answered) return;
+      answered = true;
+
+      const correct = items[current].pronoun;
+      const feedback = document.getElementById("feedback");
+
+      if (selected === correct) {
+        feedback.textContent = "✅ ¡Correcto!";
+        feedback.style.color = "green";
+        score++;
+      } else {
+        feedback.textContent = `❌ Ups... era "${correct}".`;
+        feedback.style.color = "red";
+      }
+
+      document.getElementById("score").textContent = `Puntuación: ${score}`;
+    }
+
+    function nextItem() {
+      if (!answered) return;
+
+      current++;
+      if (current < items.length) {
+        renderItem();
+      } else {
+        document.getElementById("final-score").textContent = `🎯 Puntuación final: ${score} / ${items.length}`;
+        document.getElementById("next-btn").style.display = "none";
+        document.getElementById("retry-btn").style.display = "inline-block";
+      }
+    }
+
+    function restartGame() {
+      items = shuffle([...originalItems]);
+      current = 0;
+      score = 0;
+      document.getElementById("score").textContent = `Puntuación: 0`;
+      document.getElementById("next-btn").style.display = "inline-block";
+      renderItem();
+    }
+
+    // Iniciar juego con orden aleatorio
+    restartGame();
+  </script>
+</body>
+</html>
