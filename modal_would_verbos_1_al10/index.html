@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>La Fiesta de los Deseos</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef6e4;
+      color: #333;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+    .scene {
+      border: 2px dashed #ffb703;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #fff;
+      margin-bottom: 20px;
+    }
+    .question {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .options button {
+      display: block;
+      margin: 8px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #8ecae6;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+    }
+    .options button:hover {
+      background-color: #219ebc;
+    }
+    .feedback {
+      margin-top: 10px;
+      font-style: italic;
+    }
+    #nextBtn {
+      margin-top: 15px;
+      padding: 10px 15px;
+      background-color: #fb8500;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #score {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎉 La Fiesta de los Deseos</h1>
+  <p>Elige la frase correcta usando “would” en afirmativo, negativo o interrogativo.</p>
+
+  <div id="game" class="scene"></div>
+  <button id="nextBtn" style="display:none;">Siguiente</button>
+  <div id="score"></div>
+
+  <script>
+    const scenes = [
+      { q: "¿Cómo expresarías que te gustaría acelerar?", o: ["I would like to speed up.", "I would speeding up.", "I like to speed up."], c: 0 },
+      { q: "¿Cómo negar que alimentarías al perro?", o: ["I would not feed the dog.", "I wouldn’t feeding the dog.", "I not would feed the dog."], c: 0 },
+      { q: "¿Cómo preguntar si alguien quiere alimentar al gato?", o: ["Would you like to feed the cat?", "Would you feeding the cat?", "Do you would like to feed the cat?"], c: 0 },
+      { q: "¿Cómo expresarías que algo huele mal?", o: ["I would say it stinks.", "I would saying it stinks.", "I would to stink it."], c: 0 },
+      { q: "¿Cómo negar que apostarías?", o: ["I would not bet today.", "I wouldn’t betting today.", "I not would bet today."], c: 0 },
+      { q: "¿Cómo preguntar si alguien quiere apostar?", o: ["Would you like to bet?", "Would you betting?", "Do you would bet?"], c: 0 },
+      { q: "¿Cómo expresarías que te gustaría recostarte?", o: ["I would love to lean on the couch.", "I would leaning on the couch.", "I would to lean on the couch."], c: 0 },
+      { q: "¿Cómo negar que te arrastrarías?", o: ["I would not creep around.", "I would not creeping around.", "I not would creep."], c: 0 },
+      { q: "¿Cómo preguntar si alguien quiere arrodillarse?", o: ["Would you like to kneel?", "Would you kneeling?", "Do you would kneel?"], c: 0 },
+      { q: "¿Cómo expresarías que te gustaría lanzar confeti?", o: ["I would like to throw confetti.", "I would throwing confetti.", "I would to throw confetti."], c: 0 },
+      { q: "¿Cómo negar que barrerías hoy?", o: ["I wouldn’t sweep today.", "I would not sweeping today.", "I not would sweep today."], c: 0 },
+      { q: "¿Cómo preguntar si alguien quiere tomar algo?", o: ["Would you like to drink something?", "Would you drinking something?", "Do you would like to drink?"], c: 0 },
+      { q: "¿Cómo expresarías que te gustaría actuar?", o: ["I would like to act in the play.", "I would acting in the play.", "I would to act in the play."], c: 0 },
+      { q: "¿Cómo negar que añadirías azúcar?", o: ["I would not add sugar.", "I would not adding sugar.", "I not would add sugar."], c: 0 },
+      { q: "¿Cómo preguntar si alguien quiere preguntar algo?", o: ["Would you like to ask a question?", "Would you asking a question?", "Do you would ask something?"], c: 0 },
+      { q: "¿Cómo expresarías que te gustaría responder?", o: ["I would like to answer the question.", "I would answering the question.", "I would to answer the question."], c: 0 },
+      { q: "¿Cómo negar que llegarías temprano?", o: ["I would not arrive early.", "I would not arriving early.", "I not would arrive early."], c: 0 },
+      { q: "¿Cómo preguntar si alguien quiere cepillarse el cabello?", o: ["Would you like to brush your hair?", "Would you brushing your hair?", "Do you would brush your hair?"], c: 0 },
+      { q: "¿Cómo expresarías que te gustaría pertenecer al equipo?", o: ["I would like to belong to the team.", "I would belonging to the team.", "I would to belong to the team."], c: 0 },
+      { q: "¿Cómo negar que suplicarías?", o: ["I wouldn’t beg for help.", "I would not begging for help.", "I not would beg for help."], c: 0 },
+      { q: "¿Cómo preguntar si alguien quiere creer en la magia?", o: ["Would you like to believe in magic?", "Would you believing in magic?", "Do you would believe in magic?"], c: 0 },
+      { q: "¿Cómo expresarías que te gustaría cerrar la puerta?", o: ["I would like to close the door.", "I would closing the door.", "I would to close the door."], c: 0 }
+    ];
+
+    let currentScene = 0;
+    let score = 0;
+
+    const gameDiv = document.getElementById("game");
+    const nextBtn = document.getElementById("nextBtn");
+    const scoreDiv = document.getElementById("score");
+
+    function showScene(index) {
+      const scene = scenes[index];
+      gameDiv.innerHTML = "";
+
+      const question = document.createElement("div");
+      question.className = "question";
+      question.textContent = scene.q;
+      gameDiv.appendChild(question);
+
+      const optionsDiv = document.createElement("div");
+      optionsDiv.className = "options";
+
+      scene.o.forEach((option, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => {
+          if (i === scene.c) {
+            feedback.textContent = "✅ ¡Correcto! Qué amable eres.";
+            score++;
+          } else {
+            feedback.textContent = "❌ Ups, esa no es la forma correcta.";
+          }
+          disableButtons();
+          nextBtn.style.display = "inline-block";
+        };
+        optionsDiv.appendChild(btn);
+      });
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback";
+
+      gameDiv.appendChild(optionsDiv);
+      gameDiv.appendChild(feedback);
+    }
+
+    function disableButtons() {
+      const buttons = document.querySelectorAll(".options button");
+      buttons.forEach(btn => btn.disabled = true);
+    }
+
+    nextBtn.onclick = () => {
+      currentScene++;
+      if (currentScene < scenes.length) {
+        showScene(currentScene);
+        nextBtn.style.display = "none";
+      } else {
+        showFinalScore();
+        nextBtn.style.display = "none";
+      }
+    };
+
+    function showFinalScore() {
+      gameDiv.innerHTML = "";
+      let grade = "";
+      if (score === scenes.length) grade = "🌟 ¡Perfecto!";
+      else if (score >= scenes.length * 0.8) grade = "👍 ¡Muy bien!";
+      else if (score >= scenes.length * 0.5) grade = "🙂 Bien, pero puedes mejorar.";
+      else grade = "😅 Sigue practicando.";
+
+    
+
+      scoreDiv.innerHTML = `Tu puntuación final: ${score}/${scenes.length}<br>${grade}`;
+    }
+
+    // Mezclar escenas y mostrar la primera
+    scenes.sort(() => Math.random() - 0.5);
+    showScene(currentScene);
+  </script>
+
+</body>
+</html>
