@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Empareja Verbos</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #timer, #score { font-size: 18px; margin: 10px; }
+    .button-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+    .verb-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    .verb-btn:hover { background-color: #d0eaff; }
+    .selected { background-color: #ffe08a !important; }
+    .disabled { pointer-events: none; opacity: 0.5; }
+    #endMessage { font-size: 1.2em; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🎯 Empareja Verbos</h1>
+  <div id="timer">⏱ Tiempo restante: 2100s</div>
+  <div class="button-grid" id="buttonGrid"></div>
+  <div id="endMessage"></div>
+
+  <script>
+    const verbPairs = [
+      { en: "Speed", es: "acelerar" }, { en: "Feed", es: "alimentar" }, { en: "Stink", es: "apestar" },
+      { en: "Bet", es: "apostar" }, { en: "Lean", es: "inclinarse" }, { en: "Creep", es: "arrastrarse" },
+      { en: "Kneel", es: "arrodillarse" }, { en: "Throw", es: "lanzar" }, { en: "Sweep", es: "barrer" },
+      { en: "Drink", es: "beber" }, { en: "Fall", es: "caer" }, { en: "Sing", es: "cantar" },
+      { en: "Dig", es: "excavar" }, { en: "Catch", es: "atrapar" }, { en: "Take", es: "tomar" },
+      { en: "Hang", es: "colgar" }, { en: "Swing", es: "balancearse" }, { en: "Eat", es: "comer" },
+      { en: "Buy", es: "comprar" }, { en: "Drive", es: "conducir" }, { en: "Keep", es: "mantener" },
+      { en: "Run", es: "correr" }, { en: "Cut", es: "cortar" }, { en: "Sew", es: "coser" },
+      { en: "Cost", es: "costar" }, { en: "Grow", es: "crecer" }, { en: "Give", es: "dar" },
+      { en: "Say", es: "decir" }, { en: "Tell", es: "contar" }, { en: "Act", es: "actuar" },
+      { en: "Add", es: "añadir" }, { en: "Ask", es: "preguntar" }, { en: "Answer", es: "responder" },
+      { en: "Arrive", es: "llegar" }, { en: "Brush", es: "cepillar" }, { en: "Belong", es: "pertenecer" },
+      { en: "Beg", es: "rogar" }, { en: "Believe", es: "creer" }, { en: "Close", es: "cerrar" },
+      { en: "Cook", es: "cocinar" }, { en: "Call", es: "llamar" }, { en: "Change", es: "cambiar" },
+      { en: "Clean", es: "limpiar" }, { en: "Cry", es: "llorar" }, { en: "Dance", es: "bailar" },
+      { en: "Dress", es: "vestir" }, { en: "Die", es: "morir" }, { en: "Dry", es: "secar" },
+      { en: "Enjoy", es: "disfrutar" }, { en: "Explain", es: "explicar" }, { en: "Follow", es: "seguir" },
+      { en: "Finish", es: "terminar" }, { en: "Help", es: "ayudar" }, { en: "Hope", es: "esperar" },
+      { en: "Happen", es: "suceder" }, { en: "Image", es: "imaginar" }, { en: "Kiss", es: "besar" },
+      { en: "Kill", es: "matar" }, { en: "Laugh", es: "reír" }
+    ];
+
+    let timeLeft = 2100;
+    let timerInterval;
+    let selected = [];
+    let correctMatches = 0;
+    let gameEnded = false;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function startGame() {
+      const grid = document.getElementById("buttonGrid");
+      const mixedButtons = [];
+
+      verbPairs.forEach(pair => {
+        mixedButtons.push({ text: pair.en, key: pair.en });
+        mixedButtons.push({ text: pair.es, key: pair.en });
+      });
+
+      shuffle(mixedButtons).forEach(item => {
+        const btn = document.createElement("button");
+        btn.textContent = item.text;
+        btn.className = "verb-btn";
+        btn.dataset.key = item.key;
+        btn.onclick = () => handleSelection(btn);
+        grid.appendChild(btn);
+      });
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = `⏱ Tiempo restante: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function handleSelection(button) {
+      if (gameEnded || selected.includes(button)) return;
+
+      button.classList.add("selected");
+      selected.push(button);
+
+      if (selected.length === 2) {
+        const [btn1, btn2] = selected;
+        if (btn1.dataset.key === btn2.dataset.key && btn1 !== btn2) {
+          setTimeout(() => {
+            btn1.remove();
+            btn2.remove();
+            correctMatches++;
+            checkCompletion();
+          }, 300);
+        } else {
+          setTimeout(() => {
+            btn1.classList.remove("selected");
+            btn2.classList.remove("selected");
+          }, 500);
+        }
+        selected = [];
+      }
+    }
+
+    function checkCompletion() {
+      const remaining = document.querySelectorAll(".verb-btn").length;
+      if (remaining === 0) {
+        clearInterval(timerInterval);
+        endGame();
+      }
+    }
+
+    function endGame() {
+      gameEnded = true;
+      const totalPairs = verbPairs.length;
+      const score = Math.round((correctMatches / totalPairs) * 100);
+      document.getElementById("endMessage").innerHTML =
+        `✅ Pares correctos: ${correctMatches}/${totalPairs}<br>📊 Calificación: ${score}%`;
+
+      document.querySelectorAll(".verb-btn").forEach(btn => {
+        btn.classList.add("disabled");
+        btn.onclick = null;
+      });
+    }
+
+    window.onload = startGame;
+  </script>
+</body>
+</html>
