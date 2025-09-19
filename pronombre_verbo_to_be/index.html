@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Juego de Aprendizaje de Inglés - Todos los Niveles</title>
+  <style>
+    /* Estilos generales */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+      padding: 20px;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 2.2rem;
+      color: #2a9d8f;
+      margin-bottom: 20px;
+    }
+    
+    /* Navegación entre niveles */
+    .level-nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .level-btn {
+      padding: 10px 15px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background-color: #ccc;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .level-btn.active {
+      background-color: #2a9d8f;
+      cursor: pointer;
+    }
+    
+    .level-btn.inactive {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    
+    /* Estilos comunes para todos los niveles */
+    #game-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: auto;
+    }
+    
+    .image-box {
+      font-size: 4rem;
+      margin: 10px 0;
+    }
+    
+    .riddle, .sentence, .story {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .options button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    
+    #feedback {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+    
+    #score, #final-score {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #555;
+    }
+    
+    #final-score {
+      font-size: 1.3rem;
+      color: #283618;
+      font-weight: bold;
+    }
+    
+    #next-btn, #retry-btn, #verify-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    /* Estilos específicos para cada nivel */
+    /* Nivel 1 */
+    .level1 .options button {
+      background-color: #dda15e;
+    }
+    
+    .level1 .options button:hover {
+      background-color: #bc6c25;
+    }
+    
+    .level1 #next-btn, .level1 #retry-btn {
+      background-color: #606c38;
+    }
+    
+    .level1 {
+      background-color: #fefae0;
+    }
+    
+    /* Nivel 2 */
+    .level2 .options button {
+      background-color: #2a9d8f;
+    }
+    
+    .level2 .options button:hover {
+      background-color: #21867a;
+    }
+    
+    .level2 #next-btn, .level2 #retry-btn, .level2 #level3-btn {
+      background-color: #264653;
+    }
+    
+    .level2 {
+      background-color: #eaf4f4;
+    }
+    
+    /* Nivel 3 */
+    .level3 .options button {
+      background-color: #e76f51;
+    }
+    
+    .level3 .options button:hover {
+      background-color: #d65a3a;
+    }
+    
+    .level3 #next-btn, .level3 #retry-btn, .level3 #level4-btn {
+      background-color: #264653;
+    }
+    
+    .level3 {
+      background-color: #fff3e0;
+    }
+    
+    /* Nivel 4 */
+    .level4 select {
+      font-size: 1rem;
+      padding: 5px 10px;
+      margin: 0 5px;
+    }
+    
+    .level4 #verify-btn, .level4 #retry-btn {
+      background-color: #3a86ff;
+    }
+    
+    .level4 #verify-btn:hover, .level4 #retry-btn:hover {
+      background-color: #2f6fd6;
+    }
+    
+    .level4 {
+      background-color: #f0f4ff;
+    }
+    
+    /* Calificación final */
+    #final-grade {
+      margin-top: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      border-radius: 12px;
+      color: white;
+      display: none;
+    }
+    
+    .grade-value {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    
+    .grade-message {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+    
+    /* Ocultar niveles no activos */
+    .level {
+      display: none;
+    }
+    
+    .level.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Juego de Aprendizaje de Inglés</h1>
+    
+    <div class="level-nav">
+      <button id="btn-level1" class="level-btn active" onclick="showLevel(1)">Nivel 1</button>
+      <button id="btn-level2" class="level-btn inactive" onclick="showLevel(2)">Nivel 2</button>
+      <button id="btn-level3" class="level-btn inactive" onclick="showLevel(3)">Nivel 3</button>
+      <button id="btn-level4" class="level-btn inactive" onclick="showLevel(4)">Nivel 4</button>
+    </div>
+    
+    <!-- Nivel 1 -->
+    <div id="level1" class="level active">
+      <h1>Nivel 1: ¿Quién soy yo? + Verbo To Be</h1>
+      <div id="game-box">
+        <p><strong>Instrucciones:</strong> Observa el ícono y lee el acertijo. Luego elige la opción correcta con el pronombre y el verbo <em>to be</em>. Al hacer clic, escucharás su pronunciación en inglés.</p>
+        <div class="image-box" id="emoji1">👩</div>
+        <p class="riddle" id="riddle1">Ella está feliz. ¿Quién es?</p>
+        <p id="prompt1">Elige la opción correcta:</p>
+        <div class="options" id="options1"></div>
+        <p id="feedback1"></p>
+        <p id="score1">Puntuación: 0</p>
+        <p id="final-score1"></p>
+        <button id="next-btn1" onclick="nextItem(1)">Siguiente</button>
+        <button id="retry-btn1" onclick="restartGame(1)">🔁 Reintentar</button>
+      </div>
+    </div>
+    
+    <!-- Nivel 2 -->
+    <div id="level2" class="level">
+      <h1>Nivel 2: Completa con el verbo To Be</h1>
+      <div id="game-box">
+        <p><strong>Instrucciones:</strong> Observa el ícono y completa la frase con la opción correcta. Al hacer clic, escucharás la pronunciación en inglés.</p>
+        <div class="image-box" id="emoji2">👦</div>
+        <p class="sentence" id="sentence2">_ a boy.</p>
+        <div class="options" id="options2"></div>
+        <p id="feedback2"></p>
+        <p id="score2">Puntuación: 0</p>
+        <p id="final-score2"></p>
+        <button id="next-btn2" onclick="nextItem(2)">Siguiente</button>
+        <button id="retry-btn2" onclick="restartGame(2)">🔁 Reintentar</button>
+        <button id="level3-btn" onclick="showLevel(3)">🚀 Siguiente nivel</button>
+      </div>
+    </div>
+    
+    <!-- Nivel 3 -->
+    <div id="level3" class="level">
+      <h1>Nivel 3: ¿"Am", "Is" o "Are"?</h1>
+      <div id="game-box">
+        <p><strong>Instrucciones:</strong> Observa el ícono y completa la frase con la forma correcta del verbo <em>to be</em>. Al hacer clic, escucharás su pronunciación.</p>
+        <div class="image-box" id="emoji3">👩👩</div>
+        <p class="sentence" id="sentence3">Maria and Ana _ friends.</p>
+        <div class="options" id="options3"></div>
+        <p id="feedback3"></p>
+        <p id="score3">Puntuación: 0</p>
+        <p id="final-score3"></p>
+        <button id="next-btn3" onclick="nextItem(3)">Siguiente</button>
+        <button id="retry-btn3" onclick="restartGame(3)">🔁 Reintentar</button>
+        <button id="level4-btn" onclick="showLevel(4)">🚀 Nivel 4</button>
+      </div>
+    </div>
+    
+    <!-- Nivel 4 -->
+    <div id="level4" class="level">
+      <h1>Nivel 4: Completa la historia</h1>
+      <div id="game-box">
+        <p><strong>Instrucciones:</strong> Lee la historia y elige la opción correcta para cada espacio. Al hacer clic, escucharás la pronunciación. Al final verás tu puntuación.</p>
+        <div class="story">
+          Hello! <select id="q1"><option>Selecciona</option></select> Tom, and I live in a small town with my family.  
+          I <select id="q2"><option>Selecciona</option></select> 10 years old and I love playing soccer with my friends.  
+          My sister <select id="q3"><option>Selecciona</option></select> Maria. She <select id="q4"><option>Selecciona</option></select> very smart and always helps me with homework.  
+          Our parents <select id="q5"><option>Selecciona</option></select> teachers at the local school.  
+          We <select id="q6"><option>Selecciona</option></select> very close and enjoy spending time together.  
+          Today <select id="q7"><option>Selecciona</option></select> a special day because we <select id="q8"><option>Selecciona</option></select> going to the park for a picnic.
+        </div>
+        <button id="verify-btn" onclick="checkAnswers()">Verificar respuestas</button>
+        <p id="feedback4"></p>
+        <p id="score4">Puntuación: 0 / 8</p>
+        <p id="final-score4"></p>
+        <button id="retry-btn4" onclick="restartGame(4)">🔁 Reintentar</button>
+        <button id="show-grade-btn" onclick="calculateFinalGrade()" style="display:none; background-color: #6a11cb;">📊 Ver Calificación Final</button>
+      </div>
+    </div>
+    
+    <!-- Calificación Final -->
+    <div id="final-grade">
+      <h2>¡Felicidades! Has completado todos los niveles</h2>
+      <p class="grade-message">Tu calificación final es:</p>
+      <div class="grade-value" id="grade-value">0.0</div>
+      <p class="grade-message" id="grade-message"></p>
+      <button onclick="restartAllLevels()" style="background-color: white; color: #6a11cb; font-weight: bold;">🔄 Jugar de Nuevo</button>
+    </div>
+  </div>
+
+  <script>
+    // Variables globales
+    let currentScores = {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0
+    };
+    
+    let maxScores = {
+      1: 6,
+      2: 6,
+      3: 8,
+      4: 8
+    };
+    
+    let levelsUnlocked = {
+      1: true,
+      2: false,
+      3: false,
+      4: false
+    };
+    
+    let levelsCompleted = {
+      1: false,
+      2: false,
+      3: false,
+      4: false
+    };
+    
+    // Datos para cada nivel
+    const levelData = {
+      1: {
+        originalItems: [
+          {
+            emoji: "🧍",
+            answer: "I am",
+            riddle: "Estoy hablando de mí mismo. ¿Quién soy?"
+          },
+          {
+            emoji: "👉",
+            answer: "You are",
+            riddle: "Estoy hablando contigo directamente. ¿Quién eres tú?"
+          },
+          {
+            emoji: "👦",
+            answer: "He is",
+            riddle: "Él es un niño que juega fútbol. ¿Quién es?"
+          },
+          {
+            emoji: "👩",
+            answer: "She is",
+            riddle: "Ella está feliz. ¿Quién es?"
+          },
+          {
+            emoji: "👫",
+            answer: "We are",
+            riddle: "Tú y yo estamos juntos. ¿Quiénes somos?"
+          },
+          {
+            emoji: "🧑‍🤝‍🧑",
+            answer: "They are",
+            riddle: "Ellos caminan por el parque. ¿Quiénes son?"
+          }
+        ],
+        items: [],
+        current: 0,
+        score: 0,
+        answered: false
+      },
+      2: {
+        originalItems: [
+          {
+            emoji: "🧍",
+            sentence: "_ a student.",
+            answer: "I am"
+          },
+          {
+            emoji: "👉",
+            sentence: "_ my friend.",
+            answer: "You are"
+          },
+          {
+            emoji: "👦",
+            sentence: "_ a boy.",
+            answer: "He is"
+          },
+          {
+            emoji: "👩",
+            sentence: "_ a girl.",
+            answer: "She is"
+          },
+          {
+            emoji: "👫",
+            sentence: "_ classmates.",
+            answer: "We are"
+          },
+          {
+            emoji: "🧑‍🤝‍🧑",
+            sentence: "_ friends.",
+            answer: "They are"
+          }
+        ],
+        items: [],
+        current: 0,
+        score: 0,
+        answered: false
+      },
+      3: {
+        originalItems: [
+          {
+            emoji: "🧍",
+            sentence: "I _ a student.",
+            answer: "am"
+          },
+          {
+            emoji: "🧍",
+            sentence: "I _ happy today.",
+            answer: "am"
+          },
+          {
+            emoji: "👩👩",
+            sentence: "Maria and Ana _ friends.",
+            answer: "are"
+          },
+          {
+            emoji: "👦",
+            sentence: "Tom _ a student.",
+            answer: "is"
+          },
+          {
+            emoji: "👨👨",
+            sentence: "My brothers _ at home.",
+            answer: "are"
+          },
+          {
+            emoji: "👩",
+            sentence: "She _ a teacher.",
+            answer: "is"
+          },
+          {
+            emoji: "🧍👉",
+            sentence: "You and I _ classmates.",
+            answer: "are"
+          },
+          {
+            emoji: "👨",
+            sentence: "He _ my friend.",
+            answer: "is"
+          }
+        ],
+        items: [],
+        current: 0,
+        score: 0,
+        answered: false
+      }
+    };
+    
+    // Respuestas correctas para el nivel 4
+    const correctAnswers = [
+      "I am",  // q1
+      "am",    // q2
+      "is",    // q3
+      "is",    // q4
+      "are",   // q5
+      "are",   // q6
+      "is",    // q7
+      "are"    // q8
+    ];
+    
+    const options = ["I am", "You are", "He is", "She is", "We are", "They are", "am", "is", "are"];
+    
+    // Función para mostrar un nivel específico
+    function showLevel(level) {
+      if (!levelsUnlocked[level]) return;
+      
+      // Ocultar todos los niveles
+      document.querySelectorAll('.level').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Mostrar el nivel seleccionado
+      document.getElementById('level' + level).classList.add('active');
+      
+      // Actualizar botones de navegación
+      document.querySelectorAll('.level-btn').forEach((btn, i) => {
+        if (i + 1 <= level || levelsUnlocked[i + 1]) {
+          btn.classList.remove('inactive');
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('inactive');
+        }
+      });
+    }
+    
+    // Función para mezclar arrays
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+    
+    // Función para pronunciar texto
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      speechSynthesis.speak(utterance);
+    }
+    
+    // Función para renderizar un elemento en los niveles 1-3
+    function renderItem(level) {
+      const data = levelData[level];
+      const item = data.items[data.current];
+      
+      document.getElementById("emoji" + level).textContent = item.emoji;
+      
+      if (level === 1) {
+        document.getElementById("riddle" + level).textContent = item.riddle;
+      } else {
+        document.getElementById("sentence" + level).textContent = item.sentence;
+      }
+      
+      document.getElementById("feedback" + level).textContent = "";
+      document.getElementById("final-score" + level).textContent = "";
+      document.getElementById("retry-btn" + level).style.display = "none";
+      
+      if (level === 2 && document.getElementById("level3-btn")) {
+        document.getElementById("level3-btn").style.display = "none";
+      }
+      
+      if (level === 3 && document.getElementById("level4-btn")) {
+        document.getElementById("level4-btn").style.display = "none";
+      }
+      
+      data.answered = false;
+      
+      let options;
+      if (level === 3) {
+        options = ["am", "is", "are"];
+      } else {
+        options = ["I am", "You are", "He is", "She is", "We are", "They are"];
+      }
+      
+      const container = document.getElementById("options" + level);
+      container.innerHTML = "";
+      
+      options.forEach(p => {
+        const btn = document.createElement("button");
+        btn.textContent = p;
+        btn.onclick = () => {
+          speak(p);
+          checkAnswer(p, level);
+        };
+        container.appendChild(btn);
+      });
+    }
+    
+    // Función para verificar respuesta en niveles 1-3
+    function checkAnswer(selected, level) {
+      const data = levelData[level];
+      
+      if (data.answered) return;
+      data.answered = true;
+      
+      const correct = data.items[data.current].answer;
+      const feedback = document.getElementById("feedback" + level);
+      
+      if (selected === correct) {
+        feedback.textContent = "✅ ¡Correcto!";
+        feedback.style.color = "green";
+        data.score++;
+        currentScores[level] = data.score;
+      } else {
+        feedback.textContent = `❌ Ups... era "${correct}".`;
+        feedback.style.color = "red";
+      }
+      
+      document.getElementById("score" + level).textContent = `Puntuación: ${data.score}`;
+    }
+    
+    // Función para pasar al siguiente elemento en niveles 1-3
+    function nextItem(level) {
+      const data = levelData[level];
+      
+      if (!data.answered) return;
+      
+      data.current++;
+      if (data.current < data.items.length) {
+        renderItem(level);
+      } else {
+        document.getElementById("final-score" + level).textContent = `🎯 Puntuación final: ${data.score} / ${data.items.length}`;
+        document.getElementById("next-btn" + level).style.display = "none";
+        document.getElementById("retry-btn" + level).style.display = "inline-block";
+        
+        levelsCompleted[level] = true;
+        
+        // Habilitar siguiente nivel si se obtuvo buen puntaje
+        if (level === 1 && data.score >= 4) { // 4 de 6 (66%)
+          levelsUnlocked[2] = true;
+          document.getElementById("btn-level2").classList.remove("inactive");
+          document.getElementById("btn-level2").classList.add("active");
+        } else if (level === 2 && data.score >= 4) { // 4 de 6 (66%)
+          levelsUnlocked[3] = true;
+          document.getElementById("btn-level3").classList.remove("inactive");
+          document.getElementById("btn-level3").classList.add("active");
+          document.getElementById("level3-btn").style.display = "inline-block";
+        } else if (level === 3 && data.score >= 6) { // 6 de 8 (75%)
+          levelsUnlocked[4] = true;
+          document.getElementById("btn-level4").classList.remove("inactive");
+          document.getElementById("btn-level4").classList.add("active");
+          document.getElementById("level4-btn").style.display = "inline-block";
+        }
+        
+        // Verificar si todos los niveles están completados
+        checkAllLevelsCompleted();
+      }
+    }
+    
+    // Función para reiniciar juego en niveles 1-3
+    function restartGame(level) {
+      const data = levelData[level];
+      
+      data.items = shuffle([...data.originalItems]);
+      data.current = 0;
+      data.score = 0;
+      currentScores[level] = 0;
+      document.getElementById("score" + level).textContent = "Puntuación: 0";
+      document.getElementById("next-btn" + level).style.display = "inline-block";
+      renderItem(level);
+    }
+    
+    // Funciones específicas para el nivel 4
+    function populateSelects() {
+      for (let i = 1; i <= 8; i++) {
+        const select = document.getElementById("q" + i);
+        select.innerHTML = "<option>Selecciona</option>";
+        options.forEach(opt => {
+          const option = document.createElement("option");
+          option.value = opt;
+          option.textContent = opt;
+          select.appendChild(option);
+        });
+        select.onchange = () => speak(select.value);
+      }
+      document.getElementById("feedback4").textContent = "";
+      document.getElementById("score4").textContent = "Puntuación: 0 / 8";
+      document.getElementById("final-score4").textContent = "";
+    }
+    
+    function checkAnswers() {
+      let score = 0;
+      for (let i = 1; i <= 8; i++) {
+        const selected = document.getElementById("q" + i).value;
+        if (selected === correctAnswers[i - 1]) {
+          score++;
+        }
+      }
+      
+      currentScores[4] = score;
+      levelsCompleted[4] = true;
+      
+      const feedback = document.getElementById("feedback4");
+      if (score === 8) {
+        feedback.textContent = "🎉 ¡Excelente! Completaste toda la historia correctamente.";
+        feedback.style.color = "green";
+      } else if (score >= 5) {
+        feedback.textContent = "👍 ¡Muy bien! Solo faltan algunos detalles.";
+        feedback.style.color = "orange";
+      } else {
+        feedback.textContent = "😅 Intenta de nuevo. Revisa los pronombres y el verbo to be.";
+        feedback.style.color = "red";
+      }
+      
+      document.getElementById("score4").textContent = `Puntuación: ${score} / 8`;
+      document.getElementById("final-score4").textContent = "Historia completada.";
+      document.getElementById("show-grade-btn").style.display = "inline-block";
+      
+      // Verificar si todos los niveles están completados
+      checkAllLevelsCompleted();
+    }
+    
+    // Verificar si todos los niveles están completados
+    function checkAllLevelsCompleted() {
+      const allCompleted = Object.values(levelsCompleted).every(completed => completed);
+      if (allCompleted) {
+        document.getElementById("show-grade-btn").style.display = "inline-block";
+      }
+    }
+    
+    // Calcular la calificación final
+    function calculateFinalGrade() {
+      let totalScore = 0;
+      let totalMaxScore = 0;
+      
+      for (let level = 1; level <= 4; level++) {
+        totalScore += currentScores[level];
+        totalMaxScore += maxScores[level];
+      }
+      
+      // Calcular la calificación en escala de 0 a 10 con un decimal
+      const grade = (totalScore / totalMaxScore) * 10;
+      const roundedGrade = Math.round(grade * 10) / 10;
+      
+      // Determinar el mensaje según la calificación
+      let message = "";
+      if (roundedGrade >= 9) {
+        message = "¡Excelente! Dominas el verbo To Be perfectamente.";
+      } else if (roundedGrade >= 7) {
+        message = "¡Muy bien! Tienes un buen conocimiento del verbo To Be.";
+      } else if (roundedGrade >= 5) {
+        message = "¡Bien hecho! Con un poco más de práctica mejorarás.";
+      } else {
+        message = "Sigue practicando, lo conseguirás.";
+      }
+      
+      // Mostrar la calificación
+      document.getElementById("grade-value").textContent = roundedGrade;
+      document.getElementById("grade-message").textContent = message;
+      document.getElementById("final-grade").style.display = "block";
+      
+      // Desplazar hacia la calificación
+      document.getElementById("final-grade").scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Reiniciar todos los niveles
+    function restartAllLevels() {
+      // Reiniciar niveles 1-3
+      for (let level = 1; level <= 3; level++) {
+        levelData[level].items = shuffle([...levelData[level].originalItems]);
+        levelData[level].current = 0;
+        levelData[level].score = 0;
+        levelData[level].answered = false;
+        currentScores[level] = 0;
+        levelsCompleted[level] = false;
+        
+        document.getElementById("score" + level).textContent = "Puntuación: 0";
+        document.getElementById("next-btn" + level).style.display = "inline-block";
+        document.getElementById("retry-btn" + level).style.display = "none";
+        document.getElementById("final-score" + level).textContent = "";
+      }
+      
+      // Reiniciar nivel 4
+      currentScores[4] = 0;
+      levelsCompleted[4] = false;
+      populateSelects();
+      document.getElementById("show-grade-btn").style.display = "none";
+      
+      // Reiniciar estado de niveles desbloqueados
+      levelsUnlocked = {
+        1: true,
+        2: false,
+        3: false,
+        4: false
+      };
+      
+      // Ocultar calificación final
+      document.getElementById("final-grade").style.display = "none";
+      
+      // Mostrar solo el nivel 1
+      showLevel(1);
+      
+      // Actualizar botones de navegación
+      document.querySelectorAll('.level-btn').forEach((btn, i) => {
+        if (i === 0) {
+          btn.classList.remove('inactive');
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('inactive');
+        }
+      });
+    }
+    
+    // Inicialización
+    function init() {
+      // Inicializar niveles 1-3
+      for (let level = 1; level <= 3; level++) {
+        levelData[level].items = shuffle([...levelData[level].originalItems]);
+        renderItem(level);
+      }
+      
+      // Inicializar nivel 4
+      populateSelects();
+      
+      // Mostrar solo el nivel 1 inicialmente
+      showLevel(1);
+    }
+    
+    // Ejecutar inicialización cuando se cargue la página
+    window.onload = init;
+  </script>
+</body>
+</html>
