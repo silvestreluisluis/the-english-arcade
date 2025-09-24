@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego: Artículos y Verbo To Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #eef;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 600px;
+      width: 90%;
+      background: #fff;
+      margin: 20px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    #levelTitle {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .sentence {
+      font-size: 1.2em;
+      margin: 20px 0;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+      background: #007acc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .feedback {
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+    }
+    #score {
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="levelTitle">Nivel 1: Artículos Indefinidos</div>
+    <div id="sentence" class="sentence"></div>
+    <input type="text" id="answer" placeholder="Escribe tu respuesta aquí">
+    <button onclick="checkAnswer()">Verificar</button>
+    <div id="feedback" class="feedback"></div>
+    <div id="score"></div>
+  </div>
+
+  <script>
+    const level1 = [
+      { text: "__ apple is red.", correct: "an" },
+      { text: "__ dog is barking.", correct: "a" },
+      { text: "__ elephant is big.", correct: "an" },
+      { text: "__ cat is sleeping.", correct: "a" },
+      { text: "__ orange is juicy.", correct: "an" },
+      { text: "__ book is on the table.", correct: "a" },
+      { text: "__ iguana is green.", correct: "an" },
+      { text: "__ car is fast.", correct: "a" },
+      { text: "__ umbrella is open.", correct: "an" },
+      { text: "__ house is big.", correct: "a" },
+      { text: "__ ant is tiny.", correct: "an" },
+      { text: "__ chair is red.", correct: "a" },
+      { text: "__ owl is gray.", correct: "an" },
+      { text: "__ pencil is sharp.", correct: "a" },
+      { text: "__ bottle is full.", correct: "aa" }
+    ];
+
+    const level2 = [
+      { type: "positive", text: "She ___ happy.", correct: "is" },
+      { type: "positive", text: "I ___ ready.", correct: "am" },
+      { type: "positive", text: "They ___ here.", correct: "are" },
+      { type: "negative", text: "He ___ tired. (no)", correct: "is not" },
+      { type: "negative", text: "We ___ late. (no)", correct: "are not" },
+      { type: "negative", text: "I ___ sad. (no)", correct: "am not" },
+      { type: "interrogative", text: "___ you okay?", correct: "are" },
+      { type: "interrogative", text: "___ she your friend?", correct: "is" },
+      { type: "interrogative", text: "___ I wrong?", correct: "am" },
+      { type: "positive", text: "You ___ smart.", correct: "are" },
+      { type: "negative", text: "She ___ here. (no)", correct: "is not" },
+      { type: "positive", text: "He ___ a teacher.", correct: "is" },
+      { type: "interrogative", text: "___ they students?", correct: "are" },
+      { type: "negative", text: "They ___ hungry. (no)", correct: "are not" },
+      { type: "interrogative", text: "___ we late?", correct: "are" }
+    ];
+
+    let currentLevel = 1;
+    let used = [];
+    let score = 0;
+    let count = 0;
+    let currentCorrect = "";
+
+    function getRandomSentence() {
+      const data = currentLevel === 1 ? level1 : level2;
+      if (count >= 15) {
+        if (currentLevel === 1) {
+          document.getElementById("feedback").textContent = `Nivel 1 completado. Puntaje: ${score}/15`;
+          setTimeout(() => {
+            currentLevel = 2;
+            count = 0;
+            used = [];
+            document.getElementById("levelTitle").textContent = "Nivel 2: Verbo To Be";
+            document.getElementById("feedback").textContent = "";
+            getRandomSentence();
+          }, 2500);
+        } else {
+          document.getElementById("sentence").textContent = "Juego completado.";
+          document.getElementById("answer").style.display = "none";
+          document.querySelector("button").style.display = "none";
+          document.getElementById("feedback").textContent = `🎉 Puntaje final: ${score}/30`;
+        }
+        return;
+      }
+
+      let index;
+      do {
+        index = Math.floor(Math.random() * data.length);
+      } while (used.includes(index));
+      used.push(index);
+
+      document.getElementById("sentence").textContent = data[index].text;
+      currentCorrect = data[index].correct;
+      document.getElementById("answer").value = "";
+      document.getElementById("feedback").textContent = "";
+      count++;
+    }
+
+    function checkAnswer() {
+      const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
+
+      if (userAnswer === "") {
+        document.getElementById("feedback").textContent = "⚠️ Por favor escribe una respuesta.";
+        document.getElementById("feedback").style.color = "orange";
+        return;
+      }
+
+      if (userAnswer === currentCorrect) {
+        score++;
+        document.getElementById("feedback").textContent = "✅ Correcto";
+        document.getElementById("feedback").style.color = "green";
+      } else {
+        document.getElementById("feedback").textContent = `❌ Incorrecto. Era '${currentCorrect}'`;
+        document.getElementById("feedback").style.color = "red";
+      }
+
+      document.getElementById("score").textContent = `Puntaje: ${score}`;
+      setTimeout(getRandomSentence, 1500);
+    }
+
+    window.onload = function() {
+      getRandomSentence();
+    };
+  </script>
+</body>
+</html>
