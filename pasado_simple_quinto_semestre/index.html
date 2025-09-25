@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Detective del Pasado</title>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    h2 { color: #333; }
+    .pista { background: #eef; padding: 10px; margin: 10px 0; border-left: 4px solid #88f; }
+    .sospechoso { margin: 5px 0; }
+    button { padding: 10px 15px; margin-top: 10px; }
+    #resultado, #final { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🕵️‍♂️ Detective del Pasado</h2>
+    <div id="historia"></div>
+    <button onclick="verificar()">Resolver</button>
+    <div id="resultado"></div>
+    <div id="final"></div>
+  </div>
+
+  <script>
+    const historias = [
+      {
+        enigma: "¿Quién se cayó en el escenario?",
+        pistas: [
+          "Luis sang a song and danced with joy.",
+          "María did not perform because she felt sick.",
+          "Pedro threw flowers to the audience.",
+          "Lucía fell while she was walking to the microphone."
+        ],
+        sospechosos: ["Luis", "María", "Pedro", "Lucía"],
+        respuesta: "Lucía"
+      },
+      {
+        enigma: "¿Quién no alimentó a los animales?",
+        pistas: [
+          "Carlos fed the chickens early in the morning.",
+          "Sofía did not feed the pigs.",
+          "Miguel fed the dogs before lunch.",
+          "Elena fed the rabbits in the afternoon."
+        ],
+        sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+        respuesta: "Sofía"
+      },
+{
+  enigma: "¿Quién condujo el coche sin permiso?",
+  pistas: [
+    "Luis did not drive yesterday.",
+    "María drove to the store in the morning.",
+    "Pedro walked to school.",
+    "Lucía took the bus to the city."
+  ],
+  sospechosos: ["Luis", "María", "Pedro", "Lucía"],
+  respuesta: "María"
+},
+{
+  enigma: "¿Quién no explicó el problema?",
+  pistas: [
+    "Carlos explained everything clearly.",
+    "Sofía did not explain anything.",
+    "Miguel answered all the questions.",
+    "Elena asked for help."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Sofía"
+},
+{
+  enigma: "¿Quién se coló en la casa?",
+  pistas: [
+    "Ana crept into the room silently.",
+    "Luis did not enter the house.",
+    "María knocked on the door.",
+    "Pedro stayed outside."
+  ],
+  sospechosos: ["Ana", "Luis", "María", "Pedro"],
+  respuesta: "Ana"
+},
+{
+  enigma: "¿Quién no dijo la verdad?",
+  pistas: [
+    "Carlos told the truth.",
+    "Sofía did not say anything.",
+    "Miguel said everything honestly.",
+    "Elena gave a full explanation."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Sofía"
+},
+{
+  enigma: "¿Quién barrió el piso?",
+  pistas: [
+    "Luis swept the floor before lunch.",
+    "María did not clean anything.",
+    "Pedro brushed the carpet.",
+    "Lucía cooked breakfast."
+  ],
+  sospechosos: ["Luis", "María", "Pedro", "Lucía"],
+  respuesta: "Luis"
+},
+{
+  enigma: "¿Quién no disfrutó la fiesta?",
+  pistas: [
+    "Carlos danced all night.",
+    "Sofía enjoyed the music.",
+    "Miguel did not enjoy the party.",
+    "Elena laughed with her friends."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Miguel"
+},
+{
+  enigma: "¿Quién se arrodilló en la ceremonia?",
+  pistas: [
+    "Ana knelt during the ritual.",
+    "Luis stood the entire time.",
+    "María sat quietly.",
+    "Pedro did not attend."
+  ],
+  sospechosos: ["Ana", "Luis", "María", "Pedro"],
+  respuesta: "Ana"
+},
+{
+  enigma: "¿Quién no compró nada?",
+  pistas: [
+    "Carlos bought a new shirt.",
+    "Sofía did not buy anything.",
+    "Miguel bought a book.",
+    "Elena bought some food."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Sofía"
+},
+{
+  enigma: "¿Quién alimentó al perro?",
+  pistas: [
+    "Luis fed the dog at 7 AM.",
+    "María did not feed the dog.",
+    "Pedro fed the cat.",
+    "Lucía fed the fish."
+  ],
+  sospechosos: ["Luis", "María", "Pedro", "Lucía"],
+  respuesta: "Luis"
+},
+{
+  enigma: "¿Quién no llegó a tiempo?",
+  pistas: [
+    "Carlos arrived early.",
+    "Sofía arrived on time.",
+    "Miguel did not arrive.",
+    "Elena arrived late."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Miguel"
+},
+{
+  enigma: "¿Quién cortó el papel?",
+  pistas: [
+    "Ana cut the paper with scissors.",
+    "Luis did not touch the paper.",
+    "María folded the paper.",
+    "Pedro drew on the paper."
+  ],
+  sospechosos: ["Ana", "Luis", "María", "Pedro"],
+  respuesta: "Ana"
+},
+{
+  enigma: "¿Quién no actuó en la obra?",
+  pistas: [
+    "Carlos acted in the first scene.",
+    "Sofía acted in the second scene.",
+    "Miguel did not act.",
+    "Elena acted in the final scene."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Miguel"
+},
+{
+  enigma: "¿Quién colgó la ropa?",
+  pistas: [
+    "Luis hung the clothes outside.",
+    "María did not hang anything.",
+    "Pedro dried the clothes.",
+    "Lucía folded the clothes."
+  ],
+  sospechosos: ["Luis", "María", "Pedro", "Lucía"],
+  respuesta: "Luis"
+},
+{
+  enigma: "¿Quién no dijo nada?",
+  pistas: [
+    "Carlos said something important.",
+    "Sofía did not say anything.",
+    "Miguel said a joke.",
+    "Elena said her opinion."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Sofía"
+},
+{
+  enigma: "¿Quién no se rió?",
+  pistas: [
+    "Ana laughed at the joke.",
+    "Luis laughed loudly.",
+    "María did not laugh.",
+    "Pedro laughed quietly."
+  ],
+  sospechosos: ["Ana", "Luis", "María", "Pedro"],
+  respuesta: "María"
+},
+{
+  enigma: "¿Quién no corrió en el parque?",
+  pistas: [
+    "Carlos ran five kilometers.",
+    "Sofía did not run.",
+    "Miguel ran with his dog.",
+    "Elena ran with her friend."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Sofía"
+},
+{
+  enigma: "¿Quién no cantó en el evento?",
+  pistas: [
+    "Luis sang a romantic song.",
+    "María sang a pop song.",
+    "Pedro did not sing.",
+    "Lucía sang a traditional song."
+  ],
+  sospechosos: ["Luis", "María", "Pedro", "Lucía"],
+  respuesta: "Pedro"
+},
+{
+  enigma: "¿Quién no disfrutó la película?",
+  pistas: [
+    "Carlos enjoyed the movie.",
+    "Sofía did not enjoy the movie.",
+    "Miguel enjoyed the popcorn.",
+    "Elena enjoyed the music."
+  ],
+  sospechosos: ["Carlos", "Sofía", "Miguel", "Elena"],
+  respuesta: "Sofía"
+}
+      // ... agrega aquí las 18 historias restantes con los verbos dados
+    ];
+
+    let indice = 0;
+    let puntaje = 0;
+
+    function mostrarHistoria() {
+      const h = historias[indice];
+      const contenedor = document.getElementById("historia");
+      const resultado = document.getElementById("resultado");
+      resultado.textContent = "";
+
+      contenedor.innerHTML = `<p>${h.enigma}</p>`;
+      h.pistas.forEach((p, i) => {
+        contenedor.innerHTML += `<div class="pista">${i + 1}. ${p}</div>`;
+      });
+
+      h.sospechosos.forEach(nombre => {
+        contenedor.innerHTML += `
+          <div class="sospechoso">
+            <input type="radio" name="culpable" value="${nombre}"> ${nombre}
+          </div>`;
+      });
+    }
+
+    function verificar() {
+      const seleccion = document.querySelector('input[name="culpable"]:checked');
+      const resultado = document.getElementById("resultado");
+
+      if (!seleccion) {
+        resultado.textContent = "Por favor selecciona un sospechoso.";
+        return;
+      }
+
+      if (seleccion.value === historias[indice].respuesta) {
+        resultado.textContent = "✅ Correcto.";
+        puntaje++;
+      } else {
+        resultado.textContent = "❌ Incorrecto.";
+      }
+
+      indice++;
+      if (indice < historias.length) {
+        setTimeout(mostrarHistoria, 1500);
+      } else {
+        document.getElementById("final").textContent = `🎓 Juego terminado. Tu calificación: ${puntaje} de ${historias.length}`;
+      }
+    }
+
+    // Mezclar historias y comenzar
+    historias.sort(() => Math.random() - 0.5);
+    mostrarHistoria();
+  </script>
+</body>
+</html>
