@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Juego de Verbos en Inglés</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #9face6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .timer {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 5px 15px;
+      border-radius: 10px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      width: 350px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    input {
+      margin: 5px 0;
+      padding: 8px;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+    input.correct {
+      border-color: #4CAF50;
+      background-color: #f0fff0;
+    }
+    input.incorrect {
+      border-color: #f44336;
+      background-color: #fff0f0;
+    }
+    input:required:invalid {
+      border-left: 3px solid #ff9800;
+    }
+    input:required:valid {
+      border-left: 3px solid #4CAF50;
+    }
+    .feedback {
+      font-size: 12px;
+      margin: 2px 0 10px 0;
+      min-height: 15px;
+    }
+    .correct-feedback {
+      color: #4CAF50;
+    }
+    .incorrect-feedback {
+      color: #f44336;
+    }
+    .error-message {
+      color: #f44336;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #4CAF50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+    .results {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      margin-top: 20px;
+      width: 400px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    ul {
+      text-align: left;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .progress {
+      width: 100%;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+    .progress-bar {
+      height: 10px;
+      background-color: #4CAF50;
+      border-radius: 5px;
+      width: 0%;
+      transition: width 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <h1>Juego de Verbos en Inglés</h1>
+  <div class="timer" id="timer">Tiempo restante: 40:00</div>
+
+  <div id="game" class="card"></div>
+
+  <div id="results" class="results" style="display:none;"></div>
+
+  <script>
+    const verbs = [
+      {es: "Acelerar", base: "speed", past: "sped", participle: "sped", gerund: "speeding"},
+      {es: "Alimentar", base: "feed", past: "fed", participle: "fed", gerund: "feeding"},
+      {es: "Apestar", base: "stink", past: "stank", participle: "stunk", gerund: "stinking"},
+      {es: "Apostar", base: "bet", past: "bet", participle: "bet", gerund: "betting"},
+      {es: "Inclinarse", base: "lean", past: "leant", participle: "leant", gerund: "leaning"},
+      {es: "Arrastrarse", base: "creep", past: "crept", participle: "crept", gerund: "creeping"},
+      {es: "Arrodillarse", base: "kneel", past: "knelt", participle: "knelt", gerund: "kneeling"},
+      {es: "Lanzar", base: "throw", past: "threw", participle: "thrown", gerund: "throwing"},
+      {es: "Barrer", base: "sweep", past: "swept", participle: "swept", gerund: "sweeping"},
+      {es: "Beber", base: "drink", past: "drank", participle: "drunk", gerund: "drinking"},
+      {es: "Caer", base: "fall", past: "fell", participle: "fallen", gerund: "falling"},
+      {es: "Cantar", base: "sing", past: "sang", participle: "sung", gerund: "singing"},
+      {es: "Cavar", base: "dig", past: "dug", participle: "dug", gerund: "digging"},
+      {es: "Atrapar", base: "catch", past: "caught", participle: "caught", gerund: "catching"},
+      {es: "Tomar", base: "take", past: "took", participle: "taken", gerund: "taking"},
+      {es: "Llegar", base: "arrive", past: "arrived", participle: "arrived", gerund: "arriving"},
+      {es: "Cepillar", base: "brush", past: "brushed", participle: "brushed", gerund: "brushing"},
+      {es: "Pertenecer", base: "belong", past: "belonged", participle: "belonged", gerund: "belonging"},
+      {es: "Rogar", base: "beg", past: "begged", participle: "begged", gerund: "begging"},
+      {es: "Creer", base: "believe", past: "believed", participle: "believed", gerund: "believing"},
+      {es: "Cerrar", base: "close", past: "closed", participle: "closed", gerund: "closing"},
+      {es: "Cocinar", base: "cook", past: "cooked", participle: "cooked", gerund: "cooking"},
+      {es: "Llamar", base: "call", past: "called", participle: "called", gerund: "calling"},
+      {es: "Cambiar", base: "change", past: "changed", participle: "changed", gerund: "changing"},
+      {es: "Limpiar", base: "clean", past: "cleaned", participle: "cleaned", gerund: "cleaning"},
+      {es: "Llorar", base: "cry", past: "cried", participle: "cried", gerund: "crying"},
+      {es: "Bailar", base: "dance", past: "danced", participle: "danced", gerund: "dancing"},
+      {es: "Vestir", base: "dress", past: "dressed", participle: "dressed", gerund: "dressing"},
+      {es: "Morir", base: "die", past: "died", participle: "died", gerund: "dying"},
+      {es: "Secar", base: "dry", past: "dried", participle: "dried", gerund: "drying"}
+    ];
+
+    // Seleccionar 20 verbos aleatorios
+    const selectedVerbs = verbs.sort(() => 0.5 - Math.random()).slice(0, 20);
+
+    let currentVerb = 0;
+    let correct = 0;
+    let incorrect = [];
+    let timeLeft = 40 * 60; // 40 minutos en segundos
+    let timerInterval;
+
+    function startGame() {
+      showVerb(currentVerb);
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      let minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+      document.getElementById("timer").innerText =
+        `Tiempo restante: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        endGame(); // si llega a 0, termina
+      }
+      timeLeft--;
+    }
+
+    function showVerb(i) {
+      const verb = selectedVerbs[i];
+      const progress = ((i) / selectedVerbs.length) * 100;
+      
+      document.getElementById("game").innerHTML = `
+        <div class="progress">
+          <div class="progress-bar" style="width: ${progress}%"></div>
+        </div>
+        <h2>${i+1}. ${verb.es}</h2>
+        <input type="text" id="base" placeholder="Forma base en inglés" required>
+        <div class="feedback" id="base-feedback"></div>
+        <input type="text" id="past" placeholder="Pasado" required>
+        <div class="feedback" id="past-feedback"></div>
+        <input type="text" id="participle" placeholder="Participio" required>
+        <div class="feedback" id="participle-feedback"></div>
+        <input type="text" id="gerund" placeholder="Gerundio" required>
+        <div class="feedback" id="gerund-feedback"></div>
+        <div class="error-message" id="error-message">Por favor, completa todos los campos antes de continuar.</div>
+        <button id="next-button" onclick="checkAnswer()">Siguiente</button>
+      `;
+      
+      // Agregar event listeners para validar en tiempo real
+      document.getElementById('base').addEventListener('input', validateForm);
+      document.getElementById('past').addEventListener('input', validateForm);
+      document.getElementById('participle').addEventListener('input', validateForm);
+      document.getElementById('gerund').addEventListener('input', validateForm);
+      
+      // Validar inicialmente
+      validateForm();
+    }
+
+    function validateForm() {
+      const base = document.getElementById("base").value.trim();
+      const past = document.getElementById("past").value.trim();
+      const participle = document.getElementById("participle").value.trim();
+      const gerund = document.getElementById("gerund").value.trim();
+      
+      const allFilled = base !== "" && past !== "" && participle !== "" && gerund !== "";
+      const button = document.getElementById("next-button");
+      
+      if (allFilled) {
+        button.disabled = false;
+        document.getElementById("error-message").style.display = "none";
+      } else {
+        button.disabled = true;
+        document.getElementById("error-message").style.display = "block";
+      }
+    }
+
+    function checkAnswer() {
+      // Verificar nuevamente que todos los campos estén completos
+      const base = document.getElementById("base").value.trim();
+      const past = document.getElementById("past").value.trim();
+      const participle = document.getElementById("participle").value.trim();
+      const gerund = document.getElementById("gerund").value.trim();
+      
+      if (base === "" || past === "" || participle === "" || gerund === "") {
+        document.getElementById("error-message").style.display = "block";
+        return;
+      }
+      
+      const verb = selectedVerbs[currentVerb];
+      let baseValue = base.toLowerCase();
+      let pastValue = past.toLowerCase();
+      let participleValue = participle.toLowerCase();
+      let gerundValue = gerund.toLowerCase();
+      
+      // Limpiar clases anteriores
+      document.getElementById("base").className = "";
+      document.getElementById("past").className = "";
+      document.getElementById("participle").className = "";
+      document.getElementById("gerund").className = "";
+      
+      // Limpiar mensajes anteriores
+      document.getElementById("base-feedback").innerHTML = "";
+      document.getElementById("past-feedback").innerHTML = "";
+      document.getElementById("participle-feedback").innerHTML = "";
+      document.getElementById("gerund-feedback").innerHTML = "";
+      
+      let allCorrect = true;
+      
+      // Validar cada campo individualmente
+      if (baseValue === verb.base) {
+        document.getElementById("base").classList.add("correct");
+        document.getElementById("base-feedback").innerHTML = '<span class="correct-feedback">✓ Correcto</span>';
+      } else {
+        document.getElementById("base").classList.add("incorrect");
+        document.getElementById("base-feedback").innerHTML = `<span class="incorrect-feedback">✗ Incorrecto. La respuesta correcta es: ${verb.base}</span>`;
+        allCorrect = false;
+      }
+      
+      if (pastValue === verb.past) {
+        document.getElementById("past").classList.add("correct");
+        document.getElementById("past-feedback").innerHTML = '<span class="correct-feedback">✓ Correcto</span>';
+      } else {
+        document.getElementById("past").classList.add("incorrect");
+        document.getElementById("past-feedback").innerHTML = `<span class="incorrect-feedback">✗ Incorrecto. La respuesta correcta es: ${verb.past}</span>`;
+        allCorrect = false;
+      }
+      
+      if (participleValue === verb.participle) {
+        document.getElementById("participle").classList.add("correct");
+        document.getElementById("participle-feedback").innerHTML = '<span class="correct-feedback">✓ Correcto</span>';
+      } else {
+        document.getElementById("participle").classList.add("incorrect");
+        document.getElementById("participle-feedback").innerHTML = `<span class="incorrect-feedback">✗ Incorrecto. La respuesta correcta es: ${verb.participle}</span>`;
+        allCorrect = false;
+      }
+      
+      if (gerundValue === verb.gerund) {
+        document.getElementById("gerund").classList.add("correct");
+        document.getElementById("gerund-feedback").innerHTML = '<span class="correct-feedback">✓ Correcto</span>';
+      } else {
+        document.getElementById("gerund").classList.add("incorrect");
+        document.getElementById("gerund-feedback").innerHTML = `<span class="incorrect-feedback">✗ Incorrecto. La respuesta correcta es: ${verb.gerund}</span>`;
+        allCorrect = false;
+      }
+      
+      // Deshabilitar el botón mientras se muestra la retroalimentación
+      document.getElementById("next-button").disabled = true;
+      
+      // Esperar un momento para que el usuario vea la retroalimentación antes de continuar
+      setTimeout(() => {
+        if (allCorrect) {
+          correct++;
+        } else {
+          incorrect.push(`${verb.es} → correcto: ${verb.base}, ${verb.past}, ${verb.participle}, ${verb.gerund}`);
+        }
+        
+        currentVerb++;
+        if (currentVerb < selectedVerbs.length) {
+          showVerb(currentVerb);
+        } else {
+          endGame();
+        }
+      }, 1500); // 1.5 segundos de espera
+    }
+
+    function endGame() {
+      clearInterval(timerInterval);
+      let grade = Math.round((correct / selectedVerbs.length) * 100);
+      document.getElementById("game").style.display = "none";
+      document.getElementById("results").style.display = "block";
+      document.getElementById("results").innerHTML = `
+        <h2>Resultados</h2>
+        <p>Correctos: ${correct} / ${selectedVerbs.length}</p>
+        <p>Calificación: ${grade}%</p>
+        <h3>Fallos:</h3>
+        <ul>${incorrect.map(f => `<li>${f}</li>`).join("")}</ul>
+        <button onclick="location.reload()">Jugar de nuevo</button>
+      `;
+    }
+
+    // Iniciar juego
+    startGame();
+  </script>
+</body>
+</html>
