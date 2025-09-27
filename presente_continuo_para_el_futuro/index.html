@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Present Continuous for Future</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f0f4ff, #e0f7fa);
+      color: #333;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #00796b;
+    }
+    #instruction {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .word {
+      display: inline-block;
+      margin: 6px;
+      padding: 10px 16px;
+      border: 2px solid #00796b;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #ffffff;
+      transition: background-color 0.3s;
+    }
+    .word:hover {
+      background-color: #b2dfdb;
+    }
+    .selected {
+      background-color: #80cbc4 !important;
+    }
+    #sentenceBox {
+      min-height: 60px;
+      border: 2px dashed #00796b;
+      margin: 20px auto;
+      padding: 10px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 10px;
+      background-color: #e0f2f1;
+    }
+    #feedback {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    #score {
+      font-size: 1.2em;
+      margin-top: 30px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #00796b;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #004d40;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🧠 Presente continuo para el futuro</h1>
+<p id="instruction"></p>
+<div id="wordBank"></div>
+<div id="sentenceBox"></div>
+<button onclick="undoLast()">Undo</button>
+<button onclick="checkSentence()">Check</button>
+<div id="feedback"></div>
+<div id="score"></div>
+
+<script>
+const verbs = [
+  "Speed", "Feed", "Stink", "Bet", "Lean", "Creep", "Kneel", "Throw", "Sweep", "Drink",
+  "Fall", "Sing", "Dig", "Catch", "Take", "Arrive", "Brush", "Belong", "Beg", "Believe",
+  "Close", "Cook", "Call", "Change", "Clean", "Cry", "Dance", "Dress", "Die", "Dry"
+];
+
+const timePhrases = [
+  "tomorrow", "next week", "at 5 PM", "on Saturday", "this evening", "in two hours",
+  "after lunch", "next Monday", "tonight", "at noon", "on Sunday", "this weekend"
+];
+
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function toGerund(verb) {
+  verb = verb.toLowerCase();
+  if (verb.endsWith("ie")) return verb.slice(0, -2) + "ying";
+  if (verb.endsWith("e") && !["be", "see"].includes(verb)) return verb.slice(0, -1) + "ing";
+  if (/^[a-z]{3,}$/.test(verb) && /[aeiou][^aeiou]$/.test(verb)) return verb + verb.slice(-1) + "ing";
+  return verb + "ing";
+}
+
+const structures = ["positive", "negative", "interrogative"];
+const selectedVerbs = shuffle([...verbs]).slice(0, 20);
+let questions = [];
+let current = 0;
+let score = 0;
+let selectedWords = [];
+
+selectedVerbs.forEach(verb => {
+  const structure = structures[Math.floor(Math.random() * structures.length)];
+  const time = timePhrases[Math.floor(Math.random() * timePhrases.length)];
+  const gerund = toGerund(verb);
+  let correctOrder = [];
+
+  switch (structure) {
+    case "positive":
+      correctOrder = ["They", "are", gerund, time];
+      break;
+    case "negative":
+      correctOrder = ["They", "are", "not", gerund, time];
+      break;
+    case "interrogative":
+      correctOrder = ["Are", "they", gerund, time, "?"];
+      break;
+  }
+
+  questions.push({ correctOrder, structure });
+});
+
+function speak(text) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  speechSynthesis.speak(utterance);
+}
+
+function showQuestion() {
+  if (current >= questions.length) {
+    document.getElementById("instruction").textContent = "✅ Game finished!";
+    document.getElementById("wordBank").innerHTML = "";
+    document.getElementById("sentenceBox").innerHTML = "";
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("score").textContent = `Final score: ${score} out of ${questions.length}`;
+    return;
+  }
+
+  const q = questions[current];
+  selectedWords = [];
+
+  document.getElementById("instruction").textContent = `Form a ${q.structure} sentence in English using Present Continuous for Future.`;
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("sentenceBox").innerHTML = "";
+  document.getElementById("wordBank").innerHTML = "";
+
+  const shuffledWords = shuffle([...q.correctOrder]);
+  shuffledWords.forEach(word => {
+    const btn = document.createElement("div");
+    btn.textContent = word;
+    btn.className = "word";
+    btn.onclick = () => {
+      if (btn.classList.contains("selected")) return;
+      btn.classList.add("selected");
+      selectedWords.push(btn.textContent);
+      const span = document.createElement("span");
+      span.textContent = btn.textContent + " ";
+      span.className = "word";
+      document.getElementById("sentenceBox").appendChild(span);
+      speak(btn.textContent);
+    };
+    document.getElementById("wordBank").appendChild(btn);
+  });
+}
+
+function undoLast() {
+  if (selectedWords.length === 0) return;
+  const lastWord = selectedWords.pop();
+  const wordButtons = document.querySelectorAll(".word");
+  wordButtons.forEach(btn => {
+    if (btn.textContent === lastWord && btn.classList.contains("selected")) {
+      btn.classList.remove("selected");
+    }
+  });
+  const box = document.getElementById("sentenceBox");
+  box.removeChild(box.lastChild);
+}
+
+function checkSentence() {
+  const correct = questions[current].correctOrder.join(" ");
+  const userAnswer = selectedWords.join(" ");
+  const feedback = document.getElementById("feedback");
+
+  if (userAnswer === correct) {
+    feedback.textContent = "✅ Correct!";
+    feedback.style.color = "green";
+    score++;
+  } else {
+    feedback.textContent = `❌ Incorrect. Correct sentence: "${correct}"`;
+    feedback.style.color = "red";
+  }
+
+  setTimeout(() => {
+    current++;
+    showQuestion();
+  }, 2500);
+}
+
+showQuestion();
+</script>
+
+</body>
+</html>
