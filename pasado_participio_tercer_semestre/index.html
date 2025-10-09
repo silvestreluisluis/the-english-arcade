@@ -1,0 +1,353 @@
+<!doctype html>
+
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>¿Participio Correcto?</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#6ee7b7;--muted:#94a3b8;--glass:rgba(255,255,255,0.04)}
+    *{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;min-height:100vh;background:linear-gradient(180deg,#071126 0%, #0b1b2b 100%);color:#e6eef8;display:flex;align-items:center;justify-content:center;padding:24px}
+    .app{width:100%;max-width:980px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+    h1{font-size:20px;margin:0}
+    .meta{display:flex;gap:12px;align-items:center}
+    .chip{background:var(--glass);padding:8px 12px;border-radius:999px;color:var(--muted);font-size:13px}
+    main{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:18px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+    .sentence{font-size:18px;margin-bottom:14px}
+    .hint{color:var(--muted);font-size:13px;margin-bottom:10px}
+    input[type=text]{width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;font-size:16px}
+    .controls{display:flex;gap:8px;margin-top:12px}
+    button{background:var(--accent);border:none;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer}
+    button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:12px}
+    .bar{height:100%;background:linear-gradient(90deg,#34d399,#06b6d4);width:0%}
+    .right-col{display:flex;flex-direction:column;gap:12px}
+    .stat{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02)}
+    .small{font-size:13px;color:var(--muted)}
+    .log{max-height:260px;overflow:auto;padding:10px;border-radius:8px;background:rgba(255,255,255,0.01)}
+    .log .item{padding:6px 8px;border-bottom:1px dashed rgba(255,255,255,0.02);font-size:14px}
+    .result{padding:14px;border-radius:10px;text-align:center}
+    .grade{font-size:48px;font-weight:800;margin:8px 0}
+    footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
+    .error{color:#ffb4b4}
+    @media(max-width:880px){main{grid-template-columns:1fr} .right-col{order:2}}
+  </style>
+</head>
+<body>
+  <div class="app" role="application">
+    <header>
+      <h1>¿Participio Correcto? — Past participle practice</h1>
+      <div class="meta">
+        <div class="chip">Reto: 25 oraciones</div>
+        <div class="chip" id="timer">25:00</div>
+      </div>
+    </header><main>
+  <section class="card">
+    <div class="sentence" id="sentence">Cargando...</div>
+    <div class="hint" id="hint">Forma: —</div>
+    <input type="text" id="answer" placeholder="Escribe el participio past (ej. thrown)" autocomplete="off" />
+    <div style="height:8px"></div>
+    <div class="controls">
+      <button id="submitBtn">Enviar</button>
+      <button id="skipBtn" class="secondary">Saltar</button>
+      <button id="startBtn" class="secondary">Iniciar/Resetear</button>
+    </div>
+    <div class="progress" aria-hidden="true"><div class="bar" id="progressBar"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:13px">
+      <div>Pregunta <span id="index">0</span>/25</div>
+      <div>Aciertos: <span id="score">0</span> — Errores: <span id="errors">0</span></div>
+    </div>
+    <div id="fieldError" class="small error" style="margin-top:8px;display:none"></div>
+  </section>
+
+  <aside class="right-col">
+    <div class="card stat">
+      <div>
+        <div class="small">Tiempo restante</div>
+        <div style="font-size:20px;font-weight:700" id="timeLarge">25:00</div>
+      </div>
+      <div style="text-align:right">
+        <div class="small">Progreso</div>
+        <div id="percent" style="font-weight:700; font-size:20px">0%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="small" style="margin-bottom:8px">Registro de respuestas (clic en la correcta para copiarla)</div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <div class="card">
+      <div class="small">Verbos usados en este intento</div>
+      <div style="margin-top:8px" id="verbsList" class="small"></div>
+    </div>
+  </aside>
+</main>
+
+<div id="endModal" style="display:none;margin-top:12px" class="card result"></div>
+
+<footer>Diseño simple y bonito — práctica de participios. Buen trabajo :)</footer>
+
+  </div><script>
+/* -------------------------  Datos (30 oraciones) ------------------------- */
+const SENTENCES_POOL = [
+  {verb:'Speed', text:'Ana has (acelerar) her car too much lately.', answer:'sped'},
+  {verb:'Feed', text:'The farmer has (alimentar) the animals already.', answer:'fed'},
+  {verb:'Stink', text:'The trash has (apestar) since yesterday.', answer:'stunk'},
+  {verb:'Bet', text:'Rosa has (apostar) on that team again.', answer:'bet'},
+  {verb:'Lean', text:'He has (inclinarse) over the table.', answer:'leaned'},
+  {verb:'Creep', text:'A thief has (arrastrarse) into the house quietly.', answer:'crept'},
+  {verb:'Kneel', text:'The priest has (arrodillarse) to pray.', answer:'knelt'},
+  {verb:'Throw', text:'Tom has (lanzar) the ball to his friend.', answer:'thrown'},
+  {verb:'Sweep', text:'Mary has (barrer) the floor twice today.', answer:'swept'},
+  {verb:'Drink', text:'Luis has (beber) all the juice.', answer:'drunk'},
+  {verb:'Fall', text:'The boy has (caer) from the tree.', answer:'fallen'},
+  {verb:'Sing', text:'They have (cantar) that song many times.', answer:'sung'},
+  {verb:'Dig', text:'The workers have (cavar) a big hole.', answer:'dug'},
+  {verb:'Catch', text:'I have (atrapar) a cold this week.', answer:'caught'},
+  {verb:'Take', text:'We have (tomar) many pictures today.', answer:'taken'},
+  {verb:'Act', text:'The actor has (actuar) in several movies.', answer:'acted'},
+  {verb:'Add', text:'Ana has (añadir) sugar to her coffee.', answer:'added'},
+  {verb:'Ask', text:'Rosa has (preguntar) the same question twice.', answer:'asked'},
+  {verb:'Answer', text:'He has (responder) all the emails.', answer:'answered'},
+  {verb:'Arrive', text:'The bus has (llegar) late again.', answer:'arrived'},
+  {verb:'Brush', text:'She has (cepillar) her hair before sleeping.', answer:'brushed'},
+  {verb:'Belong', text:'The dog has (pertenecer) to my uncle for years.', answer:'belonged'},
+  {verb:'Beg', text:'The beggar has (rogar) for food at the door.', answer:'begged'},
+  {verb:'Believe', text:'We have (creer) in you from the beginning.', answer:'believed'},
+  {verb:'Close', text:'The teacher has (cerrar) the door.', answer:'closed'},
+  {verb:'Cook', text:'My mom has (cocinar) a delicious cake.', answer:'cooked'},
+  {verb:'Call', text:'They have (llamar) the doctor twice.', answer:'called'},
+  {verb:'Change', text:'The weather has (cambiar) a lot lately.', answer:'changed'},
+  {verb:'Clean', text:'You have (limpiar) your room today.', answer:'cleaned'},
+  {verb:'Cry', text:'The child has (llorar) because of the movie.', answer:'cried'}
+];
+
+/* -------------------------  Variables del juego  ------------------------- */
+let selectedSentences = [];
+let TOTAL = 25; // número de preguntas por intento
+let currentIndex = 0;
+let score = 0;
+let errors = 0;
+let timeLeft = 25 * 60;
+let timerInterval = null;
+let started = false;
+
+/* Elementos DOM */
+const sentenceEl = document.getElementById('sentence');
+const hintEl = document.getElementById('hint');
+const answerEl = document.getElementById('answer');
+const submitBtn = document.getElementById('submitBtn');
+const skipBtn = document.getElementById('skipBtn');
+const startBtn = document.getElementById('startBtn');
+const indexEl = document.getElementById('index');
+const scoreEl = document.getElementById('score');
+const errorsEl = document.getElementById('errors');
+const progressBar = document.getElementById('progressBar');
+const percentEl = document.getElementById('percent');
+const timerChip = document.getElementById('timer');
+const timeLarge = document.getElementById('timeLarge');
+const logEl = document.getElementById('log');
+const verbsListEl = document.getElementById('verbsList');
+const endModal = document.getElementById('endModal');
+const fieldError = document.getElementById('fieldError');
+
+/* Aceptaciones alternativas (formas válidas extra) */
+const ALTERNATIVES = {
+  'leaned': ['leant','leaned'],
+  'leant': ['leant','leaned'],
+  'kneelt': ['knelt','kneeled'],
+  'knelt': ['knelt','kneeled'],
+  'speeded': ['sped','speeded'],
+  'sped': ['sped','speeded'],
+  'bet': ['bet','betted'],
+  'betted': ['bet','betted']
+};
+
+/* -------------------------  Utilidades  ------------------------- */
+function shuffle(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
+function formatTime(s){ const mm = Math.floor(s/60).toString().padStart(2,'0'); const ss = (s%60).toString().padStart(2,'0'); return `${mm}:${ss}`; }
+
+/* -------------------------  Preparar preguntas ------------------------- */
+function pickQuestions(){
+  const pool = shuffle(SENTENCES_POOL);
+  selectedSentences = pool.slice(0, TOTAL);
+  // actualizar TOTAL en caso que pool sea menor
+  TOTAL = selectedSentences.length;
+}
+
+/* -------------------------  Temporizador ------------------------- */
+function startTimer(){
+  stopTimer();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    updateTimerDisplay();
+    if(timeLeft <= 0){
+      stopTimer();
+      // tiempo agotado -> terminar por tiempo (timeExpired = true)
+      endGame(false, true);
+    }
+  }, 1000);
+}
+function stopTimer(){ if(timerInterval) clearInterval(timerInterval); timerInterval = null; }
+function updateTimerDisplay(){ timerChip.textContent = formatTime(timeLeft); timeLarge.textContent = formatTime(timeLeft); }
+
+/* -------------------------  Render y navegación ------------------------- */
+function renderQuestion(){
+  if(currentIndex >= TOTAL){
+    // completó todas las preguntas
+    endGame(true, false);
+    return;
+  }
+  const q = selectedSentences[currentIndex];
+  sentenceEl.textContent = q.text.replace('____', '_____');
+  hintEl.textContent = `Verbo: ${q.verb} — ( ${q.text.match(/\(([^)]+)\)/)[1]} )`;
+  indexEl.textContent = currentIndex + 1;
+  answerEl.value = '';
+  answerEl.disabled = false;
+  submitBtn.disabled = false;
+  fieldError.style.display = 'none';
+  answerEl.focus();
+  updateProgress();
+  verbsListEl.textContent = selectedSentences.map(s => s.verb).join(', ');
+}
+
+function updateProgress(){
+  const p = Math.round((currentIndex / TOTAL) * 100);
+  progressBar.style.width = `${p}%`;
+  percentEl.textContent = `${p}%`;
+}
+
+function updateStats(){ scoreEl.textContent = score; errorsEl.textContent = errors; }
+
+/* -------------------------  Validación y envío ------------------------- */
+function validateInput(text){
+  const t = text.trim();
+  if(t === '') return {ok:false, msg:'Escribe tu respuesta antes de enviar.'};
+  // permitir solo letras (sin espacios). Si quieres permitir espacios/hyphens, ajustar la regex
+  if(!/^[a-zA-Z]+$/.test(t)) return {ok:false, msg:'Usa sólo letras (sin espacios ni números).'};
+  return {ok:true, value:t.toLowerCase()};
+}
+
+function checkAnswer(){
+  if(!started){ alert('Presiona Iniciar/Resetear para comenzar.'); return; }
+  if(currentIndex >= TOTAL) return;
+
+  const raw = answerEl.value || '';
+  const v = validateInput(raw);
+  if(!v.ok){ fieldError.textContent = v.msg; fieldError.style.display = 'block'; answerEl.focus(); return; }
+  fieldError.style.display = 'none';
+
+  const q = selectedSentences[currentIndex];
+  const user = v.value;
+  const correct = q.answer.toLowerCase();
+  // construir aceptados
+  const accepted = new Set([correct]);
+  if(ALTERNATIVES[correct]){ ALTERNATIVES[correct].forEach(x=>accepted.add(x)); }
+  if(ALTERNATIVES[user]){ ALTERNATIVES[user].forEach(x=>accepted.add(x)); }
+
+  const isRight = accepted.has(user);
+  if(isRight){ score++; addLog(true, q, user); }
+  else { errors++; addLog(false, q, user); }
+
+  currentIndex++;
+  updateStats();
+
+  // Si completó todas las preguntas, renderQuestion() llamará a endGame
+  setTimeout(()=>{
+    renderQuestion();
+  }, 350);
+}
+
+function addLog(ok, q, user){
+  const div = document.createElement('div');
+  div.className = 'item';
+  if(ok){ div.innerHTML = `✅ ${q.text.replace(/\(.*?\)/,'')} — <b>${escapeHtml(user)}</b> — <i>${q.verb}</i>`; }
+  else{ div.innerHTML = `❌ ${q.text.replace(/\(.*?\)/,'')} — intentaste: <b>${escapeHtml(user)}</b> — correcta: <b>${q.answer}</b>`; }
+  div.addEventListener('click', ()=> navigator.clipboard?.writeText(q.answer));
+  logEl.prepend(div);
+}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function skipQuestion(){
+  if(!started) return;
+  // marcar como error y avanzar
+  const q = selectedSentences[currentIndex];
+  addLog(false, q, '(saltado)');
+  errors++;
+  currentIndex++;
+  updateStats();
+  if(currentIndex >= TOTAL) renderQuestion(); else renderQuestion();
+}
+
+/* -------------------------  Cálculo de calificación ------------------------- */
+function computeGrade(finishedAll, timeExpired){
+  // Regla actualizada:
+  // - Si completó todas las preguntas **antes** de que se acabe el temporizador Y obtuvo TODOS los aciertos => 10.
+  // - En cualquier otro caso (tiempo agotado o completado sin perfecto) la calificación depende de los aciertos (escala 1-10).
+
+  if(finishedAll && !timeExpired && score === TOTAL) return 10;
+  // cálculo proporcional en escala 1..10 (0 aciertos -> 1; todos -> 10)
+  const grade = Math.max(1, Math.round((score / TOTAL) * 9) + 1);
+  return grade;
+}
+
+/* -------------------------  Fin del juego ------------------------- */
+function endGame(finishedAll = false, timeExpired = false){
+  stopTimer(); started = false;
+  answerEl.disabled = true; submitBtn.disabled = true; skipBtn.disabled = true;
+  const grade = computeGrade(finishedAll, timeExpired);
+  const pct = Math.round((score / TOTAL) * 100);
+
+  endModal.style.display = 'block';
+  endModal.innerHTML = `
+    <div style="font-size:18px;font-weight:700">Resultado</div>
+    <div style="margin-top:8px">Aciertos: ${score} / ${TOTAL}</div>
+    <div style="margin-top:6px">Errores: ${errors}</div>
+    <div class="grade">${grade}</div>
+    <div style="color:var(--muted);margin-top:6px">Porcentaje: ${pct}%</div>
+    <div style="margin-top:10px"><button id="restartBtn">Jugar otra vez</button></div>
+  `;
+  document.getElementById('restartBtn').addEventListener('click', ()=>{
+    endModal.style.display = 'none'; initGame();
+  });
+}
+
+/* -------------------------  Inicializar / eventos ------------------------- */
+function initGame(){
+  // reiniciar variables
+  currentIndex = 0; score = 0; errors = 0; timeLeft = 25 * 60; started = true;
+  pickQuestions();
+  updateStats();
+  updateTimerDisplay();
+  renderQuestion();
+  logEl.innerHTML = '';
+  // habilitar botones
+  answerEl.style.display = '';
+  submitBtn.style.display = '';
+  skipBtn.disabled = false;
+  submitBtn.disabled = false;
+  startTimer();
+}
+
+submitBtn.addEventListener('click', checkAnswer);
+answerEl.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') checkAnswer(); });
+skipBtn.addEventListener('click', skipQuestion);
+startBtn.addEventListener('click', ()=>{ initGame(); endModal.style.display = 'none'; });
+
+// arranque inicial (muestra preguntas pero no inicia temporizador hasta que el usuario presione "Iniciar")
+pickQuestions();
+// Mostrar la primera pregunta en modo preparación (no iniciar timer hasta que se presione Iniciar)
+sentenceEl.textContent = 'Presiona Iniciar/Resetear para comenzar.';
+hintEl.textContent = '';
+indexEl.textContent = '0';
+scoreEl.textContent = '0';
+errorsEl.textContent = '0';
+progressBar.style.width = '0%';
+percentEl.textContent = '0%';
+
+</script></body>
+</html>
