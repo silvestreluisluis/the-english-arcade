@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Verbos Puros</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 15px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .instructions {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 0 5px 5px 0;
+            font-size: 0.85rem;
+        }
+        
+        .timer-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .timer {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .timer.warning {
+            color: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 5px;
+            text-align: left;
+            word-wrap: break-word;
+            font-size: 0.8rem;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        /* Ajustar anchos de columnas para pantallas pequeñas */
+        th:nth-child(1), td:nth-child(1) { width: 20%; } /* Español */
+        th:nth-child(2), td:nth-child(2) { width: 20%; } /* Base Form */
+        th:nth-child(3), td:nth-child(3) { width: 20%; } /* Past Form */
+        th:nth-child(4), td:nth-child(4) { width: 20%; } /* Past Participle */
+        th:nth-child(5), td:nth-child(5) { width: 20%; } /* Gerund Form */
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        input.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        input.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        #submit-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        #submit-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        #reset-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        #reset-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        #start-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1rem;
+        }
+        
+        #start-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .score {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .perfect {
+            color: #2ecc71;
+        }
+        
+        .good {
+            color: #3498db;
+        }
+        
+        .average {
+            color: #f39c12;
+        }
+        
+        .poor {
+            color: #e74c3c;
+        }
+        
+        .help {
+            font-size: 0.7rem;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
+        
+        /* Estilos para pantallas más grandes */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .instructions {
+                font-size: 1rem;
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+                font-size: 1rem;
+            }
+            
+            input {
+                padding: 8px;
+                font-size: 1rem;
+            }
+            
+            button {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Para pantallas muy pequeñas (móviles en vertical) */
+        @media (max-width: 480px) {
+            th, td {
+                padding: 6px 3px;
+                font-size: 0.75rem;
+            }
+            
+            input {
+                padding: 4px;
+                font-size: 0.75rem;
+            }
+            
+            th:nth-child(1), td:nth-child(1) { width: 22%; }
+            th:nth-child(2), td:nth-child(2) { width: 19%; }
+            th:nth-child(3), td:nth-child(3) { width: 19%; }
+            th:nth-child(4), td:nth-child(4) { width: 20%; }
+            th:nth-child(5), td:nth-child(5) { width: 20%; }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Examen de Verbos Puros</h1>
+        <p class="subtitle">Con ayudas aleatorias y temporizador</p>
+        
+        <div class="instructions">
+            <strong>Instrucciones para el alumno:</strong><br>
+            Tienes 45 minutos para completar el siguiente examen. Cada fila contiene un verbo en español y algunas formas verbales en inglés. Completa los espacios vacíos. Las ayudas están distribuidas al azar. Tu calificación se calculará automáticamente al final.
+        </div>
+        
+        <div class="timer-container">
+            <div>Tiempo restante:</div>
+            <div class="timer" id="timer">45:00</div>
+        </div>
+        
+        <div id="exam-content" style="display: none;">
+            <div class="table-container">
+                <table id="verbs-table">
+                    <thead>
+                        <tr>
+                            <th>Español</th>
+                            <th>Base Form</th>
+                            <th>Past Form</th>
+                            <th>Past Participle</th>
+                            <th>Gerund Form</th>
+                        </tr>
+                    </thead>
+                    <tbody id="verbs-body">
+                        <!-- Las filas se generarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="button-container">
+                <button id="submit-btn">Enviar Respuestas</button>
+                <button id="reset-btn">Reiniciar Examen</button>
+            </div>
+        </div>
+        
+        <div id="start-screen">
+            <div style="text-align: center; margin: 30px 0;">
+                <h2>Examen de Verbos Irregulares</h2>
+                <p>Seleccionaremos 40 verbos al azar de nuestra base de datos de 80 verbos.</p>
+                <p>Tendrás 45 minutos para completar el examen.</p>
+                <button id="start-btn">Comenzar Examen</button>
+            </div>
+        </div>
+        
+        <div class="results" id="results">
+            <h2>Resultados del Examen</h2>
+            <div class="score" id="score">0%</div>
+            <p id="correct-count">Respuestas correctas: 0/10</p>
+            <button id="review-btn">Revisar Respuestas</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de verbos irregulares
+        const verbDatabase = [
+            { spanish: "acelerar", base: "speed", past: "sped", participle: "sped", gerund: "speeding" },
+            { spanish: "alimentar", base: "feed", past: "fed", participle: "fed", gerund: "feeding" },
+            { spanish: "apestar", base: "stink", past: "stank", participle: "stunk", gerund: "stinking" },
+            { spanish: "apostar", base: "bet", past: "bet", participle: "bet", gerund: "betting" },
+            { spanish: "apoyarse", base: "lean", past: "leant", participle: "leant", gerund: "leaning" },
+            { spanish: "arrastrarse", base: "creep", past: "crept", participle: "crept", gerund: "creeping" },
+            { spanish: "arrodillarse", base: "kneel", past: "knelt", participle: "knelt", gerund: "kneeling" },
+            { spanish: "arrojar", base: "throw", past: "threw", participle: "thrown", gerund: "throwing" },
+            { spanish: "barrer", base: "sweep", past: "swept", participle: "swept", gerund: "sweeping" },
+            { spanish: "beber", base: "drink", past: "drank", participle: "drunk", gerund: "drinking" },
+            { spanish: "caer", base: "fall", past: "fell", participle: "fallen", gerund: "falling" },
+            { spanish: "cantar", base: "sing", past: "sang", participle: "sung", gerund: "singing" },
+            { spanish: "cavar", base: "dig", past: "dug", participle: "dug", gerund: "digging" },
+            { spanish: "coger", base: "catch", past: "caught", participle: "caught", gerund: "catching" },
+            { spanish: "coger/tomar", base: "take", past: "took", participle: "taken", gerund: "taking" },
+            { spanish: "colgar", base: "hang", past: "hung", participle: "hung", gerund: "hanging" },
+            { spanish: "columpiarse", base: "swing", past: "swung", participle: "swung", gerund: "swinging" },
+            { spanish: "comer", base: "eat", past: "ate", participle: "eaten", gerund: "eating" },
+            { spanish: "comprar", base: "buy", past: "bought", participle: "bought", gerund: "buying" },
+            { spanish: "conducir", base: "drive", past: "drove", participle: "driven", gerund: "driving" },
+            { spanish: "conservar", base: "keep", past: "kept", participle: "kept", gerund: "keeping" },
+            { spanish: "correr", base: "run", past: "ran", participle: "run", gerund: "running" },
+            { spanish: "cortar", base: "cut", past: "cut", participle: "cut", gerund: "cutting" },
+            { spanish: "coser", base: "sew", past: "sewed", participle: "sewn", gerund: "sewing" },
+            { spanish: "costar", base: "cost", past: "cost", participle: "cost", gerund: "costing" },
+            { spanish: "crecer", base: "grow", past: "grew", participle: "grown", gerund: "growing" },
+            { spanish: "dar", base: "give", past: "gave", participle: "given", gerund: "giving" },
+            { spanish: "decir", base: "say", past: "said", participle: "said", gerund: "saying" },
+            { spanish: "decir/contar", base: "tell", past: "told", participle: "told", gerund: "telling" },
+            { spanish: "dejar", base: "leave", past: "left", participle: "left", gerund: "leaving" },
+            { spanish: "deletrear", base: "spell", past: "spelt", participle: "spelt", gerund: "spelling" },
+            { spanish: "derramar", base: "spill", past: "spilt", participle: "spilt", gerund: "spilling" },
+            { spanish: "despertarse", base: "awake", past: "awoke", participle: "awoken", gerund: "awaking" },
+            { spanish: "despertar", base: "wake", past: "woke", participle: "woken", gerund: "waking" },
+            { spanish: "dibujar", base: "draw", past: "drew", participle: "drawn", gerund: "drawing" },
+            { spanish: "disparar", base: "shoot", past: "shot", participle: "shot", gerund: "shooting" },
+            { spanish: "dormir", base: "sleep", past: "slept", participle: "slept", gerund: "sleeping" },
+            { spanish: "echarse", base: "lie", past: "lay", participle: "lain", gerund: "lying" },
+            { spanish: "edificar", base: "build", past: "built", participle: "built", gerund: "building" },
+            { spanish: "elegir", base: "choose", past: "chose", participle: "chosen", gerund: "choosing" },
+            { spanish: "actuar", base: "act", past: "acted", participle: "acted", gerund: "acting" },
+            { spanish: "añadir", base: "add", past: "added", participle: "added", gerund: "adding" },
+            { spanish: "preguntar", base: "ask", past: "asked", participle: "asked", gerund: "asking" },
+            { spanish: "responder", base: "answer", past: "answered", participle: "answered", gerund: "answering" },
+            { spanish: "llegar", base: "arrive", past: "arrived", participle: "arrived", gerund: "arriving" },
+            { spanish: "cepillar", base: "brush", past: "brushed", participle: "brushed", gerund: "brushing" },
+            { spanish: "pertenecer", base: "belong", past: "belonged", participle: "belonged", gerund: "belonging" },
+            { spanish: "suplicar", base: "beg", past: "begged", participle: "begged", gerund: "begging" },
+            { spanish: "creer", base: "believe", past: "believed", participle: "believed", gerund: "believing" },
+            { spanish: "cerrar", base: "close", past: "closed", participle: "closed", gerund: "closing" },
+            { spanish: "cocinar", base: "cook", past: "cooked", participle: "cooked", gerund: "cooking" },
+            { spanish: "llamar", base: "call", past: "called", participle: "called", gerund: "calling" },
+            { spanish: "cambiar", base: "change", past: "changed", participle: "changed", gerund: "changing" },
+            { spanish: "limpiar", base: "clean", past: "cleaned", participle: "cleaned", gerund: "cleaning" },
+            { spanish: "llorar", base: "cry", past: "cried", participle: "cried", gerund: "crying" },
+            { spanish: "bailar", base: "dance", past: "danced", participle: "danced", gerund: "dancing" },
+            { spanish: "vestir", base: "dress", past: "dressed", participle: "dressed", gerund: "dressing" },
+            { spanish: "morir", base: "die", past: "died", participle: "died", gerund: "dying" },
+            { spanish: "secar", base: "dry", past: "dried", participle: "dried", gerund: "drying" },
+            { spanish: "disfrutar", base: "enjoy", past: "enjoyed", participle: "enjoyed", gerund: "enjoying" },
+            { spanish: "explicar", base: "explain", past: "explained", participle: "explained", gerund: "explaining" },
+            { spanish: "seguir", base: "follow", past: "followed", participle: "followed", gerund: "following" },
+            { spanish: "terminar", base: "finish", past: "finished", participle: "finished", gerund: "finishing" },
+            { spanish: "ayudar", base: "help", past: "helped", participle: "helped", gerund: "helping" },
+            { spanish: "esperar", base: "hope", past: "hoped", participle: "hoped", gerund: "hoping" },
+            { spanish: "suceder", base: "happen", past: "happened", participle: "happened", gerund: "happening" },
+            { spanish: "imaginar", base: "imagine", past: "imagined", participle: "imagined", gerund: "imagining" },
+            { spanish: "besar", base: "kiss", past: "kissed", participle: "kissed", gerund: "kissing" },
+            { spanish: "matar", base: "kill", past: "killed", participle: "killed", gerund: "killing" },
+            { spanish: "reír", base: "laugh", past: "laughed", participle: "laughed", gerund: "laughing" },
+            { spanish: "gustar", base: "like", past: "liked", participle: "liked", gerund: "liking" },
+            { spanish: "mirar", base: "look", past: "looked", participle: "looked", gerund: "looking" },
+            { spanish: "extrañar", base: "miss", past: "missed", participle: "missed", gerund: "missing" },
+            { spanish: "casar", base: "marry", past: "married", participle: "married", gerund: "marrying" },
+            { spanish: "abrir", base: "open", past: "opened", participle: "opened", gerund: "opening" },
+            { spanish: "jugar", base: "play", past: "played", participle: "played", gerund: "playing" },
+            { spanish: "preferir", base: "prefer", past: "preferred", participle: "preferred", gerund: "preferring" },
+            { spanish: "prometer", base: "promise", past: "promised", participle: "promised", gerund: "promising" },
+            { spanish: "repetir", base: "repeat", past: "repeated", participle: "repeated", gerund: "repeating" },
+            { spanish: "llover", base: "rain", past: "rained", participle: "rained", gerund: "raining" }
+        ];
+
+        // Variables globales
+        let selectedVerbs = [];
+        let timer;
+        let timeLeft = 45 * 60; // 45 minutos en segundos
+        let examStarted = false;
+
+        // Elementos DOM
+        const startScreen = document.getElementById('start-screen');
+        const examContent = document.getElementById('exam-content');
+        const verbsBody = document.getElementById('verbs-body');
+        const timerElement = document.getElementById('timer');
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const results = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const correctCountElement = document.getElementById('correct-count');
+        const reviewBtn = document.getElementById('review-btn');
+
+        // Event Listeners
+        startBtn.addEventListener('click', startExam);
+        submitBtn.addEventListener('click', submitExam);
+        resetBtn.addEventListener('click', resetExam);
+        reviewBtn.addEventListener('click', reviewAnswers);
+
+        // Función para iniciar el examen
+        function startExam() {
+            // Seleccionar 40 verbos al azar
+            selectedVerbs = getRandomVerbs(40);
+            
+            // Generar la tabla de verbos
+            generateVerbTable();
+            
+            // Ocultar pantalla de inicio y mostrar examen
+            startScreen.style.display = 'none';
+            examContent.style.display = 'block';
+            
+            // Iniciar temporizador
+            startTimer();
+            
+            examStarted = true;
+        }
+
+        // Función para obtener verbos aleatorios
+        function getRandomVerbs(count) {
+            const shuffled = [...verbDatabase].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        // Función para generar la tabla de verbos
+        function generateVerbTable() {
+            verbsBody.innerHTML = '';
+            
+            selectedVerbs.forEach(verb => {
+                const row = document.createElement('tr');
+                
+                // Determinar qué campos mostrar y cuáles dejar en blanco
+                const fields = ['base', 'past', 'participle', 'gerund'];
+                const hiddenFields = getRandomFields(2); // Ocultar 2 campos al azar
+                
+                // Celda para el verbo en español
+                const spanishCell = document.createElement('td');
+                spanishCell.textContent = verb.spanish;
+                row.appendChild(spanishCell);
+                
+                // Generar celdas para cada forma verbal
+                fields.forEach(field => {
+                    const cell = document.createElement('td');
+                    
+                    if (hiddenFields.includes(field)) {
+                        // Campo a completar por el estudiante
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.dataset.field = field;
+                        input.dataset.correct = verb[field];
+                        cell.appendChild(input);
+                        
+                        // Añadir ayuda aleatoria (10% de probabilidad)
+                        if (Math.random() < 0.1) {
+                            const help = document.createElement('div');
+                            help.className = 'help';
+                            help.textContent = `Ayuda: ${verb[field].charAt(0)}...`;
+                            cell.appendChild(help);
+                        }
+                    } else {
+                        // Campo ya completado
+                        cell.textContent = verb[field];
+                    }
+                    
+                    row.appendChild(cell);
+                });
+                
+                verbsBody.appendChild(row);
+            });
+        }
+
+        // Función para seleccionar campos aleatorios a ocultar
+        function getRandomFields(count) {
+            const fields = ['base', 'past', 'participle', 'gerund'];
+            const shuffled = [...fields].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        // Función para iniciar el temporizador
+        function startTimer() {
+            updateTimerDisplay();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    submitExam();
+                } else if (timeLeft <= 5 * 60) { // 5 minutos restantes
+                    timerElement.classList.add('warning');
+                }
+            }, 1000);
+        }
+
+        // Función para actualizar la visualización del temporizador
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Función para enviar el examen
+        function submitExam() {
+            clearInterval(timer);
+            
+            let correctAnswers = 0;
+            let totalQuestions = 0;
+            
+            // Revisar todas las respuestas
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                totalQuestions++;
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctAnswer = input.dataset.correct.toLowerCase();
+                
+                if (userAnswer === correctAnswer) {
+                    input.classList.add('correct');
+                    correctAnswers++;
+                } else {
+                    input.classList.add('incorrect');
+                }
+                
+                // Deshabilitar inputs
+                input.disabled = true;
+            });
+            
+            // Calcular puntuación
+            const score = Math.round((correctAnswers / totalQuestions) * 100);
+            
+            // Mostrar resultados
+            scoreElement.textContent = `${score}%`;
+            correctCountElement.textContent = `Respuestas correctas: ${correctAnswers}/${totalQuestions}`;
+            
+            // Aplicar clase de color según la puntuación
+            if (score >= 90) {
+                scoreElement.className = 'score perfect';
+            } else if (score >= 70) {
+                scoreElement.className = 'score good';
+            } else if (score >= 50) {
+                scoreElement.className = 'score average';
+            } else {
+                scoreElement.className = 'score poor';
+            }
+            
+            // Mostrar sección de resultados
+            results.style.display = 'block';
+            
+            // Deshabilitar botón de enviar
+            submitBtn.disabled = true;
+        }
+
+        // Función para reiniciar el examen
+        function resetExam() {
+            clearInterval(timer);
+            
+            // Restablecer variables
+            timeLeft = 45 * 60;
+            examStarted = false;
+            
+            // Restablecer UI
+            timerElement.textContent = '45:00';
+            timerElement.classList.remove('warning');
+            results.style.display = 'none';
+            examContent.style.display = 'none';
+            startScreen.style.display = 'block';
+            submitBtn.disabled = false;
+        }
+
+        // Función para revisar respuestas
+        function reviewAnswers() {
+            // Habilitar inputs temporalmente para revisión
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.disabled = false;
+            });
+            
+            // Desplazar hacia arriba para ver las preguntas
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
