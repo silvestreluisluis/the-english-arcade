@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detectives del Participio</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid #fdbb2d;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .game-area {
+            padding: 25px;
+        }
+        
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        .btn-success {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(to right, #f39c12, #e67e22);
+        }
+        
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .phase-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .question-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3498db;
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .option-btn {
+            background-color: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option-btn:hover {
+            background-color: #d6dbdf;
+        }
+        
+        .option-btn.selected {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin: 10px 0;
+            transition: border-color 0.3s;
+        }
+        
+        .input-field:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .feedback {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .score-display {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #2ecc71, #3498db);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .results {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .medal {
+            font-size: 4rem;
+            margin: 20px 0;
+        }
+        
+        .final-score {
+            font-size: 2rem;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+        
+        .verb-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .verb-item {
+            background-color: #ecf0f1;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .grade-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #2c3e50;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Detectives del Participio</h1>
+            <div class="subtitle">Analiza, corrige y completa frases usando el pasado participio</div>
+        </header>
+        
+        <div class="game-area">
+            <!-- Pantalla de inicio -->
+            <div id="start-screen" class="screen active">
+                <div class="instructions">
+                    <h2 class="phase-title">¡Bienvenido, detective!</h2>
+                    <p>Tu misión es resolver casos relacionados con el uso correcto del pasado participio en español.</p>
+                    <p>El juego tiene tres fases:</p>
+                    <ul>
+                        <li><strong>Fase 1: Investigación</strong> - Corrige frases con errores</li>
+                        <li><strong>Fase 2: Reconstrucción</strong> - Completa frases con huecos</li>
+                        <li><strong>Fase 3: Contrarreloj</strong> - Responde rápido para ganar puntos extra</li>
+                    </ul>
+                </div>
+                
+                <div class="verb-list-container">
+                    <h3 class="phase-title">Verbos incluidos en el juego</h3>
+                    <div class="verb-list">
+                        <div class="verb-item">speed</div>
+                        <div class="verb-item">feed</div>
+                        <div class="verb-item">stink</div>
+                        <div class="verb-item">bet</div>
+                        <div class="verb-item">lean</div>
+                        <div class="verb-item">creep</div>
+                        <div class="verb-item">kneel</div>
+                        <div class="verb-item">throw</div>
+                        <div class="verb-item">sweep</div>
+                        <div class="verb-item">drink</div>
+                        <div class="verb-item">fall</div>
+                        <div class="verb-item">sing</div>
+                        <div class="verb-item">dig</div>
+                        <div class="verb-item">catch</div>
+                        <div class="verb-item">take</div>
+                        <div class="verb-item">act</div>
+                        <div class="verb-item">add</div>
+                        <div class="verb-item">ask</div>
+                        <div class="verb-item">answer</div>
+                        <div class="verb-item">arrive</div>
+                        <div class="verb-item">brush</div>
+                        <div class="verb-item">belong</div>
+                        <div class="verb-item">beg</div>
+                        <div class="verb-item">believe</div>
+                        <div class="verb-item">close</div>
+                        <div class="verb-item">cook</div>
+                        <div class="verb-item">call</div>
+                        <div class="verb-item">change</div>
+                        <div class="verb-item">clean</div>
+                        <div class="verb-item">cry</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button id="start-btn" class="btn btn-success">Comenzar Investigación</button>
+                </div>
+            </div>
+            
+            <!-- Fase 1: Investigación -->
+            <div id="phase1-screen" class="screen">
+                <h2 class="phase-title">Fase 1: Investigación</h2>
+                <div class="instructions">
+                    <p>Analiza cada frase, identifica el tipo de estructura y corrige el error relacionado con el pasado participio.</p>
+                </div>
+                
+                <div class="progress-bar">
+                    <div id="phase1-progress" class="progress"></div>
+                </div>
+                
+                <div id="phase1-question" class="question-card">
+                    <div class="question-text" id="phase1-question-text"></div>
+                    
+                    <div class="options">
+                        <div class="option-btn" data-type="afirmativa">Afirmativa</div>
+                        <div class="option-btn" data-type="negativa">Negativa</div>
+                        <div class="option-btn" data-type="interrogativa">Interrogativa</div>
+                    </div>
+                    
+                    <input type="text" id="phase1-answer" class="input-field" placeholder="Escribe aquí la frase corregida...">
+                    
+                    <div id="phase1-feedback" class="feedback"></div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button id="phase1-check" class="btn">Verificar</button>
+                        <button id="phase1-next" class="btn" style="display: none;">Siguiente</button>
+                    </div>
+                </div>
+                
+                <div class="score-display">
+                    Puntuación: <span id="phase1-score">0</span> puntos
+                </div>
+            </div>
+            
+            <!-- Fase 2: Reconstrucción -->
+            <div id="phase2-screen" class="screen">
+                <h2 class="phase-title">Fase 2: Reconstrucción</h2>
+                <div class="instructions">
+                    <p>Completa las frases con la forma correcta del pasado participio. ¡Usa las pistas para ayudarte!</p>
+                </div>
+                
+                <div class="progress-bar">
+                    <div id="phase2-progress" class="progress"></div>
+                </div>
+                
+                <div id="phase2-question" class="question-card">
+                    <div class="question-text" id="phase2-question-text"></div>
+                    
+                    <input type="text" id="phase2-answer" class="input-field" placeholder="Escribe aquí el participio correcto...">
+                    
+                    <div id="phase2-feedback" class="feedback"></div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button id="phase2-check" class="btn">Verificar</button>
+                        <button id="phase2-next" class="btn" style="display: none;">Siguiente</button>
+                    </div>
+                </div>
+                
+                <div class="score-display">
+                    Puntuación: <span id="phase2-score">0</span> puntos
+                </div>
+            </div>
+            
+            <!-- Fase 3: Contrarreloj -->
+            <div id="phase3-screen" class="screen">
+                <h2 class="phase-title">Fase 3: Contrarreloj</h2>
+                <div class="instructions">
+                    <p>¡Tienes 60 segundos para resolver tantas frases como puedas! Cada acierto suma puntos, cada error resta tiempo.</p>
+                </div>
+                
+                <div class="timer" id="phase3-timer">60</div>
+                
+                <div id="phase3-question" class="question-card">
+                    <div class="question-text" id="phase3-question-text"></div>
+                    
+                    <input type="text" id="phase3-answer" class="input-field" placeholder="Escribe aquí la respuesta...">
+                    
+                    <div id="phase3-feedback" class="feedback"></div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button id="phase3-check" class="btn">Verificar</button>
+                    </div>
+                </div>
+                
+                <div class="score-display">
+                    Puntuación: <span id="phase3-score">0</span> puntos
+                </div>
+            </div>
+            
+            <!-- Pantalla de resultados -->
+            <div id="results-screen" class="screen">
+                <div class="results">
+                    <h2 class="phase-title">¡Investigación completada!</h2>
+                    
+                    <div id="final-medal" class="medal">🥉</div>
+                    
+                    <div class="final-score">Tu calificación es:</div>
+                    <div id="final-grade" class="grade-display">7.5</div>
+                    
+                    <div class="score-display" style="margin: 20px auto;">
+                        Puntuación final: <span id="final-score">0</span> puntos
+                    </div>
+                    
+                    <div id="final-description" style="margin: 20px 0;">
+                        <p>Has completado todas las fases de la investigación.</p>
+                    </div>
+                    
+                    <button id="restart-btn" class="btn btn-success">Jugar de nuevo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de preguntas con los verbos especificados y sin contracciones
+        const questions = {
+            phase1: [
+                {
+                    sentence: "He have drinked all the juice.",
+                    type: "afirmativa",
+                    corrected: "He has drunk all the juice."
+                },
+                {
+                    sentence: "She has not sang in the choir before.",
+                    type: "negativa",
+                    corrected: "She has not sung in the choir before."
+                },
+                {
+                    sentence: "Have you ever throwed a perfect game?",
+                    type: "interrogativa",
+                    corrected: "Have you ever thrown a perfect game?"
+                },
+                {
+                    sentence: "They have catched the early train.",
+                    type: "afirmativa",
+                    corrected: "They have caught the early train."
+                },
+                {
+                    sentence: "I have not took my medicine today.",
+                    type: "negativa",
+                    corrected: "I have not taken my medicine today."
+                },
+                {
+                    sentence: "Has she sweeped the floor yet?",
+                    type: "interrogativa",
+                    corrected: "Has she swept the floor yet?"
+                },
+                {
+                    sentence: "We have digged a hole in the garden.",
+                    type: "afirmativa",
+                    corrected: "We have dug a hole in the garden."
+                },
+                {
+                    sentence: "He has not fell from that height.",
+                    type: "negativa",
+                    corrected: "He has not fallen from that height."
+                },
+                {
+                    sentence: "Have you ever feed the animals?",
+                    type: "interrogativa",
+                    corrected: "Have you ever fed the animals?"
+                },
+                {
+                    sentence: "She have bet all her money on that horse.",
+                    type: "afirmativa",
+                    corrected: "She has bet all her money on that horse."
+                }
+            ],
+            phase2: [
+                {
+                    sentence: "Have you ever _ on stage? (sing)",
+                    answer: "sung",
+                    hint: "El pasado participio de 'sing' es irregular"
+                },
+                {
+                    sentence: "She has _ the door before leaving. (close)",
+                    answer: "closed",
+                    hint: "Este verbo es regular, solo añade -d"
+                },
+                {
+                    sentence: "They have not _ their homework yet. (finish)",
+                    answer: "finished",
+                    hint: "Verbo regular que termina en -sh, añade -ed"
+                },
+                {
+                    sentence: "Has he _ the ball correctly? (throw)",
+                    answer: "thrown",
+                    hint: "El pasado participio de 'throw' es irregular"
+                },
+                {
+                    sentence: "I have _ all the cookies. (eat)",
+                    answer: "eaten",
+                    hint: "El pasado participio de 'eat' es irregular"
+                },
+                {
+                    sentence: "We have not _ to that new restaurant. (go)",
+                    answer: "gone",
+                    hint: "El pasado participio de 'go' es muy irregular"
+                },
+                {
+                    sentence: "Have you _ the news? (hear)",
+                    answer: "heard",
+                    hint: "Verbo regular que termina en vocal + r, añade -d"
+                },
+                {
+                    sentence: "She has _ a beautiful picture. (draw)",
+                    answer: "drawn",
+                    hint: "El pasado participio de 'draw' es irregular"
+                },
+                {
+                    sentence: "They have not _ the meeting. (Lean)",
+                    answer: "leant",
+                    hint: "Verbo regular, añade -ed"
+                },
+                {
+                    sentence: "Has he _ his room? (clean)",
+                    answer: "cleaned",
+                    hint: "Verbo regular, añade -ed"
+                }
+            ],
+            phase3: [
+                {
+                    sentence: "She _ the door before leaving. (close)",
+                    answer: "has closed"
+                },
+                {
+                    sentence: "Have you ever _ on stage? (sing)",
+                    answer: "sung"
+                },
+                {
+                    sentence: "I have not _ my breakfast yet. (eat)",
+                    answer: "eaten"
+                },
+                {
+                    sentence: "He has _ all the juice. (drink)",
+                    answer: "drunk"
+                },
+                {
+                    sentence: "We _ to Paris last year. (travel)",
+                    answer: "traveled"
+                },
+                {
+                    sentence: "Has she _ the letter? (write)",
+                    answer: "written"
+                },
+                {
+                    sentence: "They have not _ the truth. (tell)",
+                    answer: "told"
+                },
+                {
+                    sentence: "I have _ my keys. (lose)",
+                    answer: "lost"
+                },
+                {
+                    sentence: "He _ his homework. (do)",
+                    answer: "has done"
+                },
+                {
+                    sentence: "Have you _ the movie? (see)",
+                    answer: "seen"
+                }
+            ]
+        };
+
+        // Variables del juego
+        let currentPhase = 1;
+        let currentQuestion = 0;
+        let score = 0;
+        let phase1Score = 0;
+        let phase2Score = 0;
+        let phase3Score = 0;
+        let timer;
+        let timeLeft = 60;
+        let selectedType = null;
+
+        // Elementos del DOM
+        const startScreen = document.getElementById('start-screen');
+        const phase1Screen = document.getElementById('phase1-screen');
+        const phase2Screen = document.getElementById('phase2-screen');
+        const phase3Screen = document.getElementById('phase3-screen');
+        const resultsScreen = document.getElementById('results-screen');
+
+        // Botones
+        const startBtn = document.getElementById('start-btn');
+        const phase1CheckBtn = document.getElementById('phase1-check');
+        const phase1NextBtn = document.getElementById('phase1-next');
+        const phase2CheckBtn = document.getElementById('phase2-check');
+        const phase2NextBtn = document.getElementById('phase2-next');
+        const phase3CheckBtn = document.getElementById('phase3-check');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Inicialización del juego
+        startBtn.addEventListener('click', startGame);
+        phase1CheckBtn.addEventListener('click', checkPhase1Answer);
+        phase1NextBtn.addEventListener('click', nextPhase1Question);
+        phase2CheckBtn.addEventListener('click', checkPhase2Answer);
+        phase2NextBtn.addEventListener('click', nextPhase2Question);
+        phase3CheckBtn.addEventListener('click', checkPhase3Answer);
+        restartBtn.addEventListener('click', restartGame);
+
+        // Event listeners para los botones de tipo de frase
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedType = this.getAttribute('data-type');
+            });
+        });
+
+        function startGame() {
+            startScreen.classList.remove('active');
+            phase1Screen.classList.add('active');
+            loadPhase1Question();
+        }
+
+        function loadPhase1Question() {
+            const question = questions.phase1[currentQuestion];
+            document.getElementById('phase1-question-text').textContent = question.sentence;
+            document.getElementById('phase1-answer').value = '';
+            document.getElementById('phase1-feedback').style.display = 'none';
+            document.getElementById('phase1-feedback').className = 'feedback';
+            document.getElementById('phase1-check').style.display = 'inline-block';
+            document.getElementById('phase1-next').style.display = 'none';
+            
+            // Resetear selección de tipo
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            selectedType = null;
+            
+            // Actualizar barra de progreso
+            const progress = ((currentQuestion + 1) / questions.phase1.length) * 100;
+            document.getElementById('phase1-progress').style.width = `${progress}%`;
+        }
+
+        function checkPhase1Answer() {
+            const question = questions.phase1[currentQuestion];
+            const userAnswer = document.getElementById('phase1-answer').value.trim();
+            const feedback = document.getElementById('phase1-feedback');
+            
+            // Verificar si se seleccionó el tipo de frase
+            if (!selectedType) {
+                feedback.textContent = "Por favor, selecciona el tipo de estructura de la frase.";
+                feedback.className = 'feedback incorrect';
+                feedback.style.display = 'block';
+                return;
+            }
+            
+            // Verificar si la respuesta está vacía
+            if (!userAnswer) {
+                feedback.textContent = "Por favor, escribe la frase corregida.";
+                feedback.className = 'feedback incorrect';
+                feedback.style.display = 'block';
+                return;
+            }
+            
+            let points = 0;
+            let message = "";
+            
+            // Verificar tipo de frase
+            if (selectedType === question.type) {
+                points += 5;
+                message += "✅ Correcto: has identificado bien el tipo de estructura.\n";
+            } else {
+                message += "❌ Incorrecto: el tipo de estructura es " + question.type + ".\n";
+            }
+            
+            // Verificar corrección de la frase
+            if (userAnswer.toLowerCase() === question.corrected.toLowerCase()) {
+                points += 10;
+                message += "✅ Excelente: la frase está perfectamente corregida.";
+                feedback.className = 'feedback correct';
+            } else {
+                message += "❌ La corrección no es exacta. La respuesta correcta es: '" + question.corrected + "'";
+                feedback.className = 'feedback incorrect';
+            }
+            
+            // Actualizar puntuación
+            score += points;
+            phase1Score += points;
+            document.getElementById('phase1-score').textContent = phase1Score;
+            
+            // Mostrar feedback
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+            
+            // Cambiar botones
+            document.getElementById('phase1-check').style.display = 'none';
+            document.getElementById('phase1-next').style.display = 'inline-block';
+        }
+
+        function nextPhase1Question() {
+            currentQuestion++;
+            
+            if (currentQuestion < questions.phase1.length) {
+                loadPhase1Question();
+            } else {
+                // Pasar a la siguiente fase
+                currentQuestion = 0;
+                phase1Screen.classList.remove('active');
+                phase2Screen.classList.add('active');
+                loadPhase2Question();
+            }
+        }
+
+        function loadPhase2Question() {
+            const question = questions.phase2[currentQuestion];
+            document.getElementById('phase2-question-text').textContent = question.sentence;
+            document.getElementById('phase2-answer').value = '';
+            document.getElementById('phase2-feedback').style.display = 'none';
+            document.getElementById('phase2-feedback').className = 'feedback';
+            document.getElementById('phase2-check').style.display = 'inline-block';
+            document.getElementById('phase2-next').style.display = 'none';
+            
+            // Actualizar barra de progreso
+            const progress = ((currentQuestion + 1) / questions.phase2.length) * 100;
+            document.getElementById('phase2-progress').style.width = `${progress}%`;
+        }
+
+        function checkPhase2Answer() {
+            const question = questions.phase2[currentQuestion];
+            const userAnswer = document.getElementById('phase2-answer').value.trim().toLowerCase();
+            const feedback = document.getElementById('phase2-feedback');
+            
+            if (!userAnswer) {
+                feedback.textContent = "Por favor, escribe el participio correcto.";
+                feedback.className = 'feedback incorrect';
+                feedback.style.display = 'block';
+                return;
+            }
+            
+            if (userAnswer === question.answer) {
+                // Respuesta correcta
+                score += 10;
+                phase2Score += 10;
+                document.getElementById('phase2-score').textContent = phase2Score;
+                
+                feedback.textContent = "✅ ¡Correcto! " + question.hint;
+                feedback.className = 'feedback correct';
+            } else {
+                // Respuesta incorrecta
+                feedback.textContent = "❌ Incorrecto. La respuesta correcta es '" + question.answer + "'. " + question.hint;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            feedback.style.display = 'block';
+            
+            // Cambiar botones
+            document.getElementById('phase2-check').style.display = 'none';
+            document.getElementById('phase2-next').style.display = 'inline-block';
+        }
+
+        function nextPhase2Question() {
+            currentQuestion++;
+            
+            if (currentQuestion < questions.phase2.length) {
+                loadPhase2Question();
+            } else {
+                // Pasar a la siguiente fase
+                currentQuestion = 0;
+                phase2Screen.classList.remove('active');
+                phase3Screen.classList.add('active');
+                startPhase3();
+            }
+        }
+
+        function startPhase3() {
+            timeLeft = 60;
+            document.getElementById('phase3-timer').textContent = timeLeft;
+            document.getElementById('phase3-score').textContent = phase3Score;
+            
+            loadPhase3Question();
+            
+            // Iniciar temporizador
+            timer = setInterval(function() {
+                timeLeft--;
+                document.getElementById('phase3-timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endPhase3();
+                }
+            }, 1000);
+        }
+
+        function loadPhase3Question() {
+            const question = questions.phase3[currentQuestion];
+            document.getElementById('phase3-question-text').textContent = question.sentence;
+            document.getElementById('phase3-answer').value = '';
+            document.getElementById('phase3-feedback').style.display = 'none';
+            document.getElementById('phase3-feedback').className = 'feedback';
+        }
+
+        function checkPhase3Answer() {
+            const question = questions.phase3[currentQuestion];
+            const userAnswer = document.getElementById('phase3-answer').value.trim().toLowerCase();
+            const feedback = document.getElementById('phase3-feedback');
+            
+            if (!userAnswer) {
+                feedback.textContent = "Por favor, escribe tu respuesta.";
+                feedback.className = 'feedback incorrect';
+                feedback.style.display = 'block';
+                return;
+            }
+            
+            if (userAnswer === question.answer.toLowerCase()) {
+                // Respuesta correcta
+                phase3Score += 10;
+                score += 10;
+                document.getElementById('phase3-score').textContent = phase3Score;
+                
+                feedback.textContent = "✅ ¡Correcto! +10 puntos";
+                feedback.className = 'feedback correct';
+                
+                // Bonus por velocidad (más puntos si queda mucho tiempo)
+                if (timeLeft > 40) {
+                    phase3Score += 5;
+                    score += 5;
+                    document.getElementById('phase3-score').textContent = phase3Score;
+                    feedback.textContent += " +5 puntos de bonus por velocidad";
+                }
+            } else {
+                // Respuesta incorrecta
+                feedback.textContent = "❌ Incorrecto. La respuesta correcta es '" + question.answer + "'.";
+                feedback.className = 'feedback incorrect';
+                
+                // Penalización: restar tiempo
+                timeLeft = Math.max(0, timeLeft - 5);
+                document.getElementById('phase3-timer').textContent = timeLeft;
+            }
+            
+            feedback.style.display = 'block';
+            
+            // Pasar a la siguiente pregunta después de un breve retraso
+            setTimeout(function() {
+                currentQuestion++;
+                
+                if (currentQuestion < questions.phase3.length && timeLeft > 0) {
+                    loadPhase3Question();
+                } else {
+                    endPhase3();
+                }
+            }, 1500);
+        }
+
+        function endPhase3() {
+            clearInterval(timer);
+            showResults();
+        }
+
+        function showResults() {
+            phase3Screen.classList.remove('active');
+            resultsScreen.classList.add('active');
+            
+            document.getElementById('final-score').textContent = score;
+            
+            // Calcular calificación de 0 a 10
+            const maxScore = 300; // 10 preguntas x 15 puntos (F1) + 10 preguntas x 10 puntos (F2) + 10 preguntas x 10 puntos (F3)
+            const grade = Math.min(10, (score / maxScore) * 10).toFixed(1);
+            
+            document.getElementById('final-grade').textContent = grade;
+            
+            // Determinar medalla y descripción
+            let medal, description;
+            
+            if (grade >= 9) {
+                medal = "🥇";
+                description = "¡Felicidades! Tienes un dominio sólido del pasado participio.";
+            } else if (grade >= 7) {
+                medal = "🥈";
+                description = "Buen manejo del pasado participio, con algunos errores menores.";
+            } else if (grade >= 5) {
+                medal = "🥉";
+                description = "Necesitas reforzar algunas estructuras del pasado participio.";
+            } else {
+                medal = "❌";
+                description = "Revisión urgente recomendada. Sigue practicando el pasado participio.";
+            }
+            
+            document.getElementById('final-medal').textContent = medal;
+            document.getElementById('final-description').innerHTML = `<p>${description}</p>`;
+        }
+
+        function restartGame() {
+            // Reiniciar variables del juego
+            currentPhase = 1;
+            currentQuestion = 0;
+            score = 0;
+            phase1Score = 0;
+            phase2Score = 0;
+            phase3Score = 0;
+            timeLeft = 60;
+            selectedType = null;
+            
+            // Reiniciar pantallas
+            resultsScreen.classList.remove('active');
+            startScreen.classList.add('active');
+            
+            // Reiniciar puntuaciones mostradas
+            document.getElementById('phase1-score').textContent = "0";
+            document.getElementById('phase2-score').textContent = "0";
+            document.getElementById('phase3-score').textContent = "0";
+        }
+    </script>
+</body>
+</html>
