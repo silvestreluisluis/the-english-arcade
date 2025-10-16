@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Detectives: ¿Quién fue el culpable?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #3498db;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        #game-screen {
+            display: none;
+        }
+        
+        #result-screen {
+            display: none;
+            text-align: center;
+        }
+        
+        .mystery {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .mystery-question {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        
+        .witness-section {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .witness-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .english-sentence {
+            background-color: #ffffff;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+            font-style: italic;
+            line-height: 1.5;
+        }
+        
+        .suspects {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .suspect-btn {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .suspect-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .suspect-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result-container {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .score {
+            font-size: 3rem;
+            color: #2c3e50;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .feedback {
+            font-size: 1.3rem;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .correct {
+            background-color: rgba(46, 204, 113, 0.2);
+            border-left: 5px solid #2ecc71;
+            color: #27ae60;
+        }
+        
+        .incorrect {
+            background-color: rgba(231, 76, 60, 0.2);
+            border-left: 5px solid #e74c3c;
+            color: #c0392b;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .verb-info {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #7f8c8d;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .suspects {
+                grid-template-columns: 1fr;
+            }
+            
+            .mystery-question {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Detectives: ¿Quién fue el culpable?</h1>
+            <p>Practica el pasado simple en inglés resolviendo misterios</p>
+        </header>
+        
+        <!-- Pantalla de inicio -->
+        <div id="start-screen" class="screen">
+            <div class="mystery">
+                <h2>Instrucciones</h2>
+                <p>Analiza cada caso y lee las declaraciones en inglés.</p>
+                <p>Identifica al culpable basándote en las acciones en pasado simple.</p>
+                <p>¡Responde correctamente las 30 preguntas para resolver todos los casos!</p>
+                <p class="verb-info">Cada partida utiliza 30 verbos diferentes en pasado simple.</p>
+            </div>
+            <button id="start-btn" class="btn">Comenzar Investigación</button>
+        </div>
+        
+        <!-- Pantalla del juego -->
+        <div id="game-screen" class="screen">
+            <div class="game-info">
+                <div id="question-counter">Caso: 1/30</div>
+                <div id="score-counter">Puntuación: 0</div>
+            </div>
+            
+            <div class="progress-bar">
+                <div id="progress" class="progress"></div>
+            </div>
+            
+            <div class="mystery">
+                <div id="mystery-question" class="mystery-question"></div>
+                
+                <div class="witness-section">
+                    <div class="witness-title">🔍 Declaraciones (Inglés):</div>
+                    <div id="english-sentences"></div>
+                </div>
+                
+                <div class="witness-section">
+                    <div class="witness-title">👥 ¿Quién fue el culpable?</div>
+                    <div id="suspects" class="suspects"></div>
+                </div>
+            </div>
+            
+            <div id="feedback" class="feedback"></div>
+        </div>
+        
+        <!-- Pantalla de resultados -->
+        <div id="result-screen" class="screen">
+            <h2>¡Investigación Completada!</h2>
+            <div class="result-container">
+                <div id="final-score" class="score"></div>
+                <p id="result-message"></p>
+                <div id="verbs-used" class="verb-info"></div>
+            </div>
+            <button id="restart-btn" class="btn">Nueva Investigación</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de 30 casos simplificados
+        const cases = [
+            {
+                question: "¿Quién robó el dinero de la caja?",
+                sentences: [
+                    "Alex sped away from the store quickly.",
+                    "Maria fed her cat at home all evening.",
+                    "John stank after playing soccer for hours.",
+                    "Lisa bet on the wrong horse at the racetrack."
+                ],
+                culpable: "Alex"
+            },
+            {
+                question: "¿Quién rompió la ventana del auto?",
+                sentences: [
+                    "Carlos leaned against the car while waiting.",
+                    "Emma crept quietly past the vehicle.",
+                    "Mike knelt to tie his shoes nearby.",
+                    "Sarah threw a ball that hit the window."
+                ],
+                culpable: "Sarah"
+            },
+            {
+                question: "¿Quién dejó la puerta abierta?",
+                sentences: [
+                    "David swept the floor before leaving.",
+                    "Anna drank coffee in the kitchen.",
+                    "Tom fell asleep on the sofa.",
+                    "Laura sang in the shower for an hour."
+                ],
+                culpable: "Tom"
+            },
+            {
+                question: "¿Quién comió el último pedazo de pastel?",
+                sentences: [
+                    "Paul dug in the garden all morning.",
+                    "Sofia caught a fish at the lake.",
+                    "Kevin took the last piece of cake.",
+                    "Nina hung the picture on the wall."
+                ],
+                culpable: "Kevin"
+            },
+            {
+                question: "¿Quién manejó el auto sin permiso?",
+                sentences: [
+                    "Luis swung on the playground swings.",
+                    "Elena ate breakfast at the cafe.",
+                    "Peter bought groceries for dinner.",
+                    "Marta drove the car to the beach."
+                ],
+                culpable: "Marta"
+            },
+            {
+                question: "¿Quién apagó las luces del salón?",
+                sentences: [
+                    "George acted in the school play.",
+                    "Clara added sugar to her tea.",
+                    "Henry asked about the homework.",
+                    "Rosa answered the phone call."
+                ],
+                culpable: "Rosa"
+            },
+            {
+                question: "¿Quién llegó tarde a la reunión?",
+                sentences: [
+                    "Victor arrived after everyone left.",
+                    "Isabel brushed her hair carefully.",
+                    "Oscar belonged to the chess club.",
+                    "Carmen begged for more time."
+                ],
+                culpable: "Victor"
+            },
+            {
+                question: "¿Quién creyó la información falsa?",
+                sentences: [
+                    "Javier believed the fake news.",
+                    "Patricia closed the store early.",
+                    "Ricardo cooked dinner for his family.",
+                    "Diana called her mother yesterday."
+                ],
+                culpable: "Javier"
+            },
+            {
+                question: "¿Quién cambió la contraseña?",
+                sentences: [
+                    "Roberto changed the computer password.",
+                    "Gabriela cleaned the entire house.",
+                    "Felipe cried during the sad movie.",
+                    "Andrea danced at the party all night."
+                ],
+                culpable: "Roberto"
+            },
+            {
+                question: "¿Quién se vistió con la ropa equivocada?",
+                sentences: [
+                    "Sergio dressed in formal clothes for the beach.",
+                    "Monica died in the video game.",
+                    "Raul dried the dishes after washing.",
+                    "Teresa sped through the yellow light."
+                ],
+                culpable: "Sergio"
+            },
+            {
+                question: "¿Quién alimentó a los animales?",
+                sentences: [
+                    "Enrique fed the dogs this morning.",
+                    "Lucia stank of perfume.",
+                    "Miguel bet all his money.",
+                    "Silvia leaned on the broken chair."
+                ],
+                culpable: "Enrique"
+            },
+            {
+                question: "¿Quién se arrastró por el túnel?",
+                sentences: [
+                    "Antonio crept through the dark tunnel.",
+                    "Eva knelt to pray in church.",
+                    "Jorge threw the paper in the bin.",
+                    "Ruth swept the porch clean."
+                ],
+                culpable: "Antonio"
+            },
+            {
+                question: "¿Quién bebió toda la leche?",
+                sentences: [
+                    "Francisco drank all the milk.",
+                    "Margarita fell down the stairs.",
+                    "Alberto sang in the choir.",
+                    "Beatriz dug a hole in the yard."
+                ],
+                culpable: "Francisco"
+            },
+            {
+                question: "¿Quién atrapó la pelota?",
+                sentences: [
+                    "Manuel caught the ball with one hand.",
+                    "Consuelo took the bus to work.",
+                    "Ramon hung the clock on the wall.",
+                    "Elena swung the bat powerfully."
+                ],
+                culpable: "Manuel"
+            },
+            {
+                question: "¿Quién compró los boletos?",
+                sentences: [
+                    "Pablo bought the concert tickets online.",
+                    "Raquel drove to the mountains.",
+                    "Hector acted surprised.",
+                    "Olga added salt to the soup."
+                ],
+                culpable: "Pablo"
+            },
+            {
+                question: "¿Quién preguntó por las direcciones?",
+                sentences: [
+                    "Daniel asked for directions to the hotel.",
+                    "Rosa answered all the questions correctly.",
+                    "Jose arrived at the airport early.",
+                    "Isabella brushed her teeth three times."
+                ],
+                culpable: "Daniel"
+            },
+            {
+                question: "¿Quién perteneció al equipo ganador?",
+                sentences: [
+                    "Fernando belonged to the winning team.",
+                    "Adriana begged for forgiveness.",
+                    "Diego believed the strange story.",
+                    "Camila closed the window because of rain."
+                ],
+                culpable: "Fernando"
+            },
+            {
+                question: "¿Quién cocinó la cena?",
+                sentences: [
+                    "Santiago cooked dinner for everyone.",
+                    "Valeria called her friend in Spain.",
+                    "Andres changed his mind about the trip.",
+                    "Gabriela cleaned her room thoroughly."
+                ],
+                culpable: "Santiago"
+            },
+            {
+                question: "¿Quién lloró en la película?",
+                sentences: [
+                    "Rodrigo cried during the romantic movie.",
+                    "Mariana danced until midnight.",
+                    "Esteban dressed in his best suit.",
+                    "Lucia died in the video game level."
+                ],
+                culpable: "Rodrigo"
+            },
+            {
+                question: "¿Quién secó la ropa?",
+                sentences: [
+                    "Gonzalo dried the wet clothes.",
+                    "Carolina sped to catch the train.",
+                    "Martin fed the birds in the park.",
+                    "Daniela stank from the gym workout."
+                ],
+                culpable: "Gonzalo"
+            },
+            {
+                question: "¿Quién apostó en el casino?",
+                sentences: [
+                    "Sebastian bet all his savings at the casino.",
+                    "Alejandra leaned against the wall tired.",
+                    "Mateo crept into the room quietly.",
+                    "Valentina knelt to pick up the coin."
+                ],
+                culpable: "Sebastian"
+            },
+            {
+                question: "¿Quién lanzó la piedra?",
+                sentences: [
+                    "Nicolas threw a stone into the river.",
+                    "Fernanda swept the kitchen floor.",
+                    "Lucas drank two bottles of water.",
+                    "Catalina fell while ice skating."
+                ],
+                culpable: "Nicolas"
+            },
+            {
+                question: "¿Quién cantó en el karaoke?",
+                sentences: [
+                    "Julian sang loudly at the karaoke bar.",
+                    "Gabriella dug in her purse for keys.",
+                    "Mauricio caught a cold last week.",
+                    "Jimena took photographs of the sunset."
+                ],
+                culpable: "Julian"
+            },
+            {
+                question: "¿Quién colgó el cuadro torcido?",
+                sentences: [
+                    "Rafael hung the picture crookedly.",
+                    "Paula swung on the hammock.",
+                    "Hugo ate the last cookie.",
+                    "Sara bought a new dress for the party."
+                ],
+                culpable: "Rafael"
+            },
+            {
+                question: "¿Quién manejó por el camino equivocado?",
+                sentences: [
+                    "Ignacio drove down the wrong road.",
+                    "Lourdes acted in the community theater.",
+                    "Federico added too much pepper.",
+                    "Cecilia asked the teacher for help."
+                ],
+                culpable: "Ignacio"
+            },
+            {
+                question: "¿Quién respondió el email importante?",
+                sentences: [
+                    "Emilio answered the important email.",
+                    "Ximena arrived just in time.",
+                    "Alfonso brushed the dust off his coat.",
+                    "Renata belonged to the book club."
+                ],
+                culpable: "Emilio"
+            },
+            {
+                question: "¿Quién rogó por otra oportunidad?",
+                sentences: [
+                    "Guillermo begged for another chance.",
+                    "Patricia believed the weather forecast.",
+                    "Arturo closed the shop at 9 PM.",
+                    "Monica cooked pasta for lunch."
+                ],
+                culpable: "Guillermo"
+            },
+            {
+                question: "¿Quién llamó a la policía?",
+                sentences: [
+                    "Eduardo called the police immediately.",
+                    "Veronica changed her hair color.",
+                    "Sofia cleaned the windows.",
+                    "Ruben cried when his team lost."
+                ],
+                culpable: "Eduardo"
+            },
+            {
+                question: "¿Quién bailó toda la noche?",
+                sentences: [
+                    "Omar danced all night at the wedding.",
+                    "Laura dressed in traditional clothes.",
+                    "Victor died in the car accident.",
+                    "Claudia dried her hair with a towel."
+                ],
+                culpable: "Omar"
+            },
+            {
+                question: "¿Quién aceleró en la carretera?",
+                sentences: [
+                    "Joaquin sped on the highway.",
+                    "Elena fed the homeless cats.",
+                    "Raul stank of cigarette smoke.",
+                    "Carmen bet on the lottery numbers."
+                ],
+                culpable: "Joaquin"
+            }
+        ];
+
+        // Variables del juego
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledCases = [];
+
+        // Elementos del DOM
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const questionCounter = document.getElementById('question-counter');
+        const scoreCounter = document.getElementById('score-counter');
+        const mysteryQuestion = document.getElementById('mystery-question');
+        const englishSentencesContainer = document.getElementById('english-sentences');
+        const suspectsContainer = document.getElementById('suspects');
+        const feedbackContainer = document.getElementById('feedback');
+        const progressBar = document.getElementById('progress');
+        const finalScore = document.getElementById('final-score');
+        const resultMessage = document.getElementById('result-message');
+        const verbsUsed = document.getElementById('verbs-used');
+
+        // Inicializar el juego
+        function initGame() {
+            // Mezclar casos
+            shuffledCases = [...cases].sort(() => Math.random() - 0.5);
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            // Actualizar contadores
+            updateCounters();
+            
+            // Mostrar primera pregunta
+            showQuestion();
+            
+            // Actualizar barra de progreso
+            updateProgressBar();
+        }
+
+        // Mostrar pregunta actual
+        function showQuestion() {
+            // Limpiar contenedores
+            englishSentencesContainer.innerHTML = '';
+            suspectsContainer.innerHTML = '';
+            feedbackContainer.innerHTML = '';
+            feedbackContainer.className = 'feedback';
+            
+            // Obtener caso actual
+            const currentCase = shuffledCases[currentQuestionIndex];
+            
+            // Mostrar pregunta
+            mysteryQuestion.textContent = currentCase.question;
+            
+            // Mostrar oraciones en inglés
+            currentCase.sentences.forEach(sentence => {
+                const sentenceElement = document.createElement('div');
+                sentenceElement.className = 'english-sentence';
+                sentenceElement.textContent = sentence;
+                englishSentencesContainer.appendChild(sentenceElement);
+            });
+            
+            // Extraer nombres de sospechosos de las oraciones
+            const suspects = currentCase.sentences.map(sentence => {
+                return sentence.split(' ')[0]; // Primer palabra es el nombre
+            });
+            
+            // Mezclar sospechosos pero mantener el culpable
+            const mixedSuspects = [...suspects].sort(() => Math.random() - 0.5);
+            const correctIndex = mixedSuspects.indexOf(currentCase.culpable);
+            
+            // Mostrar botones de sospechosos
+            mixedSuspects.forEach((suspect, index) => {
+                const suspectBtn = document.createElement('button');
+                suspectBtn.className = 'suspect-btn';
+                suspectBtn.textContent = suspect;
+                suspectBtn.dataset.index = index;
+                suspectBtn.dataset.correct = (index === correctIndex);
+                suspectBtn.addEventListener('click', () => checkAnswer(index, correctIndex, currentCase));
+                suspectsContainer.appendChild(suspectBtn);
+            });
+        }
+
+        // Verificar respuesta
+        function checkAnswer(selectedIndex, correctIndex, currentCase) {
+            const isCorrect = selectedIndex === correctIndex;
+            
+            // Deshabilitar botones después de seleccionar
+            const buttons = suspectsContainer.querySelectorAll('.suspect-btn');
+            buttons.forEach(button => {
+                button.disabled = true;
+                if (button.dataset.correct === "true") {
+                    button.style.background = "linear-gradient(to right, #2ecc71, #27ae60)";
+                } else if (parseInt(button.dataset.index) === selectedIndex && !isCorrect) {
+                    button.style.background = "linear-gradient(to right, #e74c3c, #c0392b)";
+                }
+            });
+            
+            // Mostrar retroalimentación
+            if (isCorrect) {
+                score += 10;
+                feedbackContainer.innerHTML = `¡Correcto! ${currentCase.culpable} fue el culpable.`;
+                feedbackContainer.className = 'feedback correct';
+            } else {
+                const correctSuspect = currentCase.culpable;
+                feedbackContainer.innerHTML = `Incorrecto. El culpable era ${correctSuspect}.`;
+                feedbackContainer.className = 'feedback incorrect';
+            }
+            
+            // Actualizar contadores
+            updateCounters();
+            
+            // Esperar un momento y pasar a la siguiente pregunta
+            setTimeout(() => {
+                currentQuestionIndex++;
+                
+                if (currentQuestionIndex < shuffledCases.length) {
+                    showQuestion();
+                    updateProgressBar();
+                } else {
+                    showResults();
+                }
+            }, 2000);
+        }
+
+        // Actualizar contadores
+        function updateCounters() {
+            questionCounter.textContent = `Caso: ${currentQuestionIndex + 1}/${shuffledCases.length}`;
+            scoreCounter.textContent = `Puntuación: ${score}`;
+        }
+
+        // Actualizar barra de progreso
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / shuffledCases.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Mostrar resultados finales
+        function showResults() {
+            gameScreen.style.display = 'none';
+            resultScreen.style.display = 'block';
+            
+            finalScore.textContent = `${score}/${shuffledCases.length * 10}`;
+            
+            // Mensaje según la puntuación
+            if (score >= 250) {
+                resultMessage.textContent = '¡Excelente trabajo, detective! Resolviste casi todos los casos correctamente.';
+            } else if (score >= 200) {
+                resultMessage.textContent = 'Buen trabajo detective. Tu análisis fue muy acertado en la mayoría de casos.';
+            } else if (score >= 150) {
+                resultMessage.textContent = 'Tienes potencial como detective. Sigue practicando tu comprensión del pasado simple.';
+            } else {
+                resultMessage.textContent = 'Necesitas practicar más el pasado simple. Revisa los verbos para mejorar.';
+            }
+            
+            // Mostrar verbos utilizados
+            const allVerbs = cases.flatMap(c => 
+                c.sentences.map(s => s.split(' ')[1]) // Segunda palabra es el verbo
+            );
+            const uniqueVerbs = [...new Set(allVerbs)];
+            verbsUsed.textContent = `Verbos en pasado simple utilizados: ${uniqueVerbs.slice(0, 15).join(', ')}...`;
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            initGame();
+        });
+
+        restartBtn.addEventListener('click', () => {
+            resultScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            initGame();
+        });
+
+        // Inicializar la aplicación
+        window.addEventListener('DOMContentLoaded', () => {
+            startScreen.style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
