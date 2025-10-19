@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detective del Pasado</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark-color);
+            font-size: 1.2rem;
+        }
+        
+        .level-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .level-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--light-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 1;
+        }
+        
+        .level-step.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .level-step.completed {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .level-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--light-color);
+            transform: translateY(-50%);
+        }
+        
+        .game-area {
+            min-height: 300px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .instructions {
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            padding: 15px;
+            background-color: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .option:hover {
+            background-color: var(--light-color);
+        }
+        
+        .option.correct {
+            background-color: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+        
+        .option.incorrect {
+            background-color: var(--error-color);
+            color: white;
+            border-color: var(--error-color);
+        }
+        
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            min-height: 60px;
+            padding: 15px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+        }
+        
+        .word {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .sentence-container {
+            min-height: 60px;
+            padding: 15px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background-color: white;
+        }
+        
+        .sentence-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .sentence-input.error {
+            border-color: var(--error-color);
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .feedback.correct {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+        }
+        
+        .feedback.incorrect {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--error-color);
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .progress-display {
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+        
+        .final-result {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .final-score {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+        
+        .final-message {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .restart-btn {
+            background-color: var(--warning-color);
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .restart-btn:hover {
+            background-color: #e67e22;
+        }
+        
+        .reset-btn {
+            background-color: var(--warning-color);
+            margin-bottom: 10px;
+        }
+        
+        .validation-message {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: -15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .continue-btn {
+            background-color: var(--success-color);
+            margin: 10px auto;
+            display: block;
+        }
+        
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕵️ Detective del Pasado</h1>
+        <p class="subtitle">Domina el pasado continuo en inglés</p>
+        
+        <div class="level-indicator">
+            <div class="level-step" id="step1">1</div>
+            <div class="level-step" id="step2">2</div>
+            <div class="level-step" id="step3">3</div>
+            <div class="level-step" id="step4">4</div>
+        </div>
+        
+        <div class="score-display">
+            Puntuación: <span id="score">0</span> / <span id="total">0</span>
+        </div>
+        
+        <div class="progress-display" id="progressDisplay">
+            Nivel 1: Pregunta <span id="currentQuestion">1</span> de 12
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <!-- El contenido del juego se cargará aquí -->
+        </div>
+        
+        <div class="buttons">
+            <button id="prevBtn" disabled>Anterior</button>
+            <button id="nextBtn">Siguiente</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentLevel = 1;
+        let score = 0;
+        let totalQuestions = 0;
+        let currentQuestionIndex = 0;
+        let currentQuestion = {};
+        let answered = false;
+        let selectedVerbs = [];
+        
+        // Almacenar las preguntas de cada nivel
+        let level1Questions = [];
+        let level2Questions = [];
+        let level3Questions = [];
+        let level4Questions = [];
+
+        // Lista de verbos proporcionada
+        const verbs = [
+            "Speed", "Feed", "Stink", "Bet", "Lean", "Creep", "Kneel", "Throw", "Sweep", 
+            "Drink", "Fall", "Sing", "Dig", "Catch", "Take", "Hang", "Swing", "Eat", 
+            "Buy", "Drive", "Act", "Add", "Ask", "Answer", "Arrive", "Brush", "Belong", 
+            "Beg", "Believe", "Close", "Cook", "Call", "Change", "Clean", "Cry", "Dance", 
+            "Dress", "Die", "Dry"
+        ];
+
+        // Función para seleccionar 36 verbos aleatorios
+        function selectRandomVerbs() {
+            // Como hay 39 verbos, seleccionamos 36 aleatorios
+            const shuffled = [...verbs].sort(() => 0.5 - Math.random());
+            selectedVerbs = shuffled.slice(0, 36);
+        }
+
+        // Función para generar la forma -ing de los verbos CORREGIDA
+        function getIngForm(verb) {
+            const baseVerb = verb.toLowerCase();
+            
+            // 1. Verbos que terminan en "e" - eliminar "e" y agregar "ing"
+            if (baseVerb.endsWith('e') && !baseVerb.endsWith('ee') && !baseVerb.endsWith('ye')) {
+                // Excepciones: verbos que mantienen la "e"
+                const keepEExceptions = ['be', 'see', 'flee', 'knee', 'agree', 'free'];
+                if (keepEExceptions.includes(baseVerb)) {
+                    return baseVerb + 'ing';
+                }
+                return baseVerb.slice(0, -1) + 'ing';
+            }
+            
+            // 2. Verbos que terminan en "ie" - cambiar "ie" por "y" y agregar "ing"
+            if (baseVerb.endsWith('ie')) {
+                return baseVerb.slice(0, -2) + 'ying';
+            }
+            
+            // 3. Verbos que terminan en consonante + vocal + consonante - duplicar última consonante
+            if (baseVerb.length >= 3) {
+                const lastThree = baseVerb.slice(-3);
+                const lastChar = lastThree[2];
+                const middleChar = lastThree[1];
+                const firstChar = lastThree[0];
+                
+                // Verificar si es consonante + vocal + consonante
+                const isConsonant = (char) => !['a', 'e', 'i', 'o', 'u'].includes(char);
+                const isVowel = (char) => ['a', 'e', 'i', 'o', 'u'].includes(char);
+                
+                if (isConsonant(firstChar) && isVowel(middleChar) && isConsonant(lastChar)) {
+                    // Excepciones: no duplicar si termina en w, x, y
+                    if (!['w', 'x', 'y'].includes(lastChar)) {
+                        // Excepciones: verbos de dos sílabas con acento en la última
+                        const doubleExceptions = ['begin', 'forget', 'regret', 'prefer', 'refer', 'occur'];
+                        if (doubleExceptions.includes(baseVerb)) {
+                            return baseVerb + lastChar + 'ing';
+                        }
+                        // Para verbos de una sílaba
+                        if (baseVerb.length === 3) {
+                            return baseVerb + lastChar + 'ing';
+                        }
+                    }
+                }
+            }
+            
+            // 4. Verbos que terminan en "c" - agregar "king" (panic → panicking)
+            if (baseVerb.endsWith('c')) {
+                return baseVerb + 'king';
+            }
+            
+            // 5. Verbos que terminan en "y" - mantener la "y" y agregar "ing"
+            if (baseVerb.endsWith('y')) {
+                return baseVerb + 'ing';
+            }
+            
+            // 6. Caso por defecto - agregar "ing"
+            return baseVerb + 'ing';
+        }
+
+        // Función para generar oraciones en pasado continuo
+        function generateSentences() {
+            // Reinicializar arrays de preguntas
+            level1Questions = [];
+            level2Questions = [];
+            level3Questions = [];
+            
+            // Generar 12 oraciones para cada nivel
+            for (let level = 1; level <= 3; level++) {
+                for (let i = 0; i < 12; i++) {
+                    const verbIndex = (level - 1) * 12 + i;
+                    const verb = selectedVerbs[verbIndex];
+                    const ingForm = getIngForm(verb);
+                    
+                    // Determinar el tipo de oración (positiva, negativa, interrogativa)
+                    const sentenceType = i % 3;
+                    
+                    // Sujetos para diferentes tipos
+                    const singularSubjects = ['I', 'He', 'She', 'It', 'The boy', 'The girl', 'The dog', 'My friend', 'The teacher', 'The cat'];
+                    const pluralSubjects = ['You', 'We', 'They', 'The children', 'My friends', 'The students', 'The players', 'The workers'];
+                    const allSubjects = [...singularSubjects, ...pluralSubjects];
+                    
+                    const subjectIndex = Math.floor(Math.random() * allSubjects.length);
+                    const subject = allSubjects[subjectIndex];
+                    
+                    // Determinar si el sujeto es singular o plural
+                    const isSingular = singularSubjects.includes(subject);
+                    
+                    let sentence, correct, options;
+                    
+                    switch(sentenceType) {
+                        case 0: // Positiva
+                            const timePhrases = ['yesterday at 5 PM', 'when you arrived', 'last night', 'this morning', 
+                                                'during the party', 'while it was raining', 'when the phone rang'];
+                            const timeIndex = Math.floor(Math.random() * timePhrases.length);
+                            
+                            sentence = `Completa la oración: "${subject} ______ ${ingForm} ${timePhrases[timeIndex]}."`;
+                            correct = isSingular ? "was" : "were";
+                            
+                            // Generar opciones
+                            options = [
+                                correct,
+                                isSingular ? "were" : "was",
+                                "did",
+                                "are"
+                            ];
+                            
+                            level1Questions.push({
+                                scene: sentence,
+                                options: shuffleArray(options),
+                                correct: options.indexOf(correct)
+                            });
+                            break;
+                            
+                        case 1: // Negativa (sin contracciones)
+                            const negativeContexts = ['when you called', 'during the meeting', 'at that time', 
+                                                     'while everyone else was working', 'yesterday afternoon'];
+                            const contextIndex = Math.floor(Math.random() * negativeContexts.length);
+                            
+                            sentence = `Completa la oración negativa: "${subject} ______ ${ingForm} ${negativeContexts[contextIndex]}."`;
+                            correct = isSingular ? "was not" : "were not";
+                            
+                            // Generar opciones
+                            options = [
+                                correct,
+                                isSingular ? "were not" : "was not",
+                                "did not",
+                                isSingular ? "wasn't" : "weren't"
+                            ];
+                            
+                            level1Questions.push({
+                                scene: sentence,
+                                options: shuffleArray(options),
+                                correct: options.indexOf(correct)
+                            });
+                            break;
+                            
+                        case 2: // Interrogativa
+                            const questionWords = ["What", "Why", "How", "Where"];
+                            const questionWord = questionWords[Math.floor(Math.random() * questionWords.length)];
+                            
+                            const questionContexts = ['yesterday', 'at that moment', 'during the storm', 
+                                                     'when I saw you', 'last weekend'];
+                            const questionContext = questionContexts[Math.floor(Math.random() * questionContexts.length)];
+                            
+                            sentence = `Completa la pregunta: "${questionWord} ______ ${subject} ${ingForm} ${questionContext}?"`;
+                            correct = isSingular ? "was" : "were";
+                            
+                            // Generar opciones
+                            options = [
+                                correct,
+                                isSingular ? "were" : "was",
+                                "did",
+                                "do"
+                            ];
+                            
+                            level1Questions.push({
+                                scene: sentence,
+                                options: shuffleArray(options),
+                                correct: options.indexOf(correct)
+                            });
+                            break;
+                    }
+                    
+                    // Para el nivel 2 (Formar oraciones)
+                    let fullSentence;
+                    if (sentenceType === 0) {
+                        const timePhrases = ['yesterday at 5 PM', 'when you arrived', 'last night', 'this morning'];
+                        const timeIndex = Math.floor(Math.random() * timePhrases.length);
+                        fullSentence = `${subject} ${isSingular ? 'was' : 'were'} ${ingForm} ${timePhrases[timeIndex]}`;
+                    } else if (sentenceType === 1) {
+                        const negativeContexts = ['when you called', 'during the meeting', 'at that time'];
+                        const contextIndex = Math.floor(Math.random() * negativeContexts.length);
+                        fullSentence = `${subject} ${isSingular ? 'was not' : 'were not'} ${ingForm} ${negativeContexts[contextIndex]}`;
+                    } else {
+                        const questionWords = ["What", "Why", "How", "Where"];
+                        const questionWord = questionWords[Math.floor(Math.random() * questionWords.length)];
+                        const questionContexts = ['yesterday', 'at that moment', 'when I saw you'];
+                        const questionContext = questionContexts[Math.floor(Math.random() * questionContexts.length)];
+                        fullSentence = `${questionWord} ${isSingular ? 'was' : 'were'} ${subject} ${ingForm} ${questionContext}`;
+                    }
+                    
+                    const words = fullSentence.split(' ');
+                    level2Questions.push({
+                        words: shuffleArray([...words]),
+                        correct: fullSentence
+                    });
+                    
+                    // Para el nivel 3 (Corrección de errores) - SOLO ERRORES BÁSICOS
+                    let incorrectSentence;
+                    let correctSentence;
+                    
+                    // Solo dos tipos de errores básicos: auxiliar incorrecto o verbo sin -ing
+                    const errorType = Math.floor(Math.random() * 2);
+                    
+                    if (sentenceType === 0) { // Positiva
+                        const timePhrases = ['yesterday at 5 PM', 'when you arrived', 'last night'];
+                        const timeIndex = Math.floor(Math.random() * timePhrases.length);
+                        
+                        if (errorType === 0) {
+                            // Error: auxiliar incorrecto (was/were)
+                            incorrectSentence = `${subject} ${isSingular ? 'were' : 'was'} ${ingForm} ${timePhrases[timeIndex]}.`;
+                        } else {
+                            // Error: verbo sin -ing
+                            incorrectSentence = `${subject} ${isSingular ? 'was' : 'were'} ${verb.toLowerCase()} ${timePhrases[timeIndex]}.`;
+                        }
+                        correctSentence = `${subject} ${isSingular ? 'was' : 'were'} ${ingForm} ${timePhrases[timeIndex]}.`;
+                        
+                    } else if (sentenceType === 1) { // Negativa
+                        const negativeContexts = ['when you called', 'during the meeting', 'at that time'];
+                        const contextIndex = Math.floor(Math.random() * negativeContexts.length);
+                        
+                        if (errorType === 0) {
+                            // Error: auxiliar incorrecto (was/were)
+                            incorrectSentence = `${subject} ${isSingular ? 'were not' : 'was not'} ${ingForm} ${negativeContexts[contextIndex]}.`;
+                        } else {
+                            // Error: verbo sin -ing
+                            incorrectSentence = `${subject} ${isSingular ? 'was not' : 'were not'} ${verb.toLowerCase()} ${negativeContexts[contextIndex]}.`;
+                        }
+                        correctSentence = `${subject} ${isSingular ? 'was not' : 'were not'} ${ingForm} ${negativeContexts[contextIndex]}.`;
+                        
+                    } else { // Interrogativa
+                        const questionWords = ["What", "Why", "How", "Where"];
+                        const questionWord = questionWords[Math.floor(Math.random() * questionWords.length)];
+                        const questionContexts = ['yesterday', 'at that moment', 'when I saw you'];
+                        const questionContext = questionContexts[Math.floor(Math.random() * questionContexts.length)];
+                        
+                        if (errorType === 0) {
+                            // Error: auxiliar incorrecto (was/were)
+                            incorrectSentence = `${questionWord} ${isSingular ? 'were' : 'was'} ${subject} ${ingForm} ${questionContext}?`;
+                        } else {
+                            // Error: verbo sin -ing
+                            incorrectSentence = `${questionWord} ${isSingular ? 'was' : 'were'} ${subject} ${verb.toLowerCase()} ${questionContext}?`;
+                        }
+                        correctSentence = `${questionWord} ${isSingular ? 'was' : 'were'} ${subject} ${ingForm} ${questionContext}?`;
+                    }
+                    
+                    level3Questions.push({
+                        sentence: incorrectSentence,
+                        correct: correctSentence
+                    });
+                }
+            }
+            
+            // Nivel 4 (Escritura libre)
+            level4Questions = [
+                {
+                    situation: "Describe lo que estabas haciendo ayer a las 6 p.m.",
+                    hint: "Usa 'I was + verbo en -ing'. Ejemplo: I was studying English."
+                },
+                {
+                    situation: "¿Qué estaban haciendo tus amigos cuando los llamaste?",
+                    hint: "Usa 'They were + verbo en -ing'. Ejemplo: They were playing soccer."
+                },
+                {
+                    situation: "Describe lo que estaba haciendo tu familia durante la cena.",
+                    hint: "Usa 'My family was/were + verbo en -ing'. Ejemplo: My family was eating dinner."
+                },
+                {
+                    situation: "¿Qué estaba pasando cuando empezó a llover?",
+                    hint: "Usa 'It was + verbo en -ing' o describe actividades. Ejemplo: It was getting dark."
+                },
+                {
+                    situation: "¿Qué estabas haciendo cuando sonó el teléfono?",
+                    hint: "Usa 'I was + verbo en -ing'. Ejemplo: I was watching TV."
+                }
+            ];
+        }
+
+        // Función para mezclar arrays
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Función para actualizar la interfaz de niveles
+        function updateLevelIndicator() {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (i < currentLevel) {
+                    step.className = "level-step completed";
+                } else if (i === currentLevel) {
+                    step.className = "level-step active";
+                } else {
+                    step.className = "level-step";
+                }
+            }
+        }
+
+        // Función para actualizar la puntuación
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('total').textContent = totalQuestions;
+        }
+
+        // Función para actualizar el progreso
+        function updateProgress() {
+            let totalInLevel = 12;
+            if (currentLevel === 4) totalInLevel = 1;
+            
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('progressDisplay').innerHTML = 
+                `Nivel ${currentLevel}: Pregunta <span id="currentQuestion">${currentQuestionIndex + 1}</span> de ${totalInLevel}`;
+        }
+
+        // Función para validar texto en cajas de texto
+        function validateTextInput(inputElement) {
+            const value = inputElement.value.trim();
+            const validationMessage = inputElement.nextElementSibling;
+            
+            if (value === '') {
+                inputElement.classList.add('error');
+                validationMessage.textContent = 'Por favor, escribe una respuesta.';
+                validationMessage.style.display = 'block';
+                return false;
+            } else if (value.length < 3) {
+                inputElement.classList.add('error');
+                validationMessage.textContent = 'La respuesta es demasiado corta.';
+                validationMessage.style.display = 'block';
+                return false;
+            } else {
+                inputElement.classList.remove('error');
+                validationMessage.style.display = 'none';
+                return true;
+            }
+        }
+
+        // Función para renderizar el nivel 1 (Selección múltiple)
+        function renderLevel1() {
+            const gameArea = document.getElementById('gameArea');
+            currentQuestion = level1Questions[currentQuestionIndex];
+            
+            gameArea.innerHTML = `
+                <h2 class="question">Nivel 1: Selección Múltiple</h2>
+                <div class="instructions">
+                    <p><strong>Instrucciones:</strong> Lee la oración cuidadosamente y selecciona la opción correcta para completarla en pasado continuo.</p>
+                    <p>Recuerda: Usa <strong>was</strong> para I/he/she/it y <strong>were</strong> para you/we/they.</p>
+                </div>
+                <p class="question">${currentQuestion.scene}</p>
+                <div class="options" id="options">
+                    ${currentQuestion.options.map((option, index) => 
+                        `<div class="option" data-index="${index}">${option}</div>`
+                    ).join('')}
+                </div>
+                <div id="feedback"></div>
+            `;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', handleMultipleChoice);
+            });
+            
+            updateLevelIndicator();
+            updateProgress();
+        }
+
+        // Función para manejar la selección múltiple
+        function handleMultipleChoice(e) {
+            if (answered) return;
+            
+            const selectedIndex = parseInt(e.target.getAttribute('data-index'));
+            const isCorrect = selectedIndex === currentQuestion.correct;
+            
+            // Mostrar retroalimentación
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = '<p class="feedback correct">¡Correcto! 🎉 Has usado la forma correcta del pasado continuo.</p>';
+                score++;
+            } else {
+                feedback.innerHTML = `<p class="feedback incorrect">Incorrecto. La respuesta correcta es: "${currentQuestion.options[currentQuestion.correct]}"</p>`;
+            }
+            
+            // Resaltar opciones
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === currentQuestion.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none';
+            });
+            
+            answered = true;
+            totalQuestions++;
+            updateScore();
+        }
+
+        // Función para renderizar el nivel 2 (Click para formar oraciones)
+        function renderLevel2() {
+            const gameArea = document.getElementById('gameArea');
+            currentQuestion = level2Questions[currentQuestionIndex];
+            
+            gameArea.innerHTML = `
+                <h2 class="question">Nivel 2: Formar Oraciones</h2>
+                <div class="instructions">
+                    <p><strong>Instrucciones:</strong> Haz clic en las palabras en el orden correcto para formar una oración en pasado continuo.</p>
+                    <p>Si cometes un error, haz clic en la palabra en la zona de oración para devolverla.</p>
+                </div>
+                <p class="question">Palabras disponibles:</p>
+                <div class="word-bank" id="wordBank">
+                    ${currentQuestion.words.map(word => 
+                        `<div class="word" data-word="${word}">${word}</div>`
+                    ).join('')}
+                </div>
+                <p class="question">Tu oración:</p>
+                <div class="sentence-container" id="sentenceContainer"></div>
+                <div id="feedback"></div>
+                <button class="reset-btn" id="resetBtn">Reiniciar</button>
+                <button id="checkBtn">Comprobar</button>
+            `;
+            
+            // Configurar eventos de clic para las palabras
+            const words = document.querySelectorAll('.word');
+            const sentenceContainer = document.getElementById('sentenceContainer');
+            
+            words.forEach(word => {
+                word.addEventListener('click', function() {
+                    if (!this.classList.contains('used')) {
+                        this.classList.add('used');
+                        this.style.backgroundColor = '#95a5a6';
+                        this.style.cursor = 'default';
+                        
+                        const wordElement = document.createElement('div');
+                        wordElement.className = 'word';
+                        wordElement.textContent = this.textContent;
+                        wordElement.style.cursor = 'pointer';
+                        wordElement.addEventListener('click', function() {
+                            // Devolver la palabra al banco
+                            this.remove();
+                            const originalWord = document.querySelector(`.word[data-word="${this.textContent}"]`);
+                            originalWord.classList.remove('used');
+                            originalWord.style.backgroundColor = '';
+                            originalWord.style.cursor = 'pointer';
+                        });
+                        
+                        sentenceContainer.appendChild(wordElement);
+                    }
+                });
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                // Reiniciar la oración
+                sentenceContainer.innerHTML = '';
+                words.forEach(word => {
+                    word.classList.remove('used');
+                    word.style.backgroundColor = '';
+                    word.style.cursor = 'pointer';
+                });
+            });
+            
+            document.getElementById('checkBtn').addEventListener('click', checkSentence);
+            
+            updateLevelIndicator();
+            updateProgress();
+        }
+
+        // Función para comprobar la oración formada
+        function checkSentence() {
+            if (answered) return;
+            
+            const sentenceContainer = document.getElementById('sentenceContainer');
+            const userSentence = Array.from(sentenceContainer.children)
+                .map(word => word.textContent)
+                .join(' ');
+            
+            const isCorrect = userSentence.toLowerCase() === currentQuestion.correct.toLowerCase();
+            
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = '<p class="feedback correct">¡Correcto! 🎉 Has formado la oración perfectamente.</p>';
+                score++;
+            } else {
+                feedback.innerHTML = `<p class="feedback incorrect">Incorrecto. La oración correcta es: "${currentQuestion.correct}"</p>`;
+            }
+            
+            answered = true;
+            totalQuestions++;
+            updateScore();
+            
+            document.getElementById('checkBtn').disabled = true;
+            document.getElementById('resetBtn').disabled = true;
+        }
+
+        // Función para renderizar el nivel 3 (Corrección de errores)
+        function renderLevel3() {
+            const gameArea = document.getElementById('gameArea');
+            currentQuestion = level3Questions[currentQuestionIndex];
+            
+            gameArea.innerHTML = `
+                <h2 class="question">Nivel 3: Corrección de Errores</h2>
+                <div class="instructions">
+                    <p><strong>Instrucciones:</strong> La siguiente oración tiene un error en el uso del pasado continuo. Corrígela escribiendo la versión correcta.</p>
+                    <p><strong>Solo necesitas corregir el auxiliar (was/were) o la terminación del verbo (-ing).</strong> El resto de la oración está correcta.</p>
+                </div>
+                <p class="question">Oración con error:</p>
+                <p class="question" style="color: var(--error-color); font-weight: bold;">"${currentQuestion.sentence}"</p>
+                <input type="text" class="sentence-input" id="correctedSentence" placeholder="Escribe la oración corregida aquí...">
+                <div class="validation-message" id="sentenceValidation"></div>
+                <div id="feedback"></div>
+                <button id="checkBtn">Comprobar</button>
+            `;
+            
+            // Agregar validación en tiempo real
+            const inputElement = document.getElementById('correctedSentence');
+            inputElement.addEventListener('input', function() {
+                validateTextInput(this);
+            });
+            
+            document.getElementById('checkBtn').addEventListener('click', checkErrorCorrection);
+            
+            updateLevelIndicator();
+            updateProgress();
+        }
+
+        // Función para comprobar la corrección de errores
+        function checkErrorCorrection() {
+            if (answered) return;
+            
+            const inputElement = document.getElementById('correctedSentence');
+            if (!validateTextInput(inputElement)) {
+                return;
+            }
+            
+            const userSentence = inputElement.value.trim();
+            const isCorrect = userSentence.toLowerCase() === currentQuestion.correct.toLowerCase();
+            
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = '<p class="feedback correct">¡Correcto! 🎉 Has corregido el error perfectamente.</p>';
+                score++;
+            } else {
+                feedback.innerHTML = `<p class="feedback incorrect">Incorrecto. La oración correcta es: "${currentQuestion.correct}"</p>`;
+            }
+            
+            answered = true;
+            totalQuestions++;
+            updateScore();
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+
+        // Función para renderizar el nivel 4 (Escritura libre)
+        function renderLevel4() {
+            const gameArea = document.getElementById('gameArea');
+            currentQuestion = level4Questions[0];
+            
+            gameArea.innerHTML = `
+                <h2 class="question">Nivel 4: Escritura Libre</h2>
+                <div class="instructions">
+                    <p><strong>Instrucciones:</strong> Escribe una oración en pasado continuo que describa la situación presentada.</p>
+                    <p>Asegúrate de usar la estructura correcta: <strong>Sujeto + was/were + verbo en -ing</strong>.</p>
+                </div>
+                <p class="question">${currentQuestion.situation}</p>
+                <p class="question" style="font-style: italic; color: var(--secondary-color);">Pista: ${currentQuestion.hint}</p>
+                <textarea class="sentence-input" id="freeWriting" placeholder="Escribe tu oración aquí..." rows="4"></textarea>
+                <div class="validation-message" id="writingValidation"></div>
+                <div id="feedback"></div>
+                <button id="checkBtn">Comprobar</button>
+            `;
+            
+            // Agregar validación en tiempo real
+            const textareaElement = document.getElementById('freeWriting');
+            textareaElement.addEventListener('input', function() {
+                validateTextInput(this);
+            });
+            
+            document.getElementById('checkBtn').addEventListener('click', checkFreeWriting);
+            
+            updateLevelIndicator();
+            updateProgress();
+        }
+
+        // Función para comprobar la escritura libre
+        function checkFreeWriting() {
+            if (answered) return;
+            
+            const textareaElement = document.getElementById('freeWriting');
+            if (!validateTextInput(textareaElement)) {
+                return;
+            }
+            
+            const userSentence = textareaElement.value.trim();
+            
+            // Validación básica de la estructura del pasado continuo
+            const pastContinuousRegex = /(I|he|she|it|the [a-z]+|my [a-z]+)\s+was\s+\w+ing|(you|we|they|the [a-z]+s|my [a-z]+s)\s+were\s+\w+ing/i;
+            const isCorrect = pastContinuousRegex.test(userSentence);
+            
+            const feedback = document.getElementById('feedback');
+            if (isCorrect) {
+                feedback.innerHTML = '<p class="feedback correct">¡Correcto! 🎉 Has usado correctamente el pasado continuo.</p>';
+                score++;
+            } else {
+                feedback.innerHTML = '<p class="feedback incorrect">Parece que hay un error en la estructura. Recuerda: I/he/she/it + was + verbo-ing o you/we/they + were + verbo-ing</p>';
+            }
+            
+            answered = true;
+            totalQuestions++;
+            updateScore();
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+
+        // Función para mostrar el resultado final
+        function showFinalResult() {
+            const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+            
+            let message = "";
+            if (percentage >= 90) {
+                message = "¡Excelente trabajo, detective del pasado! 🕵️‍♂️🎉";
+            } else if (percentage >= 70) {
+                message = "¡Buen trabajo! Solo faltaron algunos detalles. 👍";
+            } else if (percentage >= 50) {
+                message = "Estás en camino. Revisa las estructuras. 📚";
+            } else {
+                message = "Necesitas practicar más. ¡No te rindas! 💪";
+            }
+            
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="final-result">
+                    <h2>¡Juego Completado!</h2>
+                    <div class="final-score">${percentage}%</div>
+                    <p class="final-message">${message}</p>
+                    <p>Respuestas correctas: ${score} de ${totalQuestions}</p>
+                    <button class="restart-btn" id="restartBtn">Jugar de nuevo</button>
+                </div>
+            `;
+            
+            document.getElementById('restartBtn').addEventListener('click', restartGame);
+            
+            // Ocultar botones de navegación
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('progressDisplay').style.display = 'none';
+        }
+
+        // Función para avanzar a la siguiente pregunta
+        function nextQuestion() {
+            currentQuestionIndex++;
+            answered = false;
+            
+            // Verificar si hemos completado el nivel actual
+            let questionsInLevel = 12;
+            if (currentLevel === 4) questionsInLevel = 1;
+            
+            if (currentQuestionIndex >= questionsInLevel) {
+                // Nivel completado, pasar al siguiente
+                currentQuestionIndex = 0;
+                currentLevel++;
+                
+                if (currentLevel > 4) {
+                    showFinalResult();
+                    return;
+                }
+            }
+            
+            // Renderizar el nivel actual
+            switch(currentLevel) {
+                case 1:
+                    renderLevel1();
+                    break;
+                case 2:
+                    renderLevel2();
+                    break;
+                case 3:
+                    renderLevel3();
+                    break;
+                case 4:
+                    renderLevel4();
+                    break;
+            }
+            
+            // Actualizar botones
+            document.getElementById('prevBtn').disabled = currentLevel === 1 && currentQuestionIndex === 0;
+            
+            if (currentLevel === 4) {
+                document.getElementById('nextBtn').textContent = 'Finalizar';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Siguiente';
+            }
+        }
+
+        // Función para retroceder a la pregunta anterior
+        function prevQuestion() {
+            if (currentQuestionIndex === 0 && currentLevel === 1) return;
+            
+            currentQuestionIndex--;
+            answered = false;
+            
+            // Si estamos en la primera pregunta del nivel, retroceder al nivel anterior
+            if (currentQuestionIndex < 0) {
+                currentLevel--;
+                let questionsInLevel = 12;
+                if (currentLevel === 4) questionsInLevel = 1;
+                currentQuestionIndex = questionsInLevel - 1;
+            }
+            
+            // Renderizar el nivel actual
+            switch(currentLevel) {
+                case 1:
+                    renderLevel1();
+                    break;
+                case 2:
+                    renderLevel2();
+                    break;
+                case 3:
+                    renderLevel3();
+                    break;
+                case 4:
+                    renderLevel4();
+                    break;
+            }
+            
+            // Actualizar botones
+            document.getElementById('prevBtn').disabled = currentLevel === 1 && currentQuestionIndex === 0;
+            
+            if (currentLevel === 4) {
+                document.getElementById('nextBtn').textContent = 'Finalizar';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Siguiente';
+            }
+        }
+
+        // Función para reiniciar el juego
+        function restartGame() {
+            currentLevel = 1;
+            currentQuestionIndex = 0;
+            score = 0;
+            totalQuestions = 0;
+            answered = false;
+            
+            // Reinicializar con nuevos verbos aleatorios
+            selectRandomVerbs();
+            generateSentences();
+            
+            updateScore();
+            renderLevel1();
+            
+            // Mostrar botones de navegación
+            document.getElementById('prevBtn').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'block';
+            document.getElementById('progressDisplay').style.display = 'block';
+            document.getElementById('prevBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = false;
+            document.getElementById('nextBtn').textContent = 'Siguiente';
+        }
+
+        // Inicialización del juego
+        document.addEventListener('DOMContentLoaded', function() {
+            selectRandomVerbs();
+            generateSentences();
+            renderLevel1();
+            
+            // Configurar eventos de los botones
+            document.getElementById('prevBtn').addEventListener('click', prevQuestion);
+            document.getElementById('nextBtn').addEventListener('click', function() {
+                if (!answered) {
+                    alert('Por favor, responde la pregunta actual antes de continuar.');
+                    return;
+                }
+                nextQuestion();
+            });
+        });
+    </script>
+</body>
+</html>
