@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Dónde está el objeto misterioso?</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: #4a00e0;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .help-container {
+            background-color: #f0f0ff;
+            padding: 15px;
+            margin: 10px 30px;
+            border-radius: 10px;
+            border-left: 4px solid #4a00e0;
+        }
+        
+        .help-title {
+            font-weight: bold;
+            color: #4a00e0;
+            margin-bottom: 8px;
+        }
+        
+        .help-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .help-item {
+            background-color: #e6e6ff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #4a00e0;
+        }
+        
+        .game-area {
+            padding: 30px;
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a00e0;
+        }
+        
+        .sentence-container {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px dashed #4a00e0;
+        }
+        
+        .context {
+            margin-bottom: 15px;
+            font-style: italic;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .sentence {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .sentence-part {
+            padding: 5px 10px;
+        }
+        
+        .dropdown {
+            padding: 8px 15px;
+            border: 2px dashed #4a00e0;
+            border-radius: 8px;
+            background-color: #f0f0ff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 100px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .dropdown:hover {
+            background-color: #e6e6ff;
+        }
+        
+        .dropdown.selected {
+            background-color: #4a00e0;
+            color: white;
+            border-style: solid;
+        }
+        
+        .options-panel {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #e6e6ff;
+        }
+        
+        .options-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #4a00e0;
+            font-size: 1.2rem;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .option-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .option-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #4a00e0;
+            text-align: center;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .option {
+            padding: 10px 15px;
+            background-color: #e6e6ff;
+            border: 2px solid #4a00e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+        
+        .option:hover {
+            background-color: #d6d6ff;
+            transform: translateY(-2px);
+        }
+        
+        .option.selected {
+            background-color: #4a00e0;
+            color: white;
+        }
+        
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background-color: #e6ffe6;
+            color: #2e7d32;
+            border: 2px solid #2e7d32;
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background-color: #ffe6e6;
+            color: #c62828;
+            border: 2px solid #c62828;
+            display: block;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #check-btn {
+            background-color: #4a00e0;
+            color: white;
+        }
+        
+        #check-btn:hover {
+            background-color: #3800b3;
+            transform: translateY(-2px);
+        }
+        
+        #next-btn {
+            background-color: #00c853;
+            color: white;
+        }
+        
+        #next-btn:hover {
+            background-color: #00a844;
+            transform: translateY(-2px);
+        }
+        
+        #check-btn:disabled, #next-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #4a00e0;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .results-screen {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .results-screen h2 {
+            color: #4a00e0;
+            margin-bottom: 20px;
+        }
+        
+        .grade {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            display: inline-block;
+        }
+        
+        .grade-excellent {
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+        }
+        
+        .grade-good {
+            background: linear-gradient(135deg, #ff9a00 0%, #ffcc00 100%);
+        }
+        
+        .grade-poor {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+        
+        .restart-btn {
+            background-color: #4a00e0;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        .restart-btn:hover {
+            background-color: #3800b3;
+            transform: translateY(-2px);
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        @media (max-width: 600px) {
+            .sentence {
+                font-size: 1.3rem;
+            }
+            
+            .options-container {
+                flex-direction: column;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            .help-items {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>¿Dónde está el objeto misterioso?</h1>
+            <p class="subtitle">Practica el uso de there is/there are, a/an y preposiciones de lugar</p>
+        </header>
+        
+        <div class="help-container">
+            <div class="help-title">Preposiciones de lugar - Ayuda:</div>
+            <div class="help-items">
+                <div class="help-item">in (en)</div>
+                <div class="help-item">on (sobre, encima de)</div>
+                <div class="help-item">at (en, junto a)</div>
+                <div class="help-item">under (debajo de)</div>
+                <div class="help-item">above (encima de)</div>
+                <div class="help-item">below (debajo de)</div>
+                <div class="help-item">next to (al lado de)</div>
+                <div class="help-item">between (entre)</div>
+                <div class="help-item">behind (detrás de)</div>
+                <div class="help-item">in front of (delante de)</div>
+                <div class="help-item">inside (dentro de)</div>
+                <div class="help-item">outside (fuera de)</div>
+                <div class="help-item">near (cerca de)</div>
+                <div class="help-item">far from (lejos de)</div>
+            </div>
+        </div>
+        
+        <div class="game-area" id="game-area">
+            <div class="score-container">
+                <div>Pregunta: <span id="question-count">1</span>/<span id="total-questions">20</span></div>
+                <div>Puntuación: <span class="score" id="score">0</span></div>
+            </div>
+            
+            <div class="sentence-container">
+                <div class="context" id="context"></div>
+                <div class="instructions">Haz clic en las líneas discontinuas para seleccionar las opciones</div>
+                <div class="sentence" id="sentence">
+                    <!-- La frase se generará dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="options-panel" id="options-panel">
+                <div class="options-title" id="options-title">Selecciona una opción:</div>
+                <div class="options-container" id="dynamic-options">
+                    <!-- Las opciones se generarán dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="button-container">
+                <button id="check-btn">Verificar respuesta</button>
+                <button id="next-btn" disabled>Siguiente pregunta</button>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+        
+        <div class="results-screen" id="results-screen">
+            <h2>¡Juego Terminado!</h2>
+            <p>Tu puntuación final es: <span id="final-score">0</span>/200</p>
+            <div class="grade" id="grade">A</div>
+            <p id="grade-message">¡Excelente trabajo!</p>
+            <button class="restart-btn" id="restart-btn">Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Módulo de gestión de frases
+        const SentenceManager = (function() {
+            // Banco de 20 frases usando TODAS las preposiciones
+            const sentences = [
+                // Preposición: in (en)
+                { 
+                    type: "verb_article_preposition",
+                    structure: "there is", 
+                    object: "cat", 
+                    preposition: "in", 
+                    article: "a", 
+                    location: "box",
+                    context: "El gato está escondido en algún lugar"
+                },
+                
+                // Preposición: on (sobre, encima de)
+                { 
+                    type: "article_preposition",
+                    structure: "there is", 
+                    object: "apple", 
+                    preposition: "on", 
+                    article: "an", 
+                    location: "table",
+                    context: "Estoy poniendo la mesa para el desayuno"
+                },
+                
+                // Preposición: at (en, junto a)
+                { 
+                    type: "verb_preposition",
+                    structure: "there are", 
+                    object: "students", 
+                    preposition: "at", 
+                    article: "", 
+                    location: "library",
+                    context: "Es hora de estudio en la escuela"
+                },
+                
+                // Preposición: under (debajo de)
+                { 
+                    type: "verb_article_preposition",
+                    structure: "there is", 
+                    object: "book", 
+                    preposition: "under", 
+                    article: "a", 
+                    location: "bed",
+                    context: "No puedo encontrar mi libro favorito"
+                },
+                
+                // Preposición: above (encima de)
+                { 
+                    type: "article_preposition",
+                    structure: "there is", 
+                    object: "airplane", 
+                    preposition: "above", 
+                    article: "an", 
+                    location: "clouds",
+                    context: "Mira al cielo en este momento"
+                },
+                
+                // Preposición: below (debajo de)
+                { 
+                    type: "verb_preposition",
+                    structure: "there are", 
+                    object: "fish", 
+                    preposition: "below", 
+                    article: "", 
+                    location: "water",
+                    context: "Estamos en un bote en el océano"
+                },
+                
+                // Preposición: next to (al lado de)
+                { 
+                    type: "verb_article_preposition",
+                    structure: "there is", 
+                    object: "pencil", 
+                    preposition: "next to", 
+                    article: "a", 
+                    location: "notebook",
+                    context: "En mi escritorio mientras estudio"
+                },
+                
+                // Preposición: between (entre)
+                { 
+                    type: "verb_preposition",
+                    structure: "there are", 
+                    object: "trees", 
+                    preposition: "between", 
+                    article: "", 
+                    location: "two houses",
+                    context: "En el jardín de mi vecindario"
+                },
+                
+                // Preposición: behind (detrás de)
+                { 
+                    type: "article_preposition",
+                    structure: "there is", 
+                    object: "umbrella", 
+                    preposition: "behind", 
+                    article: "an", 
+                    location: "door",
+                    context: "En el pasillo cerca de la entrada"
+                },
+                
+                // Preposición: in front of (delante de)
+                { 
+                    type: "verb_preposition",
+                    structure: "there are", 
+                    object: "children", 
+                    preposition: "in front of", 
+                    article: "", 
+                    location: "school",
+                    context: "Esperando que llegue el autobús"
+                },
+                
+                // Preposición: inside (dentro de)
+                { 
+                    type: "verb_article_preposition",
+                    structure: "there is", 
+                    object: "ice cream", 
+                    preposition: "inside", 
+                    article: "an", 
+                    location: "freezer",
+                    context: "Hace mucho frío en la cocina"
+                },
+                
+                // Preposición: outside (fuera de)
+                { 
+                    type: "verb_preposition",
+                    structure: "there are", 
+                    object: "birds", 
+                    preposition: "outside", 
+                    article: "", 
+                    location: "window",
+                    context: "Escúchalos cantar"
+                },
+                
+                // Preposición: near (cerca de) - CORREGIDA
+                { 
+                    type: "article_preposition",
+                    structure: "there is", 
+                    object: "hospital", 
+                    preposition: "near", 
+                    article: "a", 
+                    location: "park",
+                    context: "En el centro de la ciudad"
+                },
+                
+                // Preposición: far from (lejos de)
+                { 
+                    type: "verb_preposition",
+                    structure: "there are", 
+                    object: "mountains", 
+                    preposition: "far from", 
+                    article: "", 
+                    location: "beach",
+                    context: "En esta área geográfica"
+                },
+                
+                // Segunda ronda con diferentes objetos
+                { 
+                    type: "verb_article_preposition",
+                    structure: "there is", 
+                    object: "octopus", 
+                    preposition: "in", 
+                    article: "an", 
+                    location: "aquarium",
+                    context: "En el museo marino"
+                },
+                
+                { 
+                    type: "article_preposition",
+                    structure: "there is", 
+                    object: "egg", 
+                    preposition: "on", 
+                    article: "an", 
+                    location: "plate",
+                    context: "Para el desayuno esta mañana"
+                },
+                
+                { 
+                    type: "verb_preposition",
+                    structure: "there are", 
+                    object: "teachers", 
+                    preposition: "at", 
+                    article: "", 
+                    location: "meeting",
+                    context: "Ahora mismo en la sala de conferencias"
+                },
+                
+                { 
+                    type: "verb_article_preposition",
+                    structure: "there is", 
+                    object: "mouse", 
+                    preposition: "under", 
+                    article: "a", 
+                    location: "chair",
+                    context: "En el laboratorio de computación"
+                },
+                
+                { 
+                    type: "article_preposition",
+                    structure: "there is", 
+                    object: "eagle", 
+                    preposition: "above", 
+                    article: "an", 
+                    location: "mountain",
+                    context: "Volando alto en el cielo"
+                },
+                
+                { 
+                    type: "verb_preposition",
+                    structure: "there are", 
+                    object: "rocks", 
+                    preposition: "below", 
+                    article: "", 
+                    location: "surface",
+                    context: "Profundo en el océano"
+                }
+            ];
+
+            // Preposiciones disponibles
+            const prepositions = [
+                "in", "on", "at", "under", "above", "below", 
+                "next to", "between", "behind", "in front of", 
+                "inside", "outside", "near", "far from"
+            ];
+
+            // Obtener una frase aleatoria
+            function getRandomSentence() {
+                const randomIndex = Math.floor(Math.random() * sentences.length);
+                return sentences[randomIndex];
+            }
+
+            // Obtener preposiciones incorrectas para las opciones
+            function getWrongPrepositions(correctPreposition, count = 3) {
+                const wrongPrepositions = prepositions.filter(p => p !== correctPreposition);
+                const shuffled = wrongPrepositions.sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count);
+            }
+
+            return {
+                getRandomSentence,
+                getWrongPrepositions,
+                prepositions
+            };
+        })();
+
+        // Módulo de gestión del juego
+        const GameManager = (function() {
+            let currentSentence = {};
+            let currentSelection = {
+                verb: "",
+                article: "",
+                preposition: ""
+            };
+            let currentDropdown = null;
+            let score = 0;
+            let questionCount = 0;
+            const totalQuestions = 20;
+            let usedSentences = [];
+
+            // Inicializar el juego
+            function init() {
+                score = 0;
+                questionCount = 0;
+                usedSentences = [];
+                currentSelection = { verb: "", article: "", preposition: "" };
+                document.getElementById('score').textContent = score;
+                document.getElementById('question-count').textContent = questionCount + 1;
+                document.getElementById('total-questions').textContent = totalQuestions;
+                document.getElementById('progress-bar').style.width = '0%';
+                
+                // Mostrar pantalla de juego
+                document.getElementById('game-area').style.display = 'block';
+                document.getElementById('results-screen').style.display = 'none';
+                
+                loadNextQuestion();
+                setupEventListeners();
+            }
+
+            // Configurar event listeners permanentes
+            function setupEventListeners() {
+                document.getElementById('check-btn').addEventListener('click', checkAnswer);
+                document.getElementById('next-btn').addEventListener('click', loadNextQuestion);
+                document.getElementById('restart-btn').addEventListener('click', init);
+            }
+
+            // Cargar la siguiente pregunta
+            function loadNextQuestion() {
+                // Verificar si el juego ha terminado
+                if (questionCount === totalQuestions) {
+                    showResults();
+                    return;
+                }
+                
+                // Reiniciar selecciones
+                currentSelection = { verb: "", article: "", preposition: "" };
+                currentDropdown = null;
+                
+                // Ocultar feedback y panel de opciones
+                document.getElementById('feedback').className = 'feedback';
+                document.getElementById('options-panel').style.display = 'none';
+                
+                // Deshabilitar botones
+                document.getElementById('check-btn').disabled = true;
+                document.getElementById('next-btn').disabled = true;
+                
+                // Obtener nueva frase que no se haya usado
+                let newSentence;
+                do {
+                    newSentence = SentenceManager.getRandomSentence();
+                } while (usedSentences.includes(newSentence.object) && usedSentences.length < 15);
+                
+                currentSentence = newSentence;
+                usedSentences.push(currentSentence.object);
+                
+                // Actualizar contador de preguntas
+                questionCount++;
+                document.getElementById('question-count').textContent = questionCount;
+                
+                // Actualizar barra de progreso
+                const progress = (questionCount / totalQuestions) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                
+                // Mostrar la frase
+                displaySentence();
+                
+                // Cambiar texto del botón si es la última pregunta
+                if (questionCount === totalQuestions) {
+                    document.getElementById('next-btn').textContent = 'Ver resultados';
+                }
+            }
+
+            // Mostrar la frase en la interfaz
+            function displaySentence() {
+                const sentenceElement = document.getElementById('sentence');
+                const contextElement = document.getElementById('context');
+                
+                contextElement.textContent = currentSentence.context;
+                
+                let sentenceHTML = '';
+                
+                switch(currentSentence.type) {
+                    case "article_preposition":
+                        sentenceHTML = `
+                            <span class="sentence-part">There is</span>
+                            <span class="dropdown ${currentSelection.article ? 'selected' : ''}" data-type="article">${currentSelection.article || '______'}</span>
+                            <span class="sentence-part">${currentSentence.object}</span>
+                            <span class="dropdown ${currentSelection.preposition ? 'selected' : ''}" data-type="preposition">${currentSelection.preposition || '______'}</span>
+                            <span class="sentence-part">the ${currentSentence.location}.</span>
+                        `;
+                        break;
+                    case "verb_preposition":
+                        sentenceHTML = `
+                            <span class="sentence-part">There</span>
+                            <span class="dropdown ${currentSelection.verb ? 'selected' : ''}" data-type="verb">${currentSelection.verb || '______'}</span>
+                            <span class="sentence-part">${currentSentence.object}</span>
+                            <span class="dropdown ${currentSelection.preposition ? 'selected' : ''}" data-type="preposition">${currentSelection.preposition || '______'}</span>
+                            <span class="sentence-part">the ${currentSentence.location}.</span>
+                        `;
+                        break;
+                    case "verb_article_preposition":
+                        sentenceHTML = `
+                            <span class="sentence-part">There</span>
+                            <span class="dropdown ${currentSelection.verb ? 'selected' : ''}" data-type="verb">${currentSelection.verb || '______'}</span>
+                            <span class="dropdown ${currentSelection.article ? 'selected' : ''}" data-type="article">${currentSelection.article || '______'}</span>
+                            <span class="sentence-part">${currentSentence.object}</span>
+                            <span class="dropdown ${currentSelection.preposition ? 'selected' : ''}" data-type="preposition">${currentSelection.preposition || '______'}</span>
+                            <span class="sentence-part">the ${currentSentence.location}.</span>
+                        `;
+                        break;
+                }
+                
+                sentenceElement.innerHTML = sentenceHTML;
+                
+                // Añadir event listeners a los dropdowns
+                document.querySelectorAll('.dropdown').forEach(dropdown => {
+                    dropdown.addEventListener('click', function() {
+                        handleDropdownClick(this);
+                    });
+                });
+            }
+
+            // Manejar clic en un dropdown
+            function handleDropdownClick(dropdown) {
+                const type = dropdown.getAttribute('data-type');
+                currentDropdown = type;
+                
+                // Mostrar panel de opciones
+                document.getElementById('options-panel').style.display = 'block';
+                
+                // Generar opciones según el tipo
+                const optionsContainer = document.getElementById('dynamic-options');
+                const optionsTitle = document.getElementById('options-title');
+                
+                let options = [];
+                let title = "";
+                
+                switch(type) {
+                    case "verb":
+                        title = "Selecciona el verbo correcto:";
+                        options = ['is', 'are'];
+                        break;
+                    case "article":
+                        title = "Selecciona el artículo correcto:";
+                        options = ['a', 'an'];
+                        break;
+                    case "preposition":
+                        title = "Selecciona la preposición correcta:";
+                        const wrongPrepositions = SentenceManager.getWrongPrepositions(currentSentence.preposition);
+                        options = [currentSentence.preposition, ...wrongPrepositions].sort(() => 0.5 - Math.random());
+                        break;
+                }
+                
+                optionsTitle.textContent = title;
+                optionsContainer.innerHTML = options.map(option => 
+                    `<div class="option" data-value="${option}">${option}</div>`
+                ).join('');
+                
+                // Añadir event listeners a las opciones
+                document.querySelectorAll('#dynamic-options .option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        currentSelection[type] = value;
+                        
+                        // Actualizar la visualización
+                        displaySentence();
+                        
+                        // Ocultar panel de opciones
+                        document.getElementById('options-panel').style.display = 'none';
+                        
+                        // Habilitar botón de verificar si todas las selecciones están completas
+                        enableCheckButton();
+                    });
+                });
+            }
+
+            // Habilitar el botón de verificar cuando todas las selecciones estén completas
+            function enableCheckButton() {
+                let allSelected = false;
+                
+                switch(currentSentence.type) {
+                    case "article_preposition":
+                        allSelected = currentSelection.article && currentSelection.preposition;
+                        break;
+                    case "verb_preposition":
+                        allSelected = currentSelection.verb && currentSelection.preposition;
+                        break;
+                    case "verb_article_preposition":
+                        allSelected = currentSelection.verb && currentSelection.article && currentSelection.preposition;
+                        break;
+                }
+                
+                document.getElementById('check-btn').disabled = !allSelected;
+            }
+
+            // Verificar la respuesta del usuario
+            function checkAnswer() {
+                let isCorrect = true;
+                
+                // Verificar cada componente según el tipo de pregunta
+                switch(currentSentence.type) {
+                    case "article_preposition":
+                        isCorrect = currentSelection.article === currentSentence.article && 
+                                    currentSelection.preposition === currentSentence.preposition;
+                        break;
+                    case "verb_preposition":
+                        isCorrect = currentSelection.verb === (currentSentence.structure === "there is" ? "is" : "are") && 
+                                    currentSelection.preposition === currentSentence.preposition;
+                        break;
+                    case "verb_article_preposition":
+                        isCorrect = currentSelection.verb === (currentSentence.structure === "there is" ? "is" : "are") && 
+                                    currentSelection.article === currentSentence.article && 
+                                    currentSelection.preposition === currentSentence.preposition;
+                        break;
+                }
+                
+                const feedbackElement = document.getElementById('feedback');
+                
+                if (isCorrect) {
+                    score += 10;
+                    document.getElementById('score').textContent = score;
+                    feedbackElement.textContent = '¡Correcto! Bien hecho.';
+                    feedbackElement.className = 'feedback correct';
+                } else {
+                    let correctAnswer = "";
+                    switch(currentSentence.type) {
+                        case "article_preposition":
+                            correctAnswer = `There is ${currentSentence.article} ${currentSentence.object} ${currentSentence.preposition} the ${currentSentence.location}.`;
+                            break;
+                        case "verb_preposition":
+                            correctAnswer = `There ${currentSentence.structure === "there is" ? "is" : "are"} ${currentSentence.object} ${currentSentence.preposition} the ${currentSentence.location}.`;
+                            break;
+                        case "verb_article_preposition":
+                            const verb = currentSentence.structure === "there is" ? "is" : "are";
+                            const article = currentSentence.article || "";
+                            correctAnswer = `There ${verb} ${article} ${currentSentence.object} ${currentSentence.preposition} the ${currentSentence.location}.`;
+                            break;
+                    }
+                    feedbackElement.textContent = `Incorrecto. La respuesta correcta es: "${correctAnswer}"`;
+                    feedbackElement.className = 'feedback incorrect';
+                }
+                
+                document.getElementById('check-btn').disabled = true;
+                document.getElementById('next-btn').disabled = false;
+            }
+
+            // Mostrar resultados finales
+            function showResults() {
+                document.getElementById('game-area').style.display = 'none';
+                document.getElementById('results-screen').style.display = 'block';
+                
+                document.getElementById('final-score').textContent = score;
+                
+                // Calcular calificación
+                const gradeElement = document.getElementById('grade');
+                const gradeMessage = document.getElementById('grade-message');
+                
+                if (score >= 180) {
+                    gradeElement.textContent = "A+";
+                    gradeElement.className = "grade grade-excellent";
+                    gradeMessage.textContent = "¡Excelente! Dominas completamente todas las preposiciones de lugar.";
+                } else if (score >= 160) {
+                    gradeElement.textContent = "A";
+                    gradeElement.className = "grade grade-excellent";
+                    gradeMessage.textContent = "¡Muy bien! Tu conocimiento de las preposiciones es excelente.";
+                } else if (score >= 140) {
+                    gradeElement.textContent = "B";
+                    gradeElement.className = "grade grade-good";
+                    gradeMessage.textContent = "¡Buen trabajo! Entiendes la mayoría de las preposiciones.";
+                } else if (score >= 100) {
+                    gradeElement.textContent = "C";
+                    gradeElement.className = "grade grade-poor";
+                    gradeMessage.textContent = "Aprobado. Sigue practicando para mejorar.";
+                } else {
+                    gradeElement.textContent = "D";
+                    gradeElement.className = "grade grade-poor";
+                    gradeMessage.textContent = "Necesitas más práctica. Revisa las preposiciones y vuelve a intentarlo.";
+                }
+            }
+
+            return {
+                init
+            };
+        })();
+
+        // Inicializar el juego cuando se carga la página
+        document.addEventListener('DOMContentLoaded', GameManager.init);
+    </script>
+</body>
+</html>
