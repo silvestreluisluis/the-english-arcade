@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detectives del Tiempo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #16213e;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4cc9f0;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #4cc9f0;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #f72585;
+            margin-top: 30px;
+        }
+        
+        .intro {
+            background-color: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .section {
+            background-color: #0f3460;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .scenario {
+            background-color: #1a1a2e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .context {
+            font-style: italic;
+            color: #4cc9f0;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 3px solid #4cc9f0;
+            background-color: rgba(76, 201, 240, 0.1);
+        }
+        
+        .sentence {
+            font-size: 1.1rem;
+            margin: 15px 0;
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .option {
+            background-color: #4cc9f0;
+            color: #16213e;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .option:hover {
+            background-color: #f72585;
+            color: white;
+        }
+        
+        .option.correct {
+            background-color: #4ade80;
+            color: #16213e;
+        }
+        
+        .option.incorrect {
+            background-color: #f72585;
+            color: white;
+        }
+        
+        .matching-game {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .english-words, .spanish-words {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .word {
+            background-color: #1a1a2e;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .word:hover {
+            background-color: #4cc9f0;
+            color: #16213e;
+        }
+        
+        .selected {
+            background-color: #f72585;
+            color: white;
+        }
+        
+        .matched {
+            background-color: #4ade80;
+            color: #16213e;
+            text-decoration: line-through;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 15px 0;
+            color: #f72585;
+        }
+        
+        button {
+            background-color: #4cc9f0;
+            color: #16213e;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: block;
+            margin: 20px auto;
+        }
+        
+        button:hover {
+            background-color: #f72585;
+            color: white;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            color: #4cc9f0;
+        }
+        
+        .result {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .expert {
+            background-color: #4ade80;
+            color: #16213e;
+        }
+        
+        .competent {
+            background-color: #4cc9f0;
+            color: #16213e;
+        }
+        
+        .apprentice {
+            background-color: #f59e0b;
+            color: #16213e;
+        }
+        
+        .explorer {
+            background-color: #f72585;
+            color: white;
+        }
+        
+        .instructions {
+            background-color: #1a1a2e;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #1a1a2e;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #4cc9f0;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .feedback {
+            text-align: center;
+            margin: 10px 0;
+            min-height: 30px;
+            font-weight: bold;
+        }
+        
+        .correct-feedback {
+            color: #4ade80;
+        }
+        
+        .incorrect-feedback {
+            color: #f72585;
+        }
+        
+        .grade-display {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #4cc9f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕵️‍♂️ Detectives del Tiempo</h1>
+        
+        <div class="intro">
+            <p>¡Bienvenido al juego interactivo "Detectives del Tiempo"! Este juego está diseñado para que practiques los adverbios de frecuencia y tiempo en presente simple de forma dinámica y divertida.</p>
+            
+            <p><strong>🎯 Adverbios incluidos:</strong></p>
+            <ul>
+                <li><strong>Frecuencia:</strong> always, usually, often, sometimes, rarely, never</li>
+                <li><strong>Tiempo:</strong> in the morning, in the afternoon, at night, on weekdays, on weekends, every day, at 7 a.m., on Sundays</li>
+                <li><strong>Traducciones:</strong> siempre, usualmente, a menudo, a veces, raramente, nunca, por la mañana, por la tarde, por la noche, entre semana, los fines de semana, todos los días, a las 7 a.m., los domingos</li>
+            </ul>
+        </div>
+        
+        <div id="welcome" class="section active">
+            <h2>¡Comienza tu entrenamiento!</h2>
+            <p>Demuestra tus habilidades como detective del tiempo completando los siguientes desafíos:</p>
+            <ul>
+                <li><strong>Sección 1:</strong> 10 ejercicios de inferencia con contexto</li>
+                <li><strong>Sección 2:</strong> Emparejamiento bilingüe contra reloj</li>
+            </ul>
+            <button id="start-game">Iniciar juego</button>
+        </div>
+        
+        <div id="section1" class="section">
+            <h2>🔍 Sección 1: Inferencias con contexto</h2>
+            <p>Lee el contexto y completa la frase con el adverbio de frecuencia correcto. Cada respuesta acertada suma puntos.</p>
+            
+            <div class="progress-bar">
+                <div class="progress" id="progress-bar"></div>
+            </div>
+            
+            <div class="scenario">
+                <div class="context" id="context-text">Ana es una estudiante muy dedicada. Estudia todos los días después de la escuela y nunca deja sus tareas para el último momento.</div>
+                <div class="sentence" id="scenario-text">She ___________ completes her homework before dinner.</div>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="options" id="options-container">
+                <!-- Las opciones se generarán dinámicamente -->
+            </div>
+            
+            <div class="score-display">
+                Ejercicio <span id="current-exercise">1</span> de 10
+            </div>
+        </div>
+        
+        <div id="section2" class="section">
+            <h2>🔗 Sección 2: Emparejamiento bilingüe</h2>
+            <p>Empareja los adverbios de frecuencia y tiempo en inglés con su equivalente en español. Tienes 1 minuto para hacer tantos pares como puedas. Cada par correcto suma puntos.</p>
+            
+            <div class="instructions">
+                <p>Instrucciones: Haz clic en una palabra en inglés y luego en su traducción en español para formar un par. Tienes 60 segundos.</p>
+            </div>
+            
+            <div class="timer" id="timer">60</div>
+            
+            <div class="matching-game">
+                <div class="english-words" id="english-words">
+                    <!-- Las palabras en inglés se generarán dinámicamente -->
+                </div>
+                
+                <div class="spanish-words" id="spanish-words">
+                    <!-- Las palabras en español se generarán dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="score-display">
+                Pares completados: <span id="pairs-completed">0</span> de 14
+            </div>
+        </div>
+        
+        <div id="results" class="section">
+            <h2>📊 Resultados Finales</h2>
+            
+            <div class="grade-display">
+                Calificación: <span id="final-grade">0</span>/10
+            </div>
+            
+            <div class="score-display">
+                Puntuación total: <span id="total-score">0</span> puntos
+            </div>
+            
+            <div class="result" id="result-message">
+                <!-- El mensaje de resultado se generará dinámicamente -->
+            </div>
+            
+            <button id="restart-game">Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentScore = 0;
+        let matchingScore = 0;
+        let currentScenario = 0;
+        let timer;
+        let timeLeft = 60;
+        let selectedEnglishWord = null;
+        let matchedPairs = 0;
+        let correctAnswers = 0;
+        let totalQuestions = 10;
+        
+        // Datos del juego con más contexto
+        const scenarios = [
+            {
+                context: "Ana es una estudiante muy dedicada. Estudia todos los días después de la escuela y nunca deja sus tareas para el último momento.",
+                text: "She ___________ completes her homework before dinner.",
+                options: ["always", "usually", "sometimes", "rarely"],
+                correct: "always"
+            },
+            {
+                context: "Tom tiene un trabajo de oficina de lunes a viernes. Su horario es muy regular y nunca falta al trabajo.",
+                text: "He ___________ goes to the office on weekdays.",
+                options: ["always", "never", "sometimes", "rarely"],
+                correct: "always"
+            },
+            {
+                context: "A María le encantan los fines de semana porque puede descansar. Por lo general, se despierta tarde los sábados y domingos.",
+                text: "She ___________ sleeps late on Saturdays and Sundays.",
+                options: ["never", "usually", "rarely", "sometimes"],
+                correct: "usually"
+            },
+            {
+                context: "David tiene un trabajo muy demandante y muchas responsabilidades. Casi no tiene tiempo libre durante la semana.",
+                text: "He ___________ has time for hobbies during the week.",
+                options: ["always", "usually", "often", "rarely"],
+                correct: "rarely"
+            },
+            {
+                context: "Lisa es una persona muy activa y saludable. Corre casi todas las mañanas antes de ir a trabajar.",
+                text: "She ___________ goes for a run in the morning.",
+                options: ["never", "sometimes", "often", "rarely"],
+                correct: "often"
+            },
+            {
+                context: "John realmente no es una persona matutina. Le cuesta mucho despertarse temprano y prefiere dormir hasta tarde.",
+                text: "He ___________ wakes up before 7 a.m.",
+                options: ["always", "usually", "sometimes", "never"],
+                correct: "never"
+            },
+            {
+                context: "A Emily le apasiona cocinar. Casi todas las noches prepara la cena para su familia y disfruta probando nuevas recetas.",
+                text: "She ___________ prepares dinner for her family.",
+                options: ["always", "usually", "rarely", "never"],
+                correct: "usually"
+            },
+            {
+                context: "Michael trabaja en ventas y su puesto requiere que visite clientes en diferentes ciudades. No viaja todas las semanas, pero sí con cierta regularidad.",
+                text: "He ___________ visits clients in other cities.",
+                options: ["always", "sometimes", "never", "rarely"],
+                correct: "sometimes"
+            },
+            {
+                context: "Sarah es extremadamente organizada. Planificar su semana el domingo por la noche es un ritual que nunca se salta.",
+                text: "She ___________ plans her week on Sunday evening.",
+                options: ["always", "usually", "sometimes", "rarely"],
+                correct: "always"
+            },
+            {
+                context: "Robert no soporta el sabor del café. En su lugar, bebe té en todas sus comidas y en cualquier momento del día.",
+                text: "He ___________ drinks tea instead.",
+                options: ["always", "usually", "sometimes", "never"],
+                correct: "always"
+            },
+            {
+                context: "Laura es profesora de yoga. Da clases tres veces por semana, los lunes, miércoles y viernes.",
+                text: "She ___________ teaches yoga classes.",
+                options: ["always", "often", "never", "rarely"],
+                correct: "often"
+            },
+            {
+                context: "Carlos es vegetariano por convicción personal. En ninguna circunstancia consume productos de origen animal.",
+                text: "He ___________ eats meat.",
+                options: ["always", "usually", "sometimes", "never"],
+                correct: "never"
+            },
+            {
+                context: "Sofía vive cerca de la playa. Cuando hace buen tiempo, que es la mayoría de los días, va a caminar por la orilla.",
+                text: "She ___________ walks along the beach.",
+                options: ["always", "usually", "rarely", "never"],
+                correct: "usually"
+            },
+            {
+                context: "Pedro tiene alergias estacionales. Solo durante la primavera tiene síntomas, el resto del año está bien.",
+                text: "He ___________ suffers from allergies.",
+                options: ["always", "sometimes", "never", "rarely"],
+                correct: "sometimes"
+            },
+            {
+                context: "Elena es bibliotecaria y adora su trabajo. Está en la biblioteca de lunes a sábado, sin excepción.",
+                text: "She ___________ works at the library.",
+                options: ["always", "usually", "sometimes", "rarely"],
+                correct: "always"
+            }
+        ];
+        
+        const wordPairs = [
+            { english: "always", spanish: "siempre" },
+            { english: "usually", spanish: "usualmente" },
+            { english: "often", spanish: "a menudo" },
+            { english: "sometimes", spanish: "a veces" },
+            { english: "rarely", spanish: "raramente" },
+            { english: "never", spanish: "nunca" },
+            { english: "in the morning", spanish: "por la mañana" },
+            { english: "in the afternoon", spanish: "por la tarde" },
+            { english: "at night", spanish: "por la noche" },
+            { english: "on weekdays", spanish: "entre semana" },
+            { english: "on weekends", spanish: "los fines de semana" },
+            { english: "every day", spanish: "todos los días" },
+            { english: "at 7 a.m.", spanish: "a las 7 a.m." },
+            { english: "on Sundays", spanish: "los domingos" }
+        ];
+        
+        // Elementos DOM
+        const startGameBtn = document.getElementById('start-game');
+        const restartGameBtn = document.getElementById('restart-game');
+        const welcomeSection = document.getElementById('welcome');
+        const section1 = document.getElementById('section1');
+        const section2 = document.getElementById('section2');
+        const resultsSection = document.getElementById('results');
+        const contextText = document.getElementById('context-text');
+        const scenarioText = document.getElementById('scenario-text');
+        const optionsContainer = document.getElementById('options-container');
+        const currentExerciseDisplay = document.getElementById('current-exercise');
+        const progressBar = document.getElementById('progress-bar');
+        const feedbackDisplay = document.getElementById('feedback');
+        const matchingScoreDisplay = document.getElementById('pairs-completed');
+        const timerDisplay = document.getElementById('timer');
+        const englishWordsContainer = document.getElementById('english-words');
+        const spanishWordsContainer = document.getElementById('spanish-words');
+        const resultMessage = document.getElementById('result-message');
+        const totalScoreDisplay = document.getElementById('total-score');
+        const finalGradeDisplay = document.getElementById('final-grade');
+        
+        // Inicialización del juego
+        function initGame() {
+            currentScore = 0;
+            matchingScore = 0;
+            currentScenario = 0;
+            timeLeft = 60;
+            matchedPairs = 0;
+            correctAnswers = 0;
+            
+            // Ocultar todas las secciones excepto la primera
+            welcomeSection.classList.remove('active');
+            section1.classList.remove('active');
+            section2.classList.remove('active');
+            resultsSection.classList.remove('active');
+            section1.classList.add('active');
+            
+            // Mezclar escenarios y seleccionar solo 10
+            shuffleArray(scenarios);
+            
+            // Cargar el primer escenario
+            loadScenario(currentScenario);
+            
+            // Preparar el juego de emparejamiento
+            prepareMatchingGame();
+        }
+        
+        // Mezclar array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Cargar escenario
+        function loadScenario(index) {
+            if (index >= totalQuestions) {
+                // Terminar sección 1 y pasar a la sección 2
+                section1.classList.remove('active');
+                section2.classList.add('active');
+                startMatchingGame();
+                return;
+            }
+            
+            const scenario = scenarios[index];
+            contextText.textContent = scenario.context;
+            scenarioText.textContent = scenario.text;
+            currentExerciseDisplay.textContent = index + 1;
+            progressBar.style.width = `${((index + 1) / totalQuestions) * 100}%`;
+            
+            // Limpiar opciones anteriores y feedback
+            optionsContainer.innerHTML = '';
+            feedbackDisplay.textContent = '';
+            feedbackDisplay.className = 'feedback';
+            
+            // Mezlar opciones
+            const shuffledOptions = shuffleArray([...scenario.options]);
+            
+            // Crear nuevas opciones
+            shuffledOptions.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.addEventListener('click', () => checkAnswer(option, scenario.correct, optionElement));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            currentScenario = index;
+        }
+        
+        // Verificar respuesta
+        function checkAnswer(selected, correct, element) {
+            // Deshabilitar todas las opciones
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            
+            if (selected === correct) {
+                // Respuesta correcta
+                element.classList.add('correct');
+                feedbackDisplay.textContent = '¡Correcto!';
+                feedbackDisplay.className = 'feedback correct-feedback';
+                correctAnswers++;
+            } else {
+                // Respuesta incorrecta
+                element.classList.add('incorrect');
+                feedbackDisplay.textContent = `La respuesta correcta es: ${correct}`;
+                feedbackDisplay.className = 'feedback incorrect-feedback';
+                
+                // Resaltar la respuesta correcta
+                document.querySelectorAll('.option').forEach(opt => {
+                    if (opt.textContent === correct) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            // Avanzar al siguiente escenario después de un breve retraso
+            setTimeout(() => {
+                loadScenario(currentScenario + 1);
+            }, 1500);
+        }
+        
+        // Preparar juego de emparejamiento
+        function prepareMatchingGame() {
+            // Limpiar contenedores
+            englishWordsContainer.innerHTML = '';
+            spanishWordsContainer.innerHTML = '';
+            
+            // Mezclar las palabras
+            const shuffledPairs = shuffleArray([...wordPairs]);
+            
+            // Crear elementos para palabras en inglés
+            shuffledPairs.forEach(pair => {
+                const englishWord = document.createElement('div');
+                englishWord.className = 'word';
+                englishWord.textContent = pair.english;
+                englishWord.dataset.word = pair.english;
+                englishWord.addEventListener('click', () => selectEnglishWord(pair.english, englishWord));
+                englishWordsContainer.appendChild(englishWord);
+            });
+            
+            // Crear elementos para palabras en español (mezcladas)
+            const shuffledSpanish = shuffleArray([...shuffledPairs]);
+            
+            shuffledSpanish.forEach(pair => {
+                const spanishWord = document.createElement('div');
+                spanishWord.className = 'word';
+                spanishWord.textContent = pair.spanish;
+                spanishWord.dataset.word = pair.spanish;
+                spanishWord.dataset.english = pair.english;
+                spanishWord.addEventListener('click', () => selectSpanishWord(pair.spanish, pair.english, spanishWord));
+                spanishWordsContainer.appendChild(spanishWord);
+            });
+        }
+        
+        // Seleccionar palabra en inglés
+        function selectEnglishWord(word, element) {
+            // Quitar selección anterior
+            document.querySelectorAll('.word.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Seleccionar nueva palabra
+            element.classList.add('selected');
+            selectedEnglishWord = word;
+        }
+        
+        // Seleccionar palabra en español
+        function selectSpanishWord(spanishWord, englishWord, element) {
+            if (!selectedEnglishWord) {
+                return;
+            }
+            
+            if (selectedEnglishWord === englishWord) {
+                // Par correcto
+                matchingScore += 5;
+                matchedPairs++;
+                matchingScoreDisplay.textContent = matchedPairs;
+                
+                // Marcar como emparejado
+                document.querySelector(`.word[data-word="${selectedEnglishWord}"]`).classList.add('matched');
+                element.classList.add('matched');
+                
+                // Verificar si se completó el juego
+                if (matchedPairs === wordPairs.length) {
+                    clearInterval(timer);
+                    endMatchingGame();
+                }
+            } else {
+                // Par incorrecto - resaltar brevemente en rojo
+                element.classList.add('incorrect');
+                setTimeout(() => {
+                    element.classList.remove('incorrect');
+                }, 500);
+            }
+            
+            // Limpiar selección
+            document.querySelectorAll('.word.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+            selectedEnglishWord = null;
+        }
+        
+        // Iniciar juego de emparejamiento
+        function startMatchingGame() {
+            timeLeft = 60;
+            timerDisplay.textContent = timeLeft;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endMatchingGame();
+                }
+            }, 1000);
+        }
+        
+        // Finalizar juego de emparejamiento
+        function endMatchingGame() {
+            section2.classList.remove('active');
+            resultsSection.classList.add('active');
+            
+            // Calcular puntuación total
+            const section1Score = correctAnswers * 10; // 10 puntos por cada acierto
+            const totalScore = section1Score + matchingScore;
+            totalScoreDisplay.textContent = totalScore;
+            
+            // Calificar de 1 a 10
+            const maxPossibleScore = (totalQuestions * 10) + (wordPairs.length * 5);
+            const grade = Math.round((totalScore / maxPossibleScore) * 10);
+            finalGradeDisplay.textContent = grade;
+            
+            // Mostrar resultado según puntuación
+            let message = '';
+            let resultClass = '';
+            
+            if (grade >= 9) {
+                message = '🥇 Detective experto del tiempo';
+                resultClass = 'expert';
+            } else if (grade >= 7) {
+                message = '🥈 Analista competente';
+                resultClass = 'competent';
+            } else if (grade >= 5) {
+                message = '🥉 Aprendiz observador';
+                resultClass = 'apprentice';
+            } else {
+                message = '🧪 Explorador en entrenamiento';
+                resultClass = 'explorer';
+            }
+            
+            resultMessage.textContent = message;
+            resultMessage.className = `result ${resultClass}`;
+            resultMessage.style.display = 'block';
+        }
+        
+        // Event Listeners
+        startGameBtn.addEventListener('click', initGame);
+        
+        restartGameBtn.addEventListener('click', () => {
+            initGame();
+            resultsSection.classList.remove('active');
+            section1.classList.add('active');
+        });
+    </script>
+</body>
+</html>
