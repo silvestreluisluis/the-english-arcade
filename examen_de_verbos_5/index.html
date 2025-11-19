@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Verbos en Inglés</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 2.5rem;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .timer-container, .score-container, .verbs-counter {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            text-align: center;
+            min-width: 180px;
+        }
+        
+        .riddle-container {
+            background: linear-gradient(to right, #e0eafc, #cfdef3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.3rem;
+            border-left: 6px solid #3498db;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group label {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            text-align: center;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .input-field.correct {
+            border-color: #2ecc71;
+            background-color: #e8f8ef;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3);
+        }
+        
+        .input-field.incorrect {
+            border-color: #e74c3c;
+            background-color: #fdedec;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-next {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .btn-next:hover {
+            background: linear-gradient(to right, #27ae60, #219653);
+        }
+        
+        .btn-next:disabled {
+            background: linear-gradient(to right, #bdc3c7, #95a5a6);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-check {
+            background: linear-gradient(to right, #f39c12, #e67e22);
+            color: white;
+        }
+        
+        .btn-check:hover {
+            background: linear-gradient(to right, #e67e22, #d35400);
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .success {
+            background: linear-gradient(to right, #d5f4e6, #c1e8d0);
+            color: #27ae60;
+            border-left: 5px solid #2ecc71;
+        }
+        
+        .error {
+            background: linear-gradient(to right, #fadbd8, #f5b7b1);
+            color: #c0392b;
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 15px;
+            margin: 20px 0;
+            height: 25px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 15px;
+        }
+        
+        .verb-counter {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        @media (max-width: 768px) {
+            .input-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-header {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Juego de Verbos en Inglés</h1>
+    
+    <div class="container">
+        <div class="game-header">
+            <div class="timer-container">
+                ⏱️ Tiempo: <span id="timer">40:00</span>
+            </div>
+            <div class="score-container">
+                🏆 Puntuación: <span id="score">0</span>
+            </div>
+            <div class="verbs-counter">
+                📚 Verbos: <span id="current-verb">1</span>/<span id="total-verbs">40</span>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="riddle-container">
+            <p id="riddle">Completa las cuatro formas del verbo: presente, pasado, participio y gerundio</p>
+        </div>
+        
+        <div class="input-container">
+            <div class="input-group">
+                <label for="present">📝 Presente Simple</label>
+                <input type="text" id="present" class="input-field">
+            </div>
+            <div class="input-group">
+                <label for="past">🕒 Pasado Simple</label>
+                <input type="text" id="past" class="input-field">
+            </div>
+            <div class="input-group">
+                <label for="participle">✅ Pasado Participio</label>
+                <input type="text" id="participle" class="input-field">
+            </div>
+            <div class="input-group">
+                <label for="gerund">🔄 Gerundio</label>
+                <input type="text" id="gerund" class="input-field">
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-check" id="check-btn">Verificar Respuestas</button>
+            <button class="btn btn-next" id="next-btn" disabled>Siguiente Verbo</button>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="verb-counter" id="verb-counter">Verbo 1 de 40</div>
+    </div>
+
+    <script>
+        // Lista completa de verbos con sus formas y acertijos
+        const allVerbs = [
+            { base: "speed", present: "speed", past: "sped", participle: "sped", gerund: "speeding", riddle: "Este verbo significa moverse muy rápido. ¿Cuáles son sus cuatro formas?" },
+            { base: "feed", present: "feed", past: "fed", participle: "fed", gerund: "feeding", riddle: "Cuando das de comer a alguien, usas este verbo. Escribe sus cuatro formas." },
+            { base: "stink", present: "stink", past: "stank", participle: "stunk", gerund: "stinking", riddle: "Este verbo describe cuando algo huele muy mal. Completa sus formas." },
+            { base: "bet", present: "bet", past: "bet", participle: "bet", gerund: "betting", riddle: "Si apuestas dinero en un juego, usas este verbo. ¿Sus cuatro formas?" },
+            { base: "lean", present: "lean", past: "leaned", participle: "leaned", gerund: "leaning", riddle: "Cuando te inclinas o apoyas en algo. Escribe las formas de este verbo." },
+            { base: "creep", present: "creep", past: "crept", participle: "crept", gerund: "creeping", riddle: "Moverse silenciosamente como un gato. Completa este verbo." },
+            { base: "kneel", present: "kneel", past: "knelt", participle: "knelt", gerund: "kneeling", riddle: "Arrodillarse es la acción de este verbo. Sus cuatro formas son:" },
+            { base: "throw", present: "throw", past: "threw", participle: "thrown", gerund: "throwing", riddle: "Lanzar una pelota al aire. Escribe las formas de este verbo." },
+            { base: "sweep", present: "sweep", past: "swept", participle: "swept", gerund: "sweeping", riddle: "Limpiar el piso con una escoba. Completa este verbo." },
+            { base: "drink", present: "drink", past: "drank", participle: "drunk", gerund: "drinking", riddle: "Tomar agua o cualquier líquido. ¿Cuáles son las formas de este verbo?" },
+            { base: "fall", present: "fall", past: "fell", participle: "fallen", gerund: "falling", riddle: "Cuando te caes al suelo. Escribe las cuatro formas de este verbo." },
+            { base: "sing", present: "sing", past: "sang", participle: "sung", gerund: "singing", riddle: "Cantar una canción. Completa las formas de este verbo." },
+            { base: "dig", present: "dig", past: "dug", participle: "dug", gerund: "digging", riddle: "Hacer un hoyo en la tierra. ¿Sus cuatro formas verbales?" },
+            { base: "catch", present: "catch", past: "caught", participle: "caught", gerund: "catching", riddle: "Atrapar una pelota que te lanzan. Completa este verbo." },
+            { base: "take", present: "take", past: "took", participle: "taken", gerund: "taking", riddle: "Tomar algo con las manos. Escribe sus formas verbales." },
+            { base: "hang", present: "hang", past: "hung", participle: "hung", gerund: "hanging", riddle: "Colgar un cuadro en la pared. ¿Cuáles son las formas de este verbo?" },
+            { base: "swing", present: "swing", past: "swung", participle: "swung", gerund: "swinging", riddle: "Mecerse en un columpio. Completa este verbo." },
+            { base: "eat", present: "eat", past: "ate", participle: "eaten", gerund: "eating", riddle: "Comer tu comida favorita. Escribe las cuatro formas de este verbo." },
+            { base: "buy", present: "buy", past: "bought", participle: "bought", gerund: "buying", riddle: "Comprar algo en una tienda. ¿Sus formas verbales?" },
+            { base: "drive", present: "drive", past: "drove", participle: "driven", gerund: "driving", riddle: "Manejar un carro. Completa las formas de este verbo." },
+            { base: "keep", present: "keep", past: "kept", participle: "kept", gerund: "keeping", riddle: "Guardar o conservar algo. Escribe sus cuatro formas." },
+            { base: "run", present: "run", past: "ran", participle: "run", gerund: "running", riddle: "Correr en el parque. ¿Cuáles son las formas de este verbo?" },
+            { base: "cut", present: "cut", past: "cut", participle: "cut", gerund: "cutting", riddle: "Cortar un papel con tijeras. Completa este verbo." },
+            { base: "sew", present: "sew", past: "sewed", participle: "sewn", gerund: "sewing", riddle: "Coser un botón en la camisa. Escribe sus formas verbales." },
+            { base: "cost", present: "cost", past: "cost", participle: "cost", gerund: "costing", riddle: "El precio que tiene algo. ¿Sus cuatro formas?" },
+            { base: "grow", present: "grow", past: "grew", participle: "grown", gerund: "growing", riddle: "Las plantas crecen con agua y sol. Completa este verbo." },
+            { base: "give", present: "give", past: "gave", participle: "given", gerund: "giving", riddle: "Dar un regalo a alguien. Escribe las formas de este verbo." },
+            { base: "say", present: "say", past: "said", participle: "said", gerund: "saying", riddle: "Decir algo importante. ¿Cuáles son sus cuatro formas?" },
+            { base: "tell", present: "tell", past: "told", participle: "told", gerund: "telling", riddle: "Contar una historia o un cuento. Completa este verbo." },
+            { base: "leave", present: "leave", past: "left", participle: "left", gerund: "leaving", riddle: "Salir de un lugar. Escribe las formas de este verbo." },
+            { base: "spell", present: "spell", past: "spelled", participle: "spelled", gerund: "spelling", riddle: "Deletrear una palabra. ¿Cuáles son sus cuatro formas?" },
+            { base: "spill", present: "spill", past: "spilled", participle: "spilled", gerund: "spilling", riddle: "Derramar un líquido. Completa este verbo." },
+            { base: "awake", present: "awake", past: "awoke", participle: "awoken", gerund: "awaking", riddle: "Despertarse por la mañana. Escribe sus formas." },
+            { base: "wake", present: "wake", past: "woke", participle: "woken", gerund: "waking", riddle: "Despertar a alguien. ¿Sus cuatro formas verbales?" },
+            { base: "draw", present: "draw", past: "drew", participle: "drawn", gerund: "drawing", riddle: "Dibujar un paisaje. Completa este verbo." },
+            { base: "shoot", present: "shoot", past: "shot", participle: "shot", gerund: "shooting", riddle: "Disparar una flecha. Escribe las formas de este verbo." },
+            { base: "sleep", present: "sleep", past: "slept", participle: "slept", gerund: "sleeping", riddle: "Dormir por la noche. ¿Cuáles son sus formas?" },
+            { base: "lie", present: "lie", past: "lay", participle: "lain", gerund: "lying", riddle: "Recostarse en la cama. Completa este verbo." },
+            { base: "build", present: "build", past: "built", participle: "built", gerund: "building", riddle: "Construir una casa. Escribe sus formas verbales." },
+            { base: "choose", present: "choose", past: "chose", participle: "chosen", gerund: "choosing", riddle: "Elegir entre opciones. ¿Sus cuatro formas?" },
+            { base: "act", present: "act", past: "acted", participle: "acted", gerund: "acting", riddle: "Representar en una obra de teatro. Completa este verbo." },
+            { base: "add", present: "add", past: "added", participle: "added", gerund: "adding", riddle: "Sumar números en matemáticas. Escribe sus formas." },
+            { base: "ask", present: "ask", past: "asked", participle: "asked", gerund: "asking", riddle: "Hacer una pregunta al profesor. ¿Cuáles son sus formas?" },
+            { base: "answer", present: "answer", past: "answered", participle: "answered", gerund: "answering", riddle: "Responder cuando te preguntan. Completa este verbo." },
+            { base: "arrive", present: "arrive", past: "arrived", participle: "arrived", gerund: "arriving", riddle: "Llegar a un destino. Escribe las formas de este verbo." },
+            { base: "brush", present: "brush", past: "brushed", participle: "brushed", gerund: "brushing", riddle: "Cepillarse los dientes. ¿Sus cuatro formas verbales?" },
+            { base: "belong", present: "belong", past: "belonged", participle: "belonged", gerund: "belonging", riddle: "Ser dueño de algo. Completa este verbo." },
+            { base: "beg", present: "beg", past: "begged", participle: "begged", gerund: "begging", riddle: "Suplicar o pedir con insistencia. Escribe sus formas." },
+            { base: "believe", present: "believe", past: "believed", participle: "believed", gerund: "believing", riddle: "Creer en algo o alguien. ¿Cuáles son sus formas?" },
+            { base: "close", present: "close", past: "closed", participle: "closed", gerund: "closing", riddle: "Cerrar una puerta o ventana. Completa este verbo." },
+            { base: "cook", present: "cook", past: "cooked", participle: "cooked", gerund: "cooking", riddle: "Preparar la comida en la cocina. Escribe sus formas." },
+            { base: "call", present: "call", past: "called", participle: "called", gerund: "calling", riddle: "Llamar por teléfono a alguien. ¿Sus cuatro formas?" },
+            { base: "change", present: "change", past: "changed", participle: "changed", gerund: "changing", riddle: "Cambiar de opinión o de ropa. Completa este verbo." },
+            { base: "clean", present: "clean", past: "cleaned", participle: "cleaned", gerund: "cleaning", riddle: "Limpiar tu habitación. Escribe las formas de este verbo." },
+            { base: "cry", present: "cry", past: "cried", participle: "cried", gerund: "crying", riddle: "Llorar cuando estás triste. ¿Cuáles son sus formas?" },
+            { base: "dance", present: "dance", past: "danced", participle: "danced", gerund: "dancing", riddle: "Bailar en una fiesta. Completa este verbo." },
+            { base: "dress", present: "dress", past: "dressed", participle: "dressed", gerund: "dressing", riddle: "Vestirse por la mañana. Escribe sus formas." },
+            { base: "die", present: "die", past: "died", participle: "died", gerund: "dying", riddle: "Dejar de vivir. ¿Sus cuatro formas verbales?" },
+            { base: "dry", present: "dry", past: "dried", participle: "dried", gerund: "drying", riddle: "Secar la ropa al sol. Completa este verbo." },
+            { base: "enjoy", present: "enjoy", past: "enjoyed", participle: "enjoyed", gerund: "enjoying", riddle: "Disfrutar de una película. Escribe las formas de este verbo." },
+            { base: "explain", present: "explain", past: "explained", participle: "explained", gerund: "explaining", riddle: "Explicar cómo funciona algo. ¿Cuáles son sus formas?" },
+            { base: "follow", present: "follow", past: "followed", participle: "followed", gerund: "following", riddle: "Seguir a alguien o algo. Completa este verbo." },
+            { base: "finish", present: "finish", past: "finished", participle: "finished", gerund: "finishing", riddle: "Terminar una tarea. Escribe sus formas." },
+            { base: "help", present: "help", past: "helped", participle: "helped", gerund: "helping", riddle: "Ayudar a un amigo. ¿Sus cuatro formas?" },
+            { base: "hope", present: "hope", past: "hoped", participle: "hoped", gerund: "hoping", riddle: "Esperar que algo bueno pase. Completa este verbo." },
+            { base: "happen", present: "happen", past: "happened", participle: "happened", gerund: "happening", riddle: "Cuando algo ocurre o sucede. Escribe las formas de este verbo." },
+            { base: "imagine", present: "imagine", past: "imagined", participle: "imagined", gerund: "imagining", riddle: "Imaginar cosas en tu mente. ¿Cuáles son sus formas?" },
+            { base: "kiss", present: "kiss", past: "kissed", participle: "kissed", gerund: "kissing", riddle: "Dar un beso a alguien. Completa este verbo." },
+            { base: "kill", present: "kill", past: "killed", participle: "killed", gerund: "killing", riddle: "Causar la muerte de algo. Escribe sus formas." },
+            { base: "laugh", present: "laugh", past: "laughed", participle: "laughed", gerund: "laughing", riddle: "Reírse de un chiste. ¿Sus cuatro formas verbales?" },
+            { base: "like", present: "like", past: "liked", participle: "liked", gerund: "liking", riddle: "Gustar de algo o alguien. Completa este verbo." },
+            { base: "look", present: "look", past: "looked", participle: "looked", gerund: "looking", riddle: "Mirar algo con atención. Escribe las formas de este verbo." },
+            { base: "miss", present: "miss", past: "missed", participle: "missed", gerund: "missing", riddle: "Extrañar a alguien. ¿Cuáles son sus formas?" },
+            { base: "marry", present: "marry", past: "married", participle: "married", gerund: "marrying", riddle: "Casarse con alguien. Completa este verbo." },
+            { base: "open", present: "open", past: "opened", participle: "opened", gerund: "opening", riddle: "Abrir una puerta o ventana. Escribe sus formas." },
+            { base: "play", present: "play", past: "played", participle: "played", gerund: "playing", riddle: "Jugar un juego. ¿Sus cuatro formas?" },
+            { base: "prefer", present: "prefer", past: "preferred", participle: "preferred", gerund: "preferring", riddle: "Preferir una opción sobre otra. Completa este verbo." },
+            { base: "promise", present: "promise", past: "promised", participle: "promised", gerund: "promising", riddle: "Prometer hacer algo. Escribe las formas de este verbo." },
+            { base: "repeat", present: "repeat", past: "repeated", participle: "repeated", gerund: "repeating", riddle: "Repetir una palabra. ¿Cuáles son sus formas?" },
+            { base: "rain", present: "rain", past: "rained", participle: "rained", gerund: "raining", riddle: "Cuando llueve. Completa este verbo." }
+        ];
+
+        // Variables del juego
+        let selectedVerbs = [];
+        let currentVerbIndex = 0;
+        let currentInput = null;
+        let score = 0;
+        let totalTime = 40 * 60; // 40 minutos en segundos
+        let timeLeft = totalTime;
+        let timerInterval;
+        let currentVerb;
+
+        // Elementos del DOM
+        const presentInput = document.getElementById('present');
+        const pastInput = document.getElementById('past');
+        const participleInput = document.getElementById('participle');
+        const gerundInput = document.getElementById('gerund');
+        const riddleElement = document.getElementById('riddle');
+        const timerElement = document.getElementById('timer');
+        const scoreElement = document.getElementById('score');
+        const checkButton = document.getElementById('check-btn');
+        const nextButton = document.getElementById('next-btn');
+        const messageElement = document.getElementById('message');
+        const progressBar = document.getElementById('progress-bar');
+        const currentVerbElement = document.getElementById('current-verb');
+        const totalVerbsElement = document.getElementById('total-verbs');
+        const verbCounterElement = document.getElementById('verb-counter');
+
+        // Función para formatear el tiempo en minutos:segundos
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+
+        // Función para seleccionar 40 verbos aleatorios
+        function selectRandomVerbs() {
+            // Hacer una copia del array original para no modificarlo
+            const shuffled = [...allVerbs].sort(() => 0.5 - Math.random());
+            // Seleccionar los primeros 40 verbos
+            selectedVerbs = shuffled.slice(0, 40);
+            totalVerbsElement.textContent = selectedVerbs.length;
+        }
+
+        // Inicializar el juego
+        function initGame() {
+            // Seleccionar verbos aleatorios si es la primera vez
+            if (selectedVerbs.length === 0) {
+                selectRandomVerbs();
+            }
+            
+            currentVerb = selectedVerbs[currentVerbIndex];
+            
+            // Actualizar la interfaz
+            riddleElement.textContent = currentVerb.riddle;
+            presentInput.value = '';
+            pastInput.value = '';
+            participleInput.value = '';
+            gerundInput.value = '';
+            
+            // Reiniciar estilos
+            presentInput.className = 'input-field';
+            pastInput.className = 'input-field';
+            participleInput.className = 'input-field';
+            gerundInput.className = 'input-field';
+            
+            // Deshabilitar botón siguiente
+            nextButton.disabled = true;
+            
+            // Limpiar mensaje
+            messageElement.textContent = '';
+            messageElement.className = 'message';
+            
+            // Establecer el primer campo como activo
+            setActiveInput(presentInput);
+            
+            // Actualizar contador de verbos
+            currentVerbElement.textContent = currentVerbIndex + 1;
+            verbCounterElement.textContent = `Verbo ${currentVerbIndex + 1} de ${selectedVerbs.length}`;
+            
+            // Actualizar barra de progreso
+            updateProgressBar();
+        }
+
+        // Actualizar la barra de progreso
+        function updateProgressBar() {
+            const progress = (currentVerbIndex / selectedVerbs.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Establecer campo de entrada activo
+        function setActiveInput(inputElement) {
+            // Quitar el enfoque de todos los campos
+            presentInput.blur();
+            pastInput.blur();
+            participleInput.blur();
+            gerundInput.blur();
+            
+            // Establecer el campo activo
+            currentInput = inputElement;
+            currentInput.focus();
+            
+            // Resaltar visualmente el campo activo
+            presentInput.style.borderColor = presentInput === currentInput ? '#3498db' : '#bdc3c7';
+            pastInput.style.borderColor = pastInput === currentInput ? '#3498db' : '#bdc3c7';
+            participleInput.style.borderColor = participleInput === currentInput ? '#3498db' : '#bdc3c7';
+            gerundInput.style.borderColor = gerundInput === currentInput ? '#3498db' : '#bdc3c7';
+        }
+
+        // Verificar respuestas
+        function checkAnswers() {
+            const presentCorrect = presentInput.value.toLowerCase() === currentVerb.present;
+            const pastCorrect = pastInput.value.toLowerCase() === currentVerb.past;
+            const participleCorrect = participleInput.value.toLowerCase() === currentVerb.participle;
+            const gerundCorrect = gerundInput.value.toLowerCase() === currentVerb.gerund;
+            
+            // Aplicar estilos según si son correctos o no
+            presentInput.className = presentCorrect ? 'input-field correct' : 'input-field incorrect';
+            pastInput.className = pastCorrect ? 'input-field correct' : 'input-field incorrect';
+            participleInput.className = participleCorrect ? 'input-field correct' : 'input-field incorrect';
+            gerundInput.className = gerundCorrect ? 'input-field correct' : 'input-field incorrect';
+            
+            // Mostrar mensaje
+            if (presentCorrect && pastCorrect && participleCorrect && gerundCorrect) {
+                messageElement.textContent = '¡Correcto! Has completado todas las formas del verbo.';
+                messageElement.className = 'message success';
+                nextButton.disabled = false;
+                score += 10;
+                scoreElement.textContent = score;
+            } else {
+                messageElement.textContent = 'Algunas respuestas son incorrectas. ¡Inténtalo de nuevo!';
+                messageElement.className = 'message error';
+            }
+        }
+
+        // Avanzar al siguiente verbo
+        function nextVerb() {
+            currentVerbIndex++;
+            
+            if (currentVerbIndex < selectedVerbs.length) {
+                initGame();
+            } else {
+                // Fin del juego
+                endGame();
+            }
+        }
+
+        // Finalizar el juego
+        function endGame() {
+            clearInterval(timerInterval);
+            
+            // Calcular puntuación final
+            const finalScore = Math.round((score / (selectedVerbs.length * 10)) * 100);
+            
+            // Mostrar mensaje final
+            riddleElement.textContent = `¡Juego terminado! Tu puntuación final es: ${finalScore}/100`;
+            
+            // Deshabilitar entradas y botones
+            presentInput.disabled = true;
+            pastInput.disabled = true;
+            participleInput.disabled = true;
+            gerundInput.disabled = true;
+            checkButton.disabled = true;
+            nextButton.disabled = true;
+            
+            // Mostrar mensaje de felicitación
+            if (finalScore >= 70) {
+                messageElement.textContent = `¡Felicidades! Has completado todos los verbos con una excelente puntuación.`;
+            } else {
+                messageElement.textContent = `¡Buen trabajo! Has completado todos los verbos. Sigue practicando para mejorar.`;
+            }
+            messageElement.className = 'message success';
+            
+            // Actualizar barra de progreso al 100%
+            progressBar.style.width = '100%';
+        }
+
+        // Iniciar temporizador
+        function startTimer() {
+            timerElement.textContent = formatTime(timeLeft);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = formatTime(timeLeft);
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // Event Listeners
+        checkButton.addEventListener('click', checkAnswers);
+        
+        nextButton.addEventListener('click', nextVerb);
+        
+        presentInput.addEventListener('click', () => setActiveInput(presentInput));
+        pastInput.addEventListener('click', () => setActiveInput(pastInput));
+        participleInput.addEventListener('click', () => setActiveInput(participleInput));
+        gerundInput.addEventListener('click', () => setActiveInput(gerundInput));
+
+        // Iniciar el juego
+        selectRandomVerbs();
+        initGame();
+        startTimer();
+    </script>
+</body>
+</html>
