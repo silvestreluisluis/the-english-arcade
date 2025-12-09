@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica de Pronombres Objetivos en Inglés - Vida Diaria</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 750px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .level-badge {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .score-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .question-container {
+            background-color: #f0f4ff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .sentence {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .blank {
+            display: inline-block;
+            width: 100px;
+            height: 40px;
+            border-bottom: 3px dashed #2575fc;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected {
+            border-color: #2575fc;
+            background-color: #e3eeff;
+        }
+
+        .option-btn.correct {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+
+        .option-btn.wrong {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+
+        .challenge-section {
+            background-color: #fff8e1;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #ffc107;
+        }
+
+        .challenge-question {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .challenge-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .challenge-btn {
+            background-color: white;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-btn:hover {
+            background-color: #fff3cd;
+        }
+
+        .challenge-btn.selected {
+            background-color: #ffc107;
+            color: white;
+            font-weight: bold;
+        }
+
+        .feedback {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            min-height: 30px;
+        }
+
+        .correct-feedback {
+            color: #28a745;
+        }
+
+        .wrong-feedback {
+            color: #dc3545;
+        }
+
+        .challenge-feedback {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .next-btn {
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .next-btn:hover {
+            background-color: #1a68e8;
+            transform: translateY(-2px);
+        }
+
+        .next-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .game-over h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        .final-score {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2575fc;
+        }
+
+        .final-grade {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .performance {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .restart-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .restart-btn:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sentence {
+                font-size: 1.1rem;
+            }
+            
+            .challenge-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pronombres Objetivos en Inglés</h1>
+        <div class="level-badge">Vida Diaria - Nivel Básico</div>
+        <p class="subtitle">Completa las oraciones y responde la pregunta simple para cada punto</p>
+        
+        <div class="score-container">
+            <div>Puntuación: <span id="score">0</span>/25</div>
+            <div>Pregunta: <span id="question-count">1</span>/<span id="total-questions">25</span></div>
+        </div>
+        
+        <div id="game-area">
+            <div class="question-container">
+                <div class="sentence" id="sentence"></div>
+                <div class="options-container" id="options-container"></div>
+                <div class="feedback" id="feedback"></div>
+                
+                <div id="challenge-section" class="challenge-section" style="display: none;">
+                    <div class="challenge-question" id="challenge-question"></div>
+                    <div class="challenge-options" id="challenge-options"></div>
+                    <div class="challenge-feedback" id="challenge-feedback"></div>
+                </div>
+                
+                <button class="next-btn" id="next-btn" disabled>Siguiente</button>
+            </div>
+        </div>
+        
+        <div id="game-over" class="game-over" style="display: none;">
+            <h2>¡Juego Terminado!</h2>
+            <p class="final-score">Tu puntuación final: <span id="final-score">0</span>/25</p>
+            <div class="final-grade" id="final-grade">0.0</div>
+            <p class="performance" id="performance"></p>
+            <button class="restart-btn" id="restart-btn">Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de preguntas actualizada con retos más simples
+        const questions = [
+            {
+                sentence: "My neighbor is going on vacation and she asked ___ to take care of her cat.",
+                options: ["me", "you", "him", "her"],
+                correctAnswer: "me",
+                challenge: "¿Quién va a cuidar al gato?",
+                challengeOptions: [
+                    "Yo",
+                    "El vecino",
+                    "El gato mismo"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "The coffee shop worker handed ___ my coffee with a big smile.",
+                options: ["me", "him", "us", "them"],
+                correctAnswer: "me",
+                challenge: "¿Quién recibe el café?",
+                challengeOptions: [
+                    "Yo",
+                    "El trabajador",
+                    "Otra persona"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "We invited many friends to the party but only some of ___ could come.",
+                options: ["you", "us", "them", "it"],
+                correctAnswer: "them",
+                challenge: "¿A quiénes invitaron a la fiesta?",
+                challengeOptions: [
+                    "A los amigos",
+                    "A la familia",
+                    "A los vecinos"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "The doctor told ___ to exercise more and eat better food.",
+                options: ["me", "her", "him", "us"],
+                correctAnswer: "me",
+                challenge: "¿Quién recibe el consejo del doctor?",
+                challengeOptions: [
+                    "Yo",
+                    "El doctor",
+                    "Otra persona"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "Our parents help ___ with our homework every day.",
+                options: ["me", "you", "us", "them"],
+                correctAnswer: "us",
+                challenge: "¿Quiénes reciben ayuda con la tarea?",
+                challengeOptions: [
+                    "Nosotros (hijos)",
+                    "Los padres",
+                    "Los profesores"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "I saw my friend at the store and I waved to ___.",
+                options: ["her", "him", "us", "them"],
+                correctAnswer: "her",
+                challenge: "¿A quién saludé en la tienda?",
+                challengeOptions: [
+                    "A mi amiga (mujer)",
+                    "A mi amigo (hombre)",
+                    "Al empleado"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "This new phone is very good and many people want ___.",
+                options: ["it", "me", "you", "us"],
+                correctAnswer: "it",
+                challenge: "¿Qué quieren las personas?",
+                challengeOptions: [
+                    "El teléfono",
+                    "Dinero",
+                    "Ayuda"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "My brother called ___ to ask about his school project.",
+                options: ["me", "you", "him", "her"],
+                correctAnswer: "me",
+                challenge: "¿Quién recibió la llamada?",
+                challengeOptions: [
+                    "Yo",
+                    "Mi hermano",
+                    "El profesor"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "The teacher explained the lesson to ___ very well.",
+                options: ["me", "you", "us", "them"],
+                correctAnswer: "us",
+                challenge: "¿A quiénes explicó la lección el profesor?",
+                challengeOptions: [
+                    "A nosotros (estudiantes)",
+                    "A mí solo",
+                    "A otros profesores"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "I gave my book to Maria and she returned ___ today.",
+                options: ["it", "me", "you", "us"],
+                correctAnswer: "it",
+                challenge: "¿Qué devolvió María?",
+                challengeOptions: [
+                    "El libro",
+                    "El dinero",
+                    "El favor"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "The children were loud so their mother told ___ to be quiet.",
+                options: ["me", "you", "us", "them"],
+                correctAnswer: "them",
+                challenge: "¿A quiénes les pidió silencio la madre?",
+                challengeOptions: [
+                    "A los niños",
+                    "A los vecinos",
+                    "A los padres"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "My boss gave ___ an important job to finish by Friday.",
+                options: ["me", "you", "him", "her"],
+                correctAnswer: "me",
+                challenge: "¿Quién recibió el trabajo importante?",
+                challengeOptions: [
+                    "Yo",
+                    "Mi jefe",
+                    "Otro empleado"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "We met our new neighbors and invited ___ for dinner.",
+                options: ["you", "us", "them", "it"],
+                correctAnswer: "them",
+                challenge: "¿A quiénes invitaron a cenar?",
+                challengeOptions: [
+                    "A los vecinos nuevos",
+                    "A la familia",
+                    "A los amigos"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "The dog was barking so I took ___ for a walk.",
+                options: ["it", "me", "you", "us"],
+                correctAnswer: "it",
+                challenge: "¿A quién saqué a pasear?",
+                challengeOptions: [
+                    "Al perro",
+                      "A mí mismo",
+                    "A un amigo"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "My sister sent ___ pictures from her trip.",
+                options: ["me", "you", "him", "her"],
+                correctAnswer: "me",
+                challenge: "¿Quién recibió las fotos del viaje?",
+                challengeOptions: [
+                    "Yo",
+                    "Mi hermana",
+                    "Nadie"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "The waiter brought ___ the menu and we ordered food.",
+                options: ["me", "you", "us", "them"],
+                correctAnswer: "us",
+                challenge: "¿A quiénes les llevó el menú el mesero?",
+                challengeOptions: [
+                    "A nosotros (clientes)",
+                    "Al cocinero",
+                    "A otros meseros"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "I can not find my keys. Did you see ___ anywhere?",
+                options: ["them", "me", "you", "us"],
+                correctAnswer: "them",
+                challenge: "¿Qué estoy buscando?",
+                challengeOptions: [
+                    "Mis llaves",
+                    "Mi teléfono",
+                    "Mi dinero"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "The movie was very boring and it put ___ to sleep.",
+                options: ["me", "him", "us", "them"],
+                correctAnswer: "him",
+                challenge: "¿A quién durmió la película?",
+                challengeOptions: [
+                    "A mi amigo (hombre)",
+                    "A mí",
+                    "A todos"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "My grandmother tells ___ stories about when she was young.",
+                options: ["me", "you", "us", "them"],
+                correctAnswer: "us",
+                challenge: "¿Quiénes escuchan las historias de la abuela?",
+                challengeOptions: [
+                    "Nosotros (nietos)",
+                    "Solo yo",
+                    "Los vecinos"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "My computer is slow so I should restart ___.",
+                options: ["it", "me", "you", "us"],
+                correctAnswer: "it",
+                challenge: "¿Qué debo reiniciar?",
+                challengeOptions: [
+                    "La computadora",
+                    "El teléfono",
+                    "La televisión"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "My friend recommended this restaurant to ___.",
+                options: ["me", "you", "him", "her"],
+                correctAnswer: "me",
+                challenge: "¿Quién recibió la recomendación del restaurante?",
+                challengeOptions: [
+                    "Yo",
+                    "Mi amigo",
+                    "El dueño"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "We got lost and a police officer helped ___ find the way.",
+                options: ["me", "you", "us", "them"],
+                correctAnswer: "us",
+                challenge: "¿A quiénes ayudó el policía?",
+                challengeOptions: [
+                    "A nosotros",
+                    "Solo a mí",
+                    "A otras personas"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "I bought a new dress and I want to show ___ to my mother.",
+                options: ["it", "me", "you", "us"],
+                correctAnswer: "it",
+                challenge: "¿Qué quiero mostrarle a mi madre?",
+                challengeOptions: [
+                    "El vestido nuevo",
+                    "La tienda",
+                    "El precio"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "The children made a big sandcastle and they love ___.",
+                options: ["it", "me", "you", "us"],
+                correctAnswer: "it",
+                challenge: "¿Qué hicieron los niños en la playa?",
+                challengeOptions: [
+                    "Un castillo de arena",
+                    "Un juego",
+                    "Un dibujo"
+                ],
+                correctChallenge: 0
+            },
+            {
+                sentence: "My cousin is visiting and I will show ___ the city.",
+                options: ["me", "you", "her", "us"],
+                correctAnswer: "her",
+                challenge: "¿A quién mostraré la ciudad?",
+                challengeOptions: [
+                    "A mi prima (mujer)",
+                    "A mi primo (hombre)",
+                    "A mis padres"
+                ],
+                correctChallenge: 0
+            }
+        ];
+
+        // Variables del juego
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+        let selectedChallengeOption = null;
+        let gameActive = true;
+        let shuffledQuestions = [];
+        let challengeAnswered = false;
+
+        // Elementos del DOM
+        const sentenceElement = document.getElementById('sentence');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackElement = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-btn');
+        const scoreElement = document.getElementById('score');
+        const questionCountElement = document.getElementById('question-count');
+        const totalQuestionsElement = document.getElementById('total-questions');
+        const gameArea = document.getElementById('game-area');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreElement = document.getElementById('final-score');
+        const finalGradeElement = document.getElementById('final-grade');
+        const performanceElement = document.getElementById('performance');
+        const restartButton = document.getElementById('restart-btn');
+        const challengeSection = document.getElementById('challenge-section');
+        const challengeQuestion = document.getElementById('challenge-question');
+        const challengeOptions = document.getElementById('challenge-options');
+        const challengeFeedback = document.getElementById('challenge-feedback');
+
+        // Función para mezclar arrays
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Función para preparar preguntas con retos mezclados
+        function prepareQuestions() {
+            shuffledQuestions = [...questions];
+            
+            // Mezclar el orden de las preguntas
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
+            }
+            
+            // Para cada pregunta, mezclar las opciones de los retos
+            shuffledQuestions.forEach(question => {
+                const correctAnswerText = question.challengeOptions[question.correctChallenge];
+                const shuffledChallengeOptions = shuffleArray(question.challengeOptions);
+                const newCorrectIndex = shuffledChallengeOptions.indexOf(correctAnswerText);
+                
+                question.challengeOptions = shuffledChallengeOptions;
+                question.correctChallenge = newCorrectIndex;
+            });
+        }
+
+        // Inicializar el juego
+        function initGame() {
+            prepareQuestions();
+            totalQuestionsElement.textContent = shuffledQuestions.length;
+            loadQuestion();
+        }
+
+        // Cargar una pregunta
+        function loadQuestion() {
+            resetOptions();
+            challengeSection.style.display = 'none';
+            challengeAnswered = false;
+            selectedChallengeOption = null;
+            
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            questionCountElement.textContent = currentQuestionIndex + 1;
+            sentenceElement.innerHTML = currentQuestion.sentence.replace('___', '<span class="blank"></span>');
+            
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.addEventListener('click', () => selectOption(option, button));
+                optionsContainer.appendChild(button);
+            });
+            
+            nextButton.disabled = true;
+            feedbackElement.textContent = '';
+        }
+
+        // Seleccionar una opción principal
+        function selectOption(option, button) {
+            if (!gameActive) return;
+            
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => {
+                btn.classList.remove('selected');
+                btn.disabled = true;
+            });
+            
+            button.classList.add('selected');
+            selectedOption = option;
+            
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            let correct = false;
+            
+            if (option === currentQuestion.correctAnswer) {
+                button.classList.add('correct');
+                feedbackElement.textContent = '✅ ¡Respuesta correcta! Ahora responde la pregunta simple para ganar el punto.';
+                feedbackElement.className = 'feedback correct-feedback';
+                correct = true;
+            } else {
+                button.classList.add('wrong');
+                feedbackElement.textContent = `❌ Incorrecto. La respuesta era: ${currentQuestion.correctAnswer}`;
+                feedbackElement.className = 'feedback wrong-feedback';
+                
+                allButtons.forEach(btn => {
+                    if (btn.textContent === currentQuestion.correctAnswer) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+            
+            if (correct) {
+                showChallenge(currentQuestion);
+            } else {
+                nextButton.disabled = false;
+            }
+        }
+
+        // Mostrar reto
+        function showChallenge(question) {
+            challengeSection.style.display = 'block';
+            challengeQuestion.textContent = question.challenge;
+            challengeOptions.innerHTML = '';
+            challengeFeedback.textContent = '';
+            
+            question.challengeOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'challenge-btn';
+                button.textContent = option;
+                button.addEventListener('click', () => selectChallengeOption(index, button));
+                challengeOptions.appendChild(button);
+            });
+        }
+
+        // Seleccionar opción del reto
+        function selectChallengeOption(index, button) {
+            if (challengeAnswered) return;
+            
+            const allButtons = document.querySelectorAll('.challenge-btn');
+            allButtons.forEach(btn => {
+                btn.classList.remove('selected');
+                btn.disabled = true;
+            });
+            
+            button.classList.add('selected');
+            selectedChallengeOption = index;
+            challengeAnswered = true;
+            
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            
+            if (index === currentQuestion.correctChallenge) {
+                challengeFeedback.textContent = '✅ ¡Correcto! Ganaste 1 punto.';
+                challengeFeedback.style.color = '#28a745';
+                score++;
+                scoreElement.textContent = score;
+            } else {
+                challengeFeedback.textContent = '❌ Incorrecto. No ganas el punto.';
+                challengeFeedback.style.color = '#dc3545';
+            }
+            
+            nextButton.disabled = false;
+        }
+
+        // Reiniciar opciones
+        function resetOptions() {
+            optionsContainer.innerHTML = '';
+            selectedOption = null;
+            gameActive = true;
+        }
+
+        // Pasar a la siguiente pregunta
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        // Calcular calificación final (0-10)
+        function calculateFinalGrade() {
+            const grade = (score / 25) * 10;
+            return Math.round(grade * 10) / 10;
+        }
+
+        // Obtener evaluación de desempeño
+        function getPerformanceText(grade) {
+            if (grade >= 9.0) {
+                return `¡Excelente trabajo! Tu calificación de ${grade}/10 muestra que entiendes perfectamente los pronombres objetivos.`;
+            } else if (grade >= 7.0) {
+                return `¡Muy bien! Con ${grade}/10, manejas bien los pronombres objetivos. Sigue practicando.`;
+            } else if (grade >= 5.0) {
+                return `Aprobado. Tu calificación de ${grade}/10 indica que comprendes los conceptos básicos.`;
+            } else {
+                return `Necesitas más práctica. Tu calificación de ${grade}/10 muestra que debes repasar los pronombres objetivos.`;
+            }
+        }
+
+        // Terminar el juego
+        function endGame() {
+            gameArea.style.display = 'none';
+            gameOverScreen.style.display = 'block';
+            finalScoreElement.textContent = score;
+            
+            const finalGrade = calculateFinalGrade();
+            finalGradeElement.textContent = finalGrade.toFixed(1);
+            
+            // Color de la calificación según desempeño
+            if (finalGrade >= 9.0) {
+                finalGradeElement.style.color = '#28a745';
+            } else if (finalGrade >= 7.0) {
+                finalGradeElement.style.color = '#ffc107';
+            } else if (finalGrade >= 5.0) {
+                finalGradeElement.style.color = '#fd7e14';
+            } else {
+                finalGradeElement.style.color = '#dc3545';
+            }
+            
+            performanceElement.textContent = getPerformanceText(finalGrade);
+        }
+
+        // Reiniciar el juego
+        function restartGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreElement.textContent = score;
+            gameArea.style.display = 'block';
+            gameOverScreen.style.display = 'none';
+            prepareQuestions();
+            loadQuestion();
+        }
+
+        // Event Listeners
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', restartGame);
+
+        // Iniciar el juego
+        initGame();
+    </script>
+</body>
+</html>
