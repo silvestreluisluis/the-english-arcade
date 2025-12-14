@@ -246,6 +246,18 @@
         }
     </style>
 </head>
+<script>
+  function sendHeight() {
+    const height = document.documentElement.scrollHeight;
+    parent.postMessage(height, "*");
+  }
+
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
+
+  // Por si el contenido cambia dinámicamente
+  setInterval(sendHeight, 500);
+</script>
 <body>
     <h1>Juego de Verbos en Inglés</h1>
     
