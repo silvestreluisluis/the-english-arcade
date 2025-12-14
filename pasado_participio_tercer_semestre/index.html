@@ -36,6 +36,18 @@
     @media(max-width:880px){main{grid-template-columns:1fr} .right-col{order:2}}
   </style>
 </head>
+<script>
+  function sendHeight() {
+    const height = document.documentElement.scrollHeight;
+    parent.postMessage(height, "*");
+  }
+
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
+
+  // Por si el contenido cambia dinámicamente
+  setInterval(sendHeight, 500);
+</script>
 <body>
   <div class="app" role="application">
     <header>
