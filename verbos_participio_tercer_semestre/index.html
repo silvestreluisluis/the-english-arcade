@@ -60,6 +60,18 @@
     }
   </style>
 </head>
+<script>
+  function sendHeight() {
+    const height = document.documentElement.scrollHeight;
+    parent.postMessage(height, "*");
+  }
+
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
+
+  // Por si el contenido cambia dinámicamente
+  setInterval(sendHeight, 500);
+</script>
 <body>
   <h1>Encuentra los pares: Español ↔ Participio en Inglés</h1>
   <div id="timer">Tiempo restante: 25:00</div>
