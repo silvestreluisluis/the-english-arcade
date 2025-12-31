@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Verbos en Inglés</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4cc9f0;
+        }
+        
+        h1 {
+            color: #4cc9f0;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #f72585;
+            margin-top: 30px;
+        }
+        
+        .section-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .section-btn {
+            padding: 12px 24px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            opacity: 0.6;
+        }
+        
+        .section-btn.active {
+            opacity: 1;
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.7);
+        }
+        
+        .section-btn.present {
+            background-color: #4361ee;
+            color: white;
+        }
+        
+        .section-btn.past {
+            background-color: #7209b7;
+            color: white;
+        }
+        
+        .section-btn.adverbs {
+            background-color: #f72585;
+            color: white;
+        }
+        
+        .section-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.3;
+        }
+        
+        .game-section {
+            background-color: #16213e;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        
+        .game-section.active {
+            display: block;
+        }
+        
+        .sentence {
+            font-size: 22px;
+            margin-bottom: 30px;
+            color: #4cc9f0;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            background-color: rgba(76, 201, 240, 0.1);
+            border-radius: 10px;
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .options-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .option {
+            background-color: #0f3460;
+            border: 2px solid #1a5fb4;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            text-align: left;
+        }
+        
+        .option:hover {
+            background-color: #1a5fb4;
+            transform: translateY(-3px);
+        }
+        
+        .option.selected {
+            background-color: #1a5fb4;
+            border-color: #4cc9f0;
+        }
+        
+        .option.correct {
+            background-color: #2e8b57;
+            border-color: #4cc9f0;
+        }
+        
+        .option.incorrect {
+            background-color: #8b0000;
+            border-color: #ff4d4d;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #4361ee;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a56d4;
+        }
+        
+        .btn-secondary {
+            background-color: #7209b7;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a08a5;
+        }
+        
+        .btn-success {
+            background-color: #2e8b57;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #267049;
+        }
+        
+        .progress-container {
+            flex-grow: 1;
+            margin: 0 20px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #0f3460;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #4cc9f0;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        
+        .score-container {
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(76, 201, 240, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .score-container.active {
+            display: block;
+        }
+        
+        .score-value {
+            font-size: 32px;
+            color: #4cc9f0;
+            font-weight: bold;
+        }
+        
+        .timer {
+            font-size: 24px;
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(247, 37, 133, 0.2);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .timer.active {
+            display: block;
+        }
+        
+        .timer.warning {
+            color: #ff4d4d;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .adverbs-game {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .adverb-card {
+            background-color: #0f3460;
+            border: 2px solid #7209b7;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+        
+        .adverb-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 10px rgba(114, 9, 183, 0.3);
+        }
+        
+        .adverb-card.selected {
+            background-color: #7209b7;
+            border-color: #4cc9f0;
+        }
+        
+        .adverb-card.matched {
+            background-color: #2e8b57;
+            border-color: #4cc9f0;
+            cursor: default;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .message.correct {
+            background-color: rgba(46, 139, 87, 0.3);
+            border: 1px solid #2e8b57;
+            color: #90ee90;
+            display: block;
+        }
+        
+        .message.incorrect {
+            background-color: rgba(139, 0, 0, 0.3);
+            border: 1px solid #8b0000;
+            color: #ff7f7f;
+            display: block;
+        }
+        
+        .instructions {
+            background-color: rgba(15, 52, 96, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #4cc9f0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #0f3460;
+            color: #8a8a8a;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Juego de Verbos en Inglés</h1>
+        <p>Practica presente simple, pasado simple y adverbios de tiempo/frecuencia</p>
+    </header>
+    
+    <div class="section-buttons">
+        <button id="btn-present" class="section-btn present active">Presente Simple</button>
+        <button id="btn-past" class="section-btn past" disabled>Pasado Simple</button>
+        <button id="btn-adverbs" class="section-btn adverbs" disabled>Adverbios (Sorpresa)</button>
+    </div>
+    
+    <div id="score-container" class="score-container">
+        <h2>Tu Calificación</h2>
+        <div class="score-value">0/10</div>
+        <p id="score-message"></p>
+    </div>
+    
+    <!-- Sección Presente Simple -->
+    <div id="present-section" class="game-section active">
+        <div class="instructions">
+            <h3>Presente Simple</h3>
+            <p>Traduce la oración en español al inglés seleccionando la opción correcta. Cada pregunta tiene 4 opciones, cada una con un verbo diferente. Solo una es correcta. Completa todas las preguntas para desbloquear la siguiente sección.</p>
+        </div>
+        
+        <div class="sentence" id="present-sentence">Cargando pregunta...</div>
+        
+        <div class="options-container" id="present-options">
+            <!-- Las opciones se generarán aquí con JavaScript -->
+        </div>
+        
+        <div class="message" id="present-message"></div>
+        
+        <div class="controls">
+            <button id="present-check" class="btn btn-primary">Verificar Respuesta</button>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="present-progress" class="progress"></div>
+                </div>
+                <div class="progress-text">Pregunta <span id="present-counter">1</span> de 40</div>
+            </div>
+            <button id="present-next" class="btn btn-secondary" disabled>Siguiente</button>
+        </div>
+    </div>
+    
+    <!-- Sección Pasado Simple -->
+    <div id="past-section" class="game-section">
+        <div class="instructions">
+            <h3>Pasado Simple</h3>
+            <p>Traduce la oración en español al inglés en pasado simple. Cada pregunta tiene 4 opciones, cada una con un verbo diferente. Solo una es correcta. Completa todas las preguntas para desbloquear la siguiente sección.</p>
+        </div>
+        
+        <div class="sentence" id="past-sentence">Cargando pregunta...</div>
+        
+        <div class="options-container" id="past-options">
+            <!-- Las opciones se generarán aquí con JavaScript -->
+        </div>
+        
+        <div class="message" id="past-message"></div>
+        
+        <div class="controls">
+            <button id="past-check" class="btn btn-primary">Verificar Respuesta</button>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="past-progress" class="progress"></div>
+                </div>
+                <div class="progress-text">Pregunta <span id="past-counter">1</span> de 40</div>
+            </div>
+            <button id="past-next" class="btn btn-secondary" disabled>Siguiente</button>
+        </div>
+    </div>
+    
+    <!-- Sección Adverbios -->
+    <div id="adverbs-section" class="game-section">
+        <div class="instructions">
+            <h3>Adverbios de Tiempo y Frecuencia</h3>
+            <p>Encuentra los pares de adverbios en inglés y español antes de que se acabe el tiempo. Tienes 1 minuto para encontrar todos los pares.</p>
+        </div>
+        
+        <div id="adverbs-timer" class="timer">01:00</div>
+        
+        <div class="adverbs-game" id="adverbs-container">
+            <!-- Las tarjetas de adverbios se generarán aquí con JavaScript -->
+        </div>
+        
+        <div class="controls">
+            <button id="adverbs-start" class="btn btn-success">Comenzar Juego</button>
+            <button id="adverbs-reset" class="btn btn-secondary">Reiniciar</button>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Juego educativo de verbos en inglés | Creado con HTML, CSS y JavaScript</p>
+    </footer>
+
+    <script>
+        // Datos para el juego
+        let gameData = {
+            present: {
+                questions: [],
+                currentQuestion: 0,
+                score: 0,
+                selectedOption: null
+            },
+            past: {
+                questions: [],
+                currentQuestion: 0,
+                score: 0,
+                selectedOption: null
+            },
+            adverbs: {
+                pairs: [],
+                selectedCards: [],
+                matchedPairs: 0,
+                totalPairs: 0,
+                timer: null,
+                timeLeft: 60,
+                gameStarted: false
+            },
+            currentSection: 'present',
+            overallScore: 0
+        };
+
+        // Lista completa de verbos para usar en las opciones
+        const allVerbs = [
+            // Verbos de movimiento y acción
+            "run", "walk", "jump", "swim", "fly", "drive", "ride", "climb", "crawl", "slide",
+            "throw", "catch", "kick", "hit", "push", "pull", "lift", "carry", "drop", "hold",
+            // Verbos de comunicación
+            "speak", "talk", "say", "tell", "ask", "answer", "call", "shout", "whisper", "sing",
+            "laugh", "cry", "smile", "frown", "nod", "shake", "wave", "point", "show", "explain",
+            // Verbos de actividades diarias
+            "eat", "drink", "cook", "clean", "wash", "dry", "brush", "comb", "dress", "undress",
+            "sleep", "wake", "rest", "work", "study", "read", "write", "draw", "paint", "build",
+            // Verbos mentales y emocionales
+            "think", "know", "understand", "remember", "forget", "learn", "teach", "believe", "doubt", "hope",
+            "want", "need", "like", "love", "hate", "prefer", "choose", "decide", "plan", "try",
+            // Verbos varios
+            "open", "close", "start", "finish", "begin", "end", "break", "fix", "buy", "sell",
+            "give", "take", "bring", "send", "receive", "find", "lose", "keep", "change", "use"
+        ];
+
+        // Adverbios de tiempo y frecuencia (inglés-español)
+        const adverbPairs = [
+            { english: "always", spanish: "siempre" },
+            { english: "usually", spanish: "usualmente" },
+            { english: "often", spanish: "a menudo" },
+            { english: "sometimes", spanish: "a veces" },
+            { english: "rarely", spanish: "rara vez" },
+            { english: "never", spanish: "nunca" },
+            { english: "daily", spanish: "diariamente" },
+            { english: "weekly", spanish: "semanalmente" },
+            { english: "monthly", spanish: "mensualmente" },
+            { english: "yearly", spanish: "anualmente" },
+            { english: "now", spanish: "ahora" },
+            { english: "today", spanish: "hoy" },
+            { english: "yesterday", spanish: "ayer" },
+            { english: "tomorrow", spanish: "mañana" },
+            { english: "soon", spanish: "pronto" },
+            { english: "later", spanish: "más tarde" }
+        ];
+
+        // Inicialización del juego
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Inicializando juego...");
+            initializeGame();
+            setupEventListeners();
+        });
+
+        function initializeGame() {
+            console.log("Generando preguntas...");
+            // Generar preguntas para presente simple
+            generatePresentQuestions();
+            console.log("Preguntas de presente generadas: " + gameData.present.questions.length);
+            
+            // Generar preguntas para pasado simple
+            generatePastQuestions();
+            console.log("Preguntas de pasado generadas: " + gameData.past.questions.length);
+            
+            // Generar pares de adverbios
+            generateAdverbPairs();
+            console.log("Pares de adverbios generados: " + gameData.adverbs.pairs.length);
+            
+            // Mostrar primera pregunta de presente simple
+            loadPresentQuestion();
+        }
+
+        function setupEventListeners() {
+            // Botones de sección
+            document.getElementById('btn-present').addEventListener('click', () => switchSection('present'));
+            document.getElementById('btn-past').addEventListener('click', () => switchSection('past'));
+            document.getElementById('btn-adverbs').addEventListener('click', () => switchSection('adverbs'));
+            
+            // Presente simple
+            document.getElementById('present-check').addEventListener('click', checkPresentAnswer);
+            document.getElementById('present-next').addEventListener('click', nextPresentQuestion);
+            
+            // Pasado simple
+            document.getElementById('past-check').addEventListener('click', checkPastAnswer);
+            document.getElementById('past-next').addEventListener('click', nextPastQuestion);
+            
+            // Adverbios
+            document.getElementById('adverbs-start').addEventListener('click', startAdverbsGame);
+            document.getElementById('adverbs-reset').addEventListener('click', resetAdverbsGame);
+        }
+
+        // Función para obtener verbos aleatorios diferentes
+        function getRandomDifferentVerbs(correctVerb, count, isPast = false) {
+            const verbs = [];
+            const usedVerbs = new Set([correctVerb.toLowerCase()]);
+            
+            while (verbs.length < count) {
+                const randomVerb = allVerbs[Math.floor(Math.random() * allVerbs.length)];
+                const verbLower = randomVerb.toLowerCase();
+                
+                if (!usedVerbs.has(verbLower)) {
+                    usedVerbs.add(verbLower);
+                    
+                    // Formatear el verbo según sea presente o pasado
+                    let formattedVerb = verbLower;
+                    if (isPast) {
+                        formattedVerb = getPastSimpleForm(verbLower);
+                    }
+                    
+                    verbs.push(formattedVerb);
+                }
+            }
+            
+            return verbs;
+        }
+
+        // Función para obtener la forma en pasado simple
+        function getPastSimpleForm(verb) {
+            const irregularVerbs = {
+                "eat": "ate",
+                "buy": "bought",
+                "drive": "drove",
+                "run": "ran",
+                "take": "took",
+                "give": "gave",
+                "say": "said",
+                "tell": "told",
+                "leave": "left",
+                "sleep": "slept",
+                "build": "built",
+                "choose": "chose",
+                "catch": "caught",
+                "teach": "taught",
+                "bring": "brought",
+                "think": "thought",
+                "fight": "fought",
+                "sing": "sang",
+                "drink": "drank",
+                "swim": "swam",
+                "begin": "began",
+                "break": "broke",
+                "speak": "spoke",
+                "steal": "stole",
+                "wake": "woke",
+                "write": "wrote",
+                "ride": "rode",
+                "rise": "rose",
+                "fall": "fell",
+                "feed": "fed",
+                "feel": "felt",
+                "find": "found",
+                "fly": "flew",
+                "forget": "forgot",
+                "get": "got",
+                "go": "went",
+                "grow": "grew",
+                "hang": "hung",
+                "have": "had",
+                "hear": "heard",
+                "hide": "hid",
+                "hit": "hit",
+                "hold": "held",
+                "hurt": "hurt",
+                "keep": "kept",
+                "know": "knew",
+                "lead": "led",
+                "learn": "learned",
+                "lend": "lent",
+                "let": "let",
+                "lie": "lay",
+                "lose": "lost",
+                "make": "made",
+                "mean": "meant",
+                "meet": "met",
+                "pay": "paid",
+                "put": "put",
+                "read": "read",
+                "ring": "rang",
+                "run": "ran",
+                "see": "saw",
+                "sell": "sold",
+                "send": "sent",
+                "set": "set",
+                "shake": "shook",
+                "shine": "shone",
+                "shoot": "shot",
+                "show": "showed",
+                "shut": "shut",
+                "sink": "sank",
+                "sit": "sat",
+                "spend": "spent",
+                "stand": "stood",
+                "swear": "swore",
+                "sweep": "swept",
+                "swim": "swam",
+                "swing": "swung",
+                "take": "took",
+                "teach": "taught",
+                "tear": "tore",
+                "tell": "told",
+                "think": "thought",
+                "throw": "threw",
+                "understand": "understood",
+                "wake": "woke",
+                "wear": "wore",
+                "win": "won",
+                "withdraw": "withdrew",
+                "write": "wrote"
+            };
+            
+            const verbLower = verb.toLowerCase();
+            if (irregularVerbs[verbLower]) {
+                return irregularVerbs[verbLower];
+            }
+            
+            // Verbos regulares
+            if (verbLower.endsWith("e")) {
+                return verbLower + "d";
+            } else if (verbLower.endsWith("y") && !["a", "e", "i", "o", "u"].includes(verbLower[verbLower.length - 2])) {
+                return verbLower.slice(0, -1) + "ied";
+            } else if (verbLower.match(/[aeiou][bcdfghjklmnpqrstvwxyz]$/) && verbLower.length <= 4) {
+                return verbLower + verbLower[verbLower.length - 1] + "ed";
+            } else {
+                return verbLower + "ed";
+            }
+        }
+
+        // Generar 40 preguntas para presente simple con opciones complejas
+        function generatePresentQuestions() {
+            // Lista de oraciones en presente simple con opciones complejas
+            const presentSentences = [
+                // Oraciones positivas (1-14)
+                {
+                    spanish: "Yo alimento a mi perro todos los días",
+                    correctAnswer: "I feed my dog every day",
+                    correctVerb: "feed"
+                },
+                {
+                    spanish: "Él apuesta en las carreras de caballos",
+                    correctAnswer: "He bets on horse races",
+                    correctVerb: "bets"
+                },
+                {
+                    spanish: "Nosotros nos inclinamos hacia adelante para escuchar",
+                    correctAnswer: "We lean forward to listen",
+                    correctVerb: "lean"
+                },
+                {
+                    spanish: "Ella lanza la pelota con fuerza",
+                    correctAnswer: "She throws the ball hard",
+                    correctVerb: "throws"
+                },
+                {
+                    spanish: "Yo barro el piso de la cocina",
+                    correctAnswer: "I sweep the kitchen floor",
+                    correctVerb: "sweep"
+                },
+                {
+                    spanish: "Ellos beben agua después de hacer ejercicio",
+                    correctAnswer: "They drink water after exercising",
+                    correctVerb: "drink"
+                },
+                {
+                    spanish: "Él canta en el coro de la iglesia",
+                    correctAnswer: "He sings in the church choir",
+                    correctVerb: "sings"
+                },
+                {
+                    spanish: "Yo atrapo la pelota con una mano",
+                    correctAnswer: "I catch the ball with one hand",
+                    correctVerb: "catch"
+                },
+                {
+                    spanish: "Ella toma el autobús para ir al trabajo",
+                    correctAnswer: "She takes the bus to work",
+                    correctVerb: "takes"
+                },
+                {
+                    spanish: "Nosotros colgamos las fotos en la pared",
+                    correctAnswer: "We hang the pictures on the wall",
+                    correctVerb: "hang"
+                },
+                {
+                    spanish: "Ellos comen frutas y verduras frescas",
+                    correctAnswer: "They eat fresh fruits and vegetables",
+                    correctVerb: "eat"
+                },
+                {
+                    spanish: "Yo compro el pan en la panadería",
+                    correctAnswer: "I buy bread at the bakery",
+                    correctVerb: "buy"
+                },
+                {
+                    spanish: "Él conduce un coche azul",
+                    correctAnswer: "He drives a blue car",
+                    correctVerb: "drives"
+                },
+                {
+                    spanish: "Ella guarda sus joyas en una caja fuerte",
+                    correctAnswer: "She keeps her jewelry in a safe",
+                    correctVerb: "keeps"
+                },
+                // Oraciones negativas (15-28)
+                {
+                    spanish: "Yo no corro los fines de semana",
+                    correctAnswer: "I do not run on weekends",
+                    correctVerb: "run"
+                },
+                {
+                    spanish: "Ella no corta el papel con tijeras",
+                    correctAnswer: "She does not cut the paper with scissors",
+                    correctVerb: "cut"
+                },
+                {
+                    spanish: "Nosotros no cosemos ropa en casa",
+                    correctAnswer: "We do not sew clothes at home",
+                    correctVerb: "sew"
+                },
+                {
+                    spanish: "Ellos no crecen plantas en el apartamento",
+                    correctAnswer: "They do not grow plants in the apartment",
+                    correctVerb: "grow"
+                },
+                {
+                    spanish: "Él no da consejos a sus amigos",
+                    correctAnswer: "He does not give advice to his friends",
+                    correctVerb: "give"
+                },
+                {
+                    spanish: "Yo no digo mentiras",
+                    correctAnswer: "I do not tell lies",
+                    correctVerb: "tell"
+                },
+                {
+                    spanish: "Ella no deja sus cosas por todas partes",
+                    correctAnswer: "She does not leave her things everywhere",
+                    correctVerb: "leave"
+                },
+                {
+                    spanish: "Nosotros no deletreamos palabras difíciles",
+                    correctAnswer: "We do not spell difficult words",
+                    correctVerb: "spell"
+                },
+                {
+                    spanish: "Ellos no derraman líquidos en la mesa",
+                    correctAnswer: "They do not spill liquids on the table",
+                    correctVerb: "spill"
+                },
+                {
+                    spanish: "Él no dibuja caricaturas para el periódico",
+                    correctAnswer: "He does not draw cartoons for the newspaper",
+                    correctVerb: "draw"
+                },
+                {
+                    spanish: "Yo no duermo durante el día",
+                    correctAnswer: "I do not sleep during the day",
+                    correctVerb: "sleep"
+                },
+                {
+                    spanish: "Ella no miente sobre su edad",
+                    correctAnswer: "She does not lie about her age",
+                    correctVerb: "lie"
+                },
+                {
+                    spanish: "Nosotros no construimos casas de madera",
+                    correctAnswer: "We do not build wooden houses",
+                    correctVerb: "build"
+                },
+                {
+                    spanish: "Ellos no eligen ropa cara",
+                    correctAnswer: "They do not choose expensive clothes",
+                    correctVerb: "choose"
+                },
+                // Oraciones interrogativas (29-40)
+                {
+                    spanish: "¿Yo actúo en obras de teatro?",
+                    correctAnswer: "Do I act in plays?",
+                    correctVerb: "act"
+                },
+                {
+                    spanish: "¿Él agrega azúcar a su café?",
+                    correctAnswer: "Does he add sugar to his coffee?",
+                    correctVerb: "add"
+                },
+                {
+                    spanish: "¿Ella pregunta direcciones cuando está perdida?",
+                    correctAnswer: "Does she ask for directions when she is lost?",
+                    correctVerb: "ask"
+                },
+                {
+                    spanish: "¿Nosotros respondemos todas las preguntas en clase?",
+                    correctAnswer: "Do we answer all the questions in class?",
+                    correctVerb: "answer"
+                },
+                {
+                    spanish: "¿Ellos llegan temprano a sus citas?",
+                    correctAnswer: "Do they arrive early for their appointments?",
+                    correctVerb: "arrive"
+                },
+                {
+                    spanish: "¿Yo cepillo mi cabello tres veces al día?",
+                    correctAnswer: "Do I brush my hair three times a day?",
+                    correctVerb: "brush"
+                },
+                {
+                    spanish: "¿Él pertenece a un club de lectura?",
+                    correctAnswer: "Does he belong to a book club?",
+                    correctVerb: "belong"
+                },
+                {
+                    spanish: "¿Ella suplica por ayuda cuando la necesita?",
+                    correctAnswer: "Does she beg for help when she needs it?",
+                    correctVerb: "beg"
+                },
+                {
+                    spanish: "¿Nosotros creemos en la honestidad?",
+                    correctAnswer: "Do we believe in honesty?",
+                    correctVerb: "believe"
+                },
+                {
+                    spanish: "¿Ellos cierran las ventanas por la noche?",
+                    correctAnswer: "Do they close the windows at night?",
+                    correctVerb: "close"
+                },
+                {
+                    spanish: "¿Yo cocino la cena para mi familia?",
+                    correctAnswer: "Do I cook dinner for my family?",
+                    correctVerb: "cook"
+                },
+                {
+                    spanish: "¿Él llama a sus padres cada domingo?",
+                    correctAnswer: "Does he call his parents every Sunday?",
+                    correctVerb: "call"
+                }
+            ];
+
+            // Mezclar las oraciones
+            shuffleArray(presentSentences);
+
+            // Generar opciones complejas para cada oración
+            presentSentences.forEach((sentence, index) => {
+                // Extraer el verbo base de la respuesta correcta
+                const correctVerbBase = sentence.correctVerb.toLowerCase().replace(/s$/, '').replace(/es$/, '').replace(/ies$/, 'y');
+                
+                // Obtener 3 verbos diferentes para las opciones incorrectas
+                const otherVerbs = getRandomDifferentVerbs(correctVerbBase, 3, false);
+                
+                // Crear las opciones incorrectas
+                const options = [];
+                
+                // Para cada verbo incorrecto, crear una oración similar
+                otherVerbs.forEach(verb => {
+                    // Determinar el sujeto de la oración original
+                    let subject = "I";
+                    if (sentence.correctAnswer.startsWith("He ")) subject = "He";
+                    else if (sentence.correctAnswer.startsWith("She ")) subject = "She";
+                    else if (sentence.correctAnswer.startsWith("We ")) subject = "We";
+                    else if (sentence.correctAnswer.startsWith("They ")) subject = "They";
+                    
+                    // Formatear el verbo según el sujeto
+                    let formattedVerb = verb;
+                    if ((subject === "He" || subject === "She" || subject === "It") && 
+                        !sentence.correctAnswer.includes(" do ") && 
+                        !sentence.correctAnswer.includes(" does ") &&
+                        !sentence.correctAnswer.startsWith("Do ") &&
+                        !sentence.correctAnswer.startsWith("Does ")) {
+                        // Para tercera persona singular en presente
+                        if (verb.endsWith("y") && !["a", "e", "i", "o", "u"].includes(verb[verb.length - 2])) {
+                            formattedVerb = verb.slice(0, -1) + "ies";
+                        } else if (verb.endsWith("o") || verb.endsWith("s") || verb.endsWith("x") || 
+                                   verb.endsWith("z") || verb.endsWith("ch") || verb.endsWith("sh")) {
+                            formattedVerb = verb + "es";
+                        } else {
+                            formattedVerb = verb + "s";
+                        }
+                    }
+                    
+                    // Construir la oración incorrecta
+                    let incorrectAnswer = "";
+                    
+                    if (sentence.correctAnswer.includes(" do not ") || sentence.correctAnswer.includes(" does not ")) {
+                        // Es negativa
+                        const auxiliary = (subject === "He" || subject === "She" || subject === "It") ? "does not" : "do not";
+                        incorrectAnswer = `${subject} ${auxiliary} ${verb} ${sentence.correctAnswer.split(' ').slice(3).join(' ')}`;
+                    } else if (sentence.correctAnswer.startsWith("Do ") || sentence.correctAnswer.startsWith("Does ")) {
+                        // Es interrogativa
+                        const auxiliary = sentence.correctAnswer.startsWith("Does ") ? "Does" : "Do";
+                        const rest = sentence.correctAnswer.substring(sentence.correctAnswer.indexOf(' ', 4) + 1);
+                        incorrectAnswer = `${auxiliary} ${subject.toLowerCase()} ${verb} ${rest}`;
+                    } else {
+                        // Es positiva
+                        incorrectAnswer = `${subject} ${formattedVerb} ${sentence.correctAnswer.split(' ').slice(1).join(' ').replace(sentence.correctVerb, '').trim()}`;
+                        // Asegurar que el verbo incorrecto esté en la posición correcta
+                        const words = sentence.correctAnswer.split(' ');
+                        words[1] = formattedVerb;
+                        incorrectAnswer = words.join(' ');
+                    }
+                    
+                    options.push(incorrectAnswer);
+                });
+                
+                // Añadir la respuesta correcta
+                options.push(sentence.correctAnswer);
+                
+                // Mezclar las opciones
+                shuffleArray(options);
+                
+                // Encontrar el índice de la respuesta correcta
+                const correctIndex = options.indexOf(sentence.correctAnswer);
+                
+                gameData.present.questions.push({
+                    spanish: sentence.spanish,
+                    options: options,
+                    correctAnswer: sentence.correctAnswer,
+                    correctIndex: correctIndex,
+                    correctVerb: sentence.correctVerb
+                });
+            });
+            
+            console.log("Preguntas de presente con opciones complejas generadas exitosamente");
+        }
+
+        // Generar 40 preguntas para pasado simple con opciones complejas
+        function generatePastQuestions() {
+            // Lista de oraciones en pasado simple con opciones complejas
+            const pastSentences = [
+                // Oraciones positivas (1-14)
+                {
+                    spanish: "Yo cambié mi número de teléfono ayer",
+                    correctAnswer: "I changed my phone number yesterday",
+                    correctVerb: "changed"
+                },
+                {
+                    spanish: "Ella limpió su habitación el sábado pasado",
+                    correctAnswer: "She cleaned her room last Saturday",
+                    correctVerb: "cleaned"
+                },
+                {
+                    spanish: "Nosotros lloramos durante la película triste",
+                    correctAnswer: "We cried during the sad movie",
+                    correctVerb: "cried"
+                },
+                {
+                    spanish: "Ellos bailaron toda la noche en la fiesta",
+                    correctAnswer: "They danced all night at the party",
+                    correctVerb: "danced"
+                },
+                {
+                    spanish: "Él se vistió elegantemente para la entrevista",
+                    correctAnswer: "He dressed elegantly for the interview",
+                    correctVerb: "dressed"
+                },
+                {
+                    spanish: "Yo disfruté las vacaciones en la playa",
+                    correctAnswer: "I enjoyed the vacation at the beach",
+                    correctVerb: "enjoyed"
+                },
+                {
+                    spanish: "Ella explicó las reglas del juego",
+                    correctAnswer: "She explained the rules of the game",
+                    correctVerb: "explained"
+                },
+                {
+                    spanish: "Nosotros seguimos las instrucciones cuidadosamente",
+                    correctAnswer: "We followed the instructions carefully",
+                    correctVerb: "followed"
+                },
+                {
+                    spanish: "Ellos terminaron el proyecto a tiempo",
+                    correctAnswer: "They finished the project on time",
+                    correctVerb: "finished"
+                },
+                {
+                    spanish: "Él ayudó a su vecino con las compras",
+                    correctAnswer: "He helped his neighbor with the shopping",
+                    correctVerb: "helped"
+                },
+                {
+                    spanish: "Yo esperé buenas noticias",
+                    correctAnswer: "I hoped for good news",
+                    correctVerb: "hoped"
+                },
+                {
+                    spanish: "Ella imaginó un futuro mejor",
+                    correctAnswer: "She imagined a better future",
+                    correctVerb: "imagined"
+                },
+                {
+                    spanish: "Nosotros besamos a nuestros hijos antes de dormir",
+                    correctAnswer: "We kissed our children before bed",
+                    correctVerb: "kissed"
+                },
+                {
+                    spanish: "Ellos se rieron de la comedia",
+                    correctAnswer: "They laughed at the comedy",
+                    correctVerb: "laughed"
+                },
+                // Oraciones negativas (15-28)
+                {
+                    spanish: "Yo no miré la televisión anoche",
+                    correctAnswer: "I did not watch television last night",
+                    correctVerb: "watch"
+                },
+                {
+                    spanish: "Ella no extrañó a su familia durante el viaje",
+                    correctAnswer: "She did not miss her family during the trip",
+                    correctVerb: "miss"
+                },
+                {
+                    spanish: "Nosotros no abrimos la ventana ayer",
+                    correctAnswer: "We did not open the window yesterday",
+                    correctVerb: "open"
+                },
+                {
+                    spanish: "Ellos no jugaron videojuegos el fin de semana pasado",
+                    correctAnswer: "They did not play video games last weekend",
+                    correctVerb: "play"
+                },
+                {
+                    spanish: "Él no prefirió el café al té",
+                    correctAnswer: "He did not prefer coffee to tea",
+                    correctVerb: "prefer"
+                },
+                {
+                    spanish: "Yo no prometí llegar temprano",
+                    correctAnswer: "I did not promise to arrive early",
+                    correctVerb: "promise"
+                },
+                {
+                    spanish: "Ella no repitió la pregunta",
+                    correctAnswer: "She did not repeat the question",
+                    correctVerb: "repeat"
+                },
+                {
+                    spanish: "Nosotros no recordamos la dirección exacta",
+                    correctAnswer: "We did not remember the exact address",
+                    correctVerb: "remember"
+                },
+                {
+                    spanish: "Ellos no sonrieron durante la foto",
+                    correctAnswer: "They did not smile during the photo",
+                    correctVerb: "smile"
+                },
+                {
+                    spanish: "Él no estudió para el examen final",
+                    correctAnswer: "He did not study for the final exam",
+                    correctVerb: "study"
+                },
+                {
+                    spanish: "Yo no fumé cuando era joven",
+                    correctAnswer: "I did not smoke when I was young",
+                    correctVerb: "smoke"
+                },
+                {
+                    spanish: "Ella no se detuvo en la luz roja",
+                    correctAnswer: "She did not stop at the red light",
+                    correctVerb: "stop"
+                },
+                {
+                    spanish: "Nosotros no hablamos sobre política en la cena",
+                    correctAnswer: "We did not talk about politics at dinner",
+                    correctVerb: "talk"
+                },
+                {
+                    spanish: "Ellos no tocaron el piano en el concierto",
+                    correctAnswer: "They did not play the piano at the concert",
+                    correctVerb: "play"
+                },
+                // Oraciones interrogativas (29-40)
+                {
+                    spanish: "¿Yo usé el diccionario para traducir?",
+                    correctAnswer: "Did I use the dictionary to translate?",
+                    correctVerb: "use"
+                },
+                {
+                    spanish: "¿Él visitó a sus abuelos el mes pasado?",
+                    correctAnswer: "Did he visit his grandparents last month?",
+                    correctVerb: "visit"
+                },
+                {
+                    spanish: "¿Ella esperó el autobús por una hora?",
+                    correctAnswer: "Did she wait for the bus for an hour?",
+                    correctVerb: "wait"
+                },
+                {
+                    spanish: "¿Nosotros caminamos al parque ayer?",
+                    correctAnswer: "Did we walk to the park yesterday?",
+                    correctVerb: "walk"
+                },
+                {
+                    spanish: "¿Ellos lavaron los platos después de cenar?",
+                    correctAnswer: "Did they wash the dishes after dinner?",
+                    correctVerb: "wash"
+                },
+                {
+                    spanish: "¿Yo deseé buena suerte a mi amigo?",
+                    correctAnswer: "Did I wish good luck to my friend?",
+                    correctVerb: "wish"
+                },
+                {
+                    spanish: "¿Él trabajó horas extras la semana pasada?",
+                    correctAnswer: "Did he work overtime last week?",
+                    correctVerb: "work"
+                },
+                {
+                    spanish: "¿Ella secó su cabello con una toalla?",
+                    correctAnswer: "Did she dry her hair with a towel?",
+                    correctVerb: "dry"
+                },
+                {
+                    spanish: "¿Nosotros agradecimos la ayuda de nuestros amigos?",
+                    correctAnswer: "Did we thank our friends for their help?",
+                    correctVerb: "thank"
+                },
+                {
+                    spanish: "¿Ellos mataron el tiempo viendo televisión?",
+                    correctAnswer: "Did they kill time watching television?",
+                    correctVerb: "kill"
+                },
+                {
+                    spanish: "¿Yo maté la araña en mi habitación?",
+                    correctAnswer: "Did I kill the spider in my room?",
+                    correctVerb: "kill"
+                },
+                {
+                    spanish: "¿Él se casó con su novia de la infancia?",
+                    correctAnswer: "Did he marry his childhood sweetheart?",
+                    correctVerb: "marry"
+                }
+            ];
+
+            // Mezclar las oraciones
+            shuffleArray(pastSentences);
+
+            // Generar opciones complejas para cada oración
+            pastSentences.forEach((sentence, index) => {
+                // Extraer el verbo base de la respuesta correcta (en forma base)
+                let correctVerbBase = sentence.correctVerb.toLowerCase();
+                
+                // Si la oración es en pasado, extraer la forma base
+                if (sentence.correctAnswer.includes(" did not ") || sentence.correctAnswer.startsWith("Did ")) {
+                    // Para negativas e interrogativas, el verbo ya está en forma base
+                    correctVerbBase = sentence.correctVerb;
+                } else {
+                    // Para positivas, necesitamos obtener la forma base del pasado
+                    // Esto es complejo, así que usaremos un enfoque simplificado
+                    correctVerbBase = sentence.correctVerb.toLowerCase();
+                    // Eliminar terminaciones comunes de pasado
+                    if (correctVerbBase.endsWith("ed")) {
+                        correctVerbBase = correctVerbBase.slice(0, -2);
+                        if (correctVerbBase.endsWith("i")) {
+                            correctVerbBase = correctVerbBase.slice(0, -1) + "y";
+                        }
+                    }
+                }
+                
+                // Obtener 3 verbos diferentes para las opciones incorrectas
+                const otherVerbs = getRandomDifferentVerbs(correctVerbBase, 3, true);
+                
+                // Crear las opciones incorrectas
+                const options = [];
+                
+                // Para cada verbo incorrecto, crear una oración similar
+                otherVerbs.forEach(verb => {
+                    // Determinar el sujeto de la oración original
+                    let subject = "I";
+                    if (sentence.correctAnswer.startsWith("He ")) subject = "He";
+                    else if (sentence.correctAnswer.startsWith("She ")) subject = "She";
+                    else if (sentence.correctAnswer.startsWith("We ")) subject = "We";
+                    else if (sentence.correctAnswer.startsWith("They ")) subject = "They";
+                    else if (sentence.correctAnswer.startsWith("Did he ")) subject = "he";
+                    else if (sentence.correctAnswer.startsWith("Did she ")) subject = "she";
+                    else if (sentence.correctAnswer.startsWith("Did we ")) subject = "we";
+                    else if (sentence.correctAnswer.startsWith("Did they ")) subject = "they";
+                    else if (sentence.correctAnswer.startsWith("Did I ")) subject = "I";
+                    
+                    // Construir la oración incorrecta
+                    let incorrectAnswer = "";
+                    
+                    if (sentence.correctAnswer.includes(" did not ")) {
+                        // Es negativa en pasado
+                        incorrectAnswer = `${subject} did not ${verb} ${sentence.correctAnswer.split(' ').slice(4).join(' ')}`;
+                    } else if (sentence.correctAnswer.startsWith("Did ")) {
+                        // Es interrogativa en pasado
+                        const rest = sentence.correctAnswer.substring(sentence.correctAnswer.indexOf(' ', 4) + 1);
+                        incorrectAnswer = `Did ${subject} ${verb} ${rest}`;
+                    } else {
+                        // Es positiva en pasado
+                        const words = sentence.correctAnswer.split(' ');
+                        words[1] = verb; // Reemplazar el verbo
+                        incorrectAnswer = words.join(' ');
+                    }
+                    
+                    options.push(incorrectAnswer);
+                });
+                
+                // Añadir la respuesta correcta
+                options.push(sentence.correctAnswer);
+                
+                // Mezclar las opciones
+                shuffleArray(options);
+                
+                // Encontrar el índice de la respuesta correcta
+                const correctIndex = options.indexOf(sentence.correctAnswer);
+                
+                gameData.past.questions.push({
+                    spanish: sentence.spanish,
+                    options: options,
+                    correctAnswer: sentence.correctAnswer,
+                    correctIndex: correctIndex,
+                    correctVerb: sentence.correctVerb
+                });
+            });
+            
+            console.log("Preguntas de pasado con opciones complejas generadas exitosamente");
+        }
+
+        // Generar pares de adverbios para la sección 3
+        function generateAdverbPairs() {
+            // Mezclar los pares de adverbios
+            const shuffledPairs = [...adverbPairs];
+            shuffleArray(shuffledPairs);
+            
+            // Tomar solo 8 pares para el juego (16 cartas)
+            gameData.adverbs.pairs = shuffledPairs.slice(0, 8);
+            gameData.adverbs.totalPairs = 8;
+        }
+
+        // Cargar una pregunta de presente simple
+        function loadPresentQuestion() {
+            const current = gameData.present.currentQuestion;
+            const question = gameData.present.questions[current];
+            
+            if (!question) {
+                console.error("No hay pregunta en el índice " + current);
+                document.getElementById('present-sentence').textContent = "Error al cargar la pregunta";
+                return;
+            }
+            
+            document.getElementById('present-sentence').textContent = question.spanish;
+            
+            const optionsContainer = document.getElementById('present-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.dataset.index = index;
+                
+                optionElement.addEventListener('click', function() {
+                    // Deseleccionar todas las opciones
+                    document.querySelectorAll('#present-options .option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Seleccionar esta opción
+                    this.classList.add('selected');
+                    gameData.present.selectedOption = parseInt(this.dataset.index);
+                    document.getElementById('present-check').disabled = false;
+                });
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Actualizar contador y barra de progreso
+            document.getElementById('present-counter').textContent = current + 1;
+            document.getElementById('present-progress').style.width = `${((current + 1) / 40) * 100}%`;
+            
+            // Reiniciar estado del botón
+            document.getElementById('present-check').disabled = true;
+            document.getElementById('present-next').disabled = true;
+            gameData.present.selectedOption = null;
+            
+            // Limpiar mensaje anterior
+            const message = document.getElementById('present-message');
+            message.className = 'message';
+            message.style.display = 'none';
+        }
+
+        // Verificar respuesta de presente simple
+        function checkPresentAnswer() {
+            const current = gameData.present.currentQuestion;
+            const question = gameData.present.questions[current];
+            
+            if (gameData.present.selectedOption === null) {
+                alert('Por favor, selecciona una opción');
+                return;
+            }
+            
+            const options = document.querySelectorAll('#present-options .option');
+            
+            // Mostrar respuesta correcta e incorrecta
+            options.forEach((option, index) => {
+                if (index === question.correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === gameData.present.selectedOption) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none';
+            });
+            
+            // Mostrar mensaje
+            const message = document.getElementById('present-message');
+            if (gameData.present.selectedOption === question.correctIndex) {
+                message.textContent = '¡Correcto!';
+                message.className = 'message correct';
+                gameData.present.score++;
+            } else {
+                message.textContent = `Incorrecto. La respuesta correcta es: ${question.correctAnswer}`;
+                message.className = 'message incorrect';
+            }
+            message.style.display = 'block';
+            
+            // Habilitar botón siguiente
+            document.getElementById('present-next').disabled = false;
+            document.getElementById('present-check').disabled = true;
+        }
+
+        // Siguiente pregunta de presente simple
+        function nextPresentQuestion() {
+            gameData.present.currentQuestion++;
+            
+            if (gameData.present.currentQuestion < 40) {
+                loadPresentQuestion();
+            } else {
+                // Terminar sección de presente simple
+                document.getElementById('present-check').style.display = 'none';
+                document.getElementById('present-next').textContent = 'Sección Completada';
+                document.getElementById('present-next').disabled = true;
+                
+                // Activar botón de pasado simple
+                document.getElementById('btn-past').disabled = false;
+                
+                // Mostrar puntuación parcial
+                showPartialScore('present');
+                
+                // Cambiar a sección de pasado simple automáticamente
+                setTimeout(() => {
+                    switchSection('past');
+                    loadPastQuestion();
+                }, 2000);
+            }
+        }
+
+        // Cargar una pregunta de pasado simple
+        function loadPastQuestion() {
+            const current = gameData.past.currentQuestion;
+            const question = gameData.past.questions[current];
+            
+            if (!question) {
+                console.error("No hay pregunta en el índice " + current);
+                document.getElementById('past-sentence').textContent = "Error al cargar la pregunta";
+                return;
+            }
+            
+            document.getElementById('past-sentence').textContent = question.spanish;
+            
+            const optionsContainer = document.getElementById('past-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.dataset.index = index;
+                
+                optionElement.addEventListener('click', function() {
+                    // Deseleccionar todas las opciones
+                    document.querySelectorAll('#past-options .option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Seleccionar esta opción
+                    this.classList.add('selected');
+                    gameData.past.selectedOption = parseInt(this.dataset.index);
+                    document.getElementById('past-check').disabled = false;
+                });
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Actualizar contador y barra de progreso
+            document.getElementById('past-counter').textContent = current + 1;
+            document.getElementById('past-progress').style.width = `${((current + 1) / 40) * 100}%`;
+            
+            // Reiniciar estado del botón
+            document.getElementById('past-check').disabled = true;
+            document.getElementById('past-next').disabled = true;
+            gameData.past.selectedOption = null;
+            
+            // Limpiar mensaje anterior
+            const message = document.getElementById('past-message');
+            message.className = 'message';
+            message.style.display = 'none';
+        }
+
+        // Verificar respuesta de pasado simple
+        function checkPastAnswer() {
+            const current = gameData.past.currentQuestion;
+            const question = gameData.past.questions[current];
+            
+            if (gameData.past.selectedOption === null) {
+                alert('Por favor, selecciona una opción');
+                return;
+            }
+            
+            const options = document.querySelectorAll('#past-options .option');
+            
+            // Mostrar respuesta correcta e incorrecta
+            options.forEach((option, index) => {
+                if (index === question.correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === gameData.past.selectedOption) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none';
+            });
+            
+            // Mostrar mensaje
+            const message = document.getElementById('past-message');
+            if (gameData.past.selectedOption === question.correctIndex) {
+                message.textContent = '¡Correcto!';
+                message.className = 'message correct';
+                gameData.past.score++;
+            } else {
+                message.textContent = `Incorrecto. La respuesta correcta es: ${question.correctAnswer}`;
+                message.className = 'message incorrect';
+            }
+            message.style.display = 'block';
+            
+            // Habilitar botón siguiente
+            document.getElementById('past-next').disabled = false;
+            document.getElementById('past-check').disabled = true;
+        }
+
+        // Siguiente pregunta de pasado simple
+        function nextPastQuestion() {
+            gameData.past.currentQuestion++;
+            
+            if (gameData.past.currentQuestion < 40) {
+                loadPastQuestion();
+            } else {
+                // Terminar sección de pasado simple
+                document.getElementById('past-check').style.display = 'none';
+                document.getElementById('past-next').textContent = 'Sección Completada';
+                document.getElementById('past-next').disabled = true;
+                
+                // Activar botón de adverbios
+                document.getElementById('btn-adverbs').disabled = false;
+                
+                // Mostrar puntuación parcial
+                showPartialScore('past');
+                
+                // Calcular puntuación general
+                calculateOverallScore();
+                
+                // Cambiar a sección de adverbios automáticamente
+                setTimeout(() => {
+                    switchSection('adverbs');
+                }, 2000);
+            }
+        }
+
+        // Mostrar puntuación parcial de una sección
+        function showPartialScore(section) {
+            let score, total;
+            if (section === 'present') {
+                score = gameData.present.score;
+                total = 40;
+            } else {
+                score = gameData.past.score;
+                total = 40;
+            }
+            
+            const percentage = (score / total) * 100;
+            alert(`Sección ${section === 'present' ? 'Presente Simple' : 'Pasado Simple'} completada.\nPuntuación: ${score}/${total} (${percentage.toFixed(1)}%)`);
+        }
+
+        // Calcular puntuación general
+        function calculateOverallScore() {
+            const presentPercentage = (gameData.present.score / 40) * 100;
+            const pastPercentage = (gameData.past.score / 40) * 100;
+            
+            // Calcular promedio y convertirlo a escala de 1-10
+            const averagePercentage = (presentPercentage + pastPercentage) / 2;
+            gameData.overallScore = Math.round((averagePercentage / 10) * 10) / 10;
+            
+            // Asegurar que esté entre 1 y 10
+            gameData.overallScore = Math.max(1, Math.min(10, gameData.overallScore));
+        }
+
+        // Mostrar puntuación final
+        function showFinalScore() {
+            const scoreContainer = document.getElementById('score-container');
+            const scoreValue = document.querySelector('.score-value');
+            const scoreMessage = document.getElementById('score-message');
+            
+            scoreValue.textContent = `${gameData.overallScore}/10`;
+            
+            let message = "";
+            if (gameData.overallScore >= 9) {
+                message = "¡Excelente! Dominas los verbos en inglés.";
+            } else if (gameData.overallScore >= 7) {
+                message = "Muy bien, tienes un buen conocimiento de los verbos.";
+            } else if (gameData.overallScore >= 5) {
+                message = "Buen trabajo, pero podrías practicar más.";
+            } else {
+                message = "Sigue practicando, mejorarás con el tiempo.";
+            }
+            
+            scoreMessage.textContent = message;
+            scoreContainer.classList.add('active');
+        }
+
+        // Iniciar juego de adverbios
+        function startAdverbsGame() {
+            if (gameData.adverbs.gameStarted) return;
+            
+            gameData.adverbs.gameStarted = true;
+            gameData.adverbs.timeLeft = 60;
+            gameData.adverbs.matchedPairs = 0;
+            gameData.adverbs.selectedCards = [];
+            
+            // Mostrar temporizador
+            const timerElement = document.getElementById('adverbs-timer');
+            timerElement.classList.add('active');
+            updateTimerDisplay();
+            
+            // Iniciar temporizador
+            gameData.adverbs.timer = setInterval(() => {
+                gameData.adverbs.timeLeft--;
+                updateTimerDisplay();
+                
+                if (gameData.adverbs.timeLeft <= 0) {
+                    endAdverbsGame();
+                } else if (gameData.adverbs.timeLeft <= 10) {
+                    timerElement.classList.add('warning');
+                }
+            }, 1000);
+            
+            // Crear cartas de adverbios
+            createAdverbCards();
+            
+            // Deshabilitar botón de inicio
+            document.getElementById('adverbs-start').disabled = true;
+        }
+
+        // Crear cartas para el juego de adverbios
+        function createAdverbCards() {
+            const container = document.getElementById('adverbs-container');
+            container.innerHTML = '';
+            
+            // Crear un array con todos los adverbios (inglés y español)
+            const cards = [];
+            
+            gameData.adverbs.pairs.forEach(pair => {
+                cards.push({
+                    text: pair.english,
+                    type: 'english',
+                    pairId: pair.english
+                });
+                
+                cards.push({
+                    text: pair.spanish,
+                    type: 'spanish',
+                    pairId: pair.english
+                });
+            });
+            
+            // Mezclar las cartas
+            shuffleArray(cards);
+            
+            // Crear elementos de carta
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'adverb-card';
+                cardElement.textContent = card.text;
+                cardElement.dataset.index = index;
+                cardElement.dataset.type = card.type;
+                cardElement.dataset.pairId = card.pairId;
+                
+                cardElement.addEventListener('click', () => selectAdverbCard(cardElement));
+                
+                container.appendChild(cardElement);
+            });
+        }
+
+        // Seleccionar carta en el juego de adverbios
+        function selectAdverbCard(cardElement) {
+            if (!gameData.adverbs.gameStarted || cardElement.classList.contains('matched')) {
+                return;
+            }
+            
+            // Si ya hay 2 cartas seleccionadas, no hacer nada
+            if (gameData.adverbs.selectedCards.length >= 2) {
+                return;
+            }
+            
+            // Seleccionar carta
+            cardElement.classList.add('selected');
+            gameData.adverbs.selectedCards.push(cardElement);
+            
+            // Si hay 2 cartas seleccionadas, verificar si son un par
+            if (gameData.adverbs.selectedCards.length === 2) {
+                const card1 = gameData.adverbs.selectedCards[0];
+                const card2 = gameData.adverbs.selectedCards[1];
+                
+                // Verificar si son un par (mismo pairId)
+                if (card1.dataset.pairId === card2.dataset.pairId) {
+                    // Es un par correcto
+                    setTimeout(() => {
+                        card1.classList.remove('selected');
+                        card2.classList.remove('selected');
+                        card1.classList.add('matched');
+                        card2.classList.add('matched');
+                        
+                        gameData.adverbs.matchedPairs++;
+                        gameData.adverbs.selectedCards = [];
+                        
+                        // Verificar si se completó el juego
+                        if (gameData.adverbs.matchedPairs === gameData.adverbs.totalPairs) {
+                            endAdverbsGame(true);
+                        }
+                    }, 500);
+                } else {
+                    // No es un par, voltear las cartas después de un segundo
+                    setTimeout(() => {
+                        card1.classList.remove('selected');
+                        card2.classList.remove('selected');
+                        gameData.adverbs.selectedCards = [];
+                    }, 1000);
+                }
+            }
+        }
+
+        // Actualizar visualización del temporizador
+        function updateTimerDisplay() {
+            const timerElement = document.getElementById('adverbs-timer');
+            const minutes = Math.floor(gameData.adverbs.timeLeft / 60);
+            const seconds = gameData.adverbs.timeLeft % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Terminar juego de adverbios
+        function endAdverbsGame(isComplete = false) {
+            clearInterval(gameData.adverbs.timer);
+            gameData.adverbs.gameStarted = false;
+            
+            const timerElement = document.getElementById('adverbs-timer');
+            timerElement.classList.remove('warning');
+            
+            if (isComplete) {
+                timerElement.textContent = "¡Tiempo completado! Has encontrado todos los pares.";
+                
+                // Mostrar puntuación final
+                setTimeout(() => {
+                    showFinalScore();
+                }, 1000);
+            } else {
+                timerElement.textContent = "¡Se acabó el tiempo!";
+                
+                // Mostrar puntuación final
+                setTimeout(() => {
+                    showFinalScore();
+                }, 1000);
+            }
+            
+            // Habilitar botón de reinicio
+            document.getElementById('adverbs-reset').disabled = false;
+        }
+
+        // Reiniciar juego de adverbios
+        function resetAdverbsGame() {
+            clearInterval(gameData.adverbs.timer);
+            
+            // Restablecer estado del juego
+            gameData.adverbs.selectedCards = [];
+            gameData.adverbs.matchedPairs = 0;
+            gameData.adverbs.gameStarted = false;
+            gameData.adverbs.timeLeft = 60;
+            
+            // Restablecer interfaz
+            const timerElement = document.getElementById('adverbs-timer');
+            timerElement.classList.remove('active', 'warning');
+            timerElement.textContent = "01:00";
+            
+            document.getElementById('adverbs-start').disabled = false;
+            document.getElementById('adverbs-reset').disabled = false;
+            
+            // Volver a crear las cartas
+            createAdverbCards();
+        }
+
+        // Cambiar entre secciones del juego
+        function switchSection(section) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.game-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            // Desactivar todos los botones de sección
+            document.querySelectorAll('.section-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(`${section}-section`).classList.add('active');
+            
+            // Activar el botón de la sección seleccionada
+            document.getElementById(`btn-${section}`).classList.add('active');
+            
+            // Actualizar sección actual
+            gameData.currentSection = section;
+        }
+
+        // Función para mezclar un array (algoritmo de Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
