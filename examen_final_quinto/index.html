@@ -344,6 +344,12 @@
         }
     </style>
 </head>
+<script>
+  window.addEventListener("load", () => {
+    const height = document.body.scrollHeight;
+    parent.postMessage(height, "*");
+  });
+</script>   
 <body>
     <header>
         <h1>Juego de Verbos en Inglés</h1>
