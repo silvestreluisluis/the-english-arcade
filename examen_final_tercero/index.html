@@ -375,6 +375,12 @@
         }
     </style>
 </head>
+<script>
+  window.addEventListener("load", () => {
+    const height = document.body.scrollHeight;
+    parent.postMessage(height, "*");
+  });
+</script>
 <body>
     <div class="container">
         <header>
