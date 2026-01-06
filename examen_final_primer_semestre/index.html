@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Inglés y Tecnología</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #2575fc;
+        }
+
+        h1 {
+            color: #2575fc;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #6a11cb;
+            font-size: 1.2rem;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e0e0e0;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 4px;
+            background-color: #2575fc;
+            transform: translateY(-50%);
+            z-index: 2;
+            transition: width 0.5s ease;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #777;
+            position: relative;
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background-color: #2575fc;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed {
+            background-color: #6a11cb;
+            color: white;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #2575fc;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            color: #2575fc;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .instructions {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #6a11cb;
+        }
+
+        .instructions h3 {
+            color: #6a11cb;
+            margin-bottom: 8px;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .question:last-child {
+            border-bottom: none;
+        }
+
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .context {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #2575fc;
+            outline: none;
+        }
+
+        button {
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #1c65e0;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-next {
+            background-color: #6a11cb;
+            display: block;
+            margin: 30px auto 0;
+        }
+
+        .btn-next:hover {
+            background-color: #580da8;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            background-color: #333;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .timer.warning {
+            background-color: #ff9800;
+            animation: pulse 1s infinite;
+        }
+
+        .timer.danger {
+            background-color: #f44336;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .matching-game {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card-match {
+            height: 100px;
+            background-color: #f0f7ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            padding: 10px;
+            user-select: none;
+        }
+
+        .card-match:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-match.selected {
+            background-color: #2575fc;
+            color: white;
+        }
+
+        .card-match.matched {
+            background-color: #4CAF50;
+            color: white;
+            cursor: default;
+        }
+
+        .card-match.matched:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .option {
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background-color: #e1f0ff;
+            transform: translateY(-3px);
+        }
+
+        .option.selected {
+            background-color: #2575fc;
+            color: white;
+        }
+
+        .option.correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .option.incorrect {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .result {
+            text-align: center;
+            padding: 40px;
+            background-color: #f9f9f9;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #6a11cb;
+            margin: 20px 0;
+        }
+
+        .section-score {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-score:last-child {
+            border-bottom: none;
+        }
+
+        .feedback {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .counter {
+            font-weight: bold;
+            color: #2575fc;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .matching-game {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .matching-game {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Juego de Inglés y Tecnología</h1>
+            <p class="subtitle">Completa todas las secciones para obtener tu calificación</p>
+        </header>
+
+        <div class="progress-container">
+            <div class="progress-line" id="progressLine"></div>
+            <div class="step active" id="step1">1</div>
+            <div class="step" id="step2">2</div>
+            <div class="step" id="step3">3</div>
+            <div class="step" id="step4">4</div>
+            <div class="step" id="step5">5</div>
+        </div>
+
+        <!-- Sección 1: Cyberespacio -->
+        <section class="section active" id="section1">
+            <div class="card">
+                <h2>Sección 1: ¿Qué es el Cyberespacio?</h2>
+                <div class="instructions">
+                    <h3>Instrucciones:</h3>
+                    <p>Escribe una respuesta sobre lo que es el cyberespacio. Tu respuesta será correcta si incluye al menos 3 palabras clave relacionadas con el tema.</p>
+                </div>
+                
+                <div class="question">
+                    <div class="question-text">¿Qué es el cyberespacio?</div>
+                    <textarea id="cyberspaceAnswer" rows="5" placeholder="Escribe tu respuesta aquí..."></textarea>
+                    <div id="cyberspaceFeedback" class="feedback"></div>
+                </div>
+                
+                <button id="btnCheckSection1">Verificar respuesta</button>
+                <button id="btnNextSection1" class="btn-next" disabled>Siguiente sección</button>
+            </div>
+        </section>
+
+        <!-- Sección 2: Adjetivos posesivos -->
+        <section class="section" id="section2">
+            <div class="card">
+                <h2>Sección 2: Adjetivos Posesivos</h2>
+                <div class="instructions">
+                    <h3>Instrucciones:</h3>
+                    <p>Completa cada oración con el adjetivo posesivo correcto (my, your, his, her, its, our, their). Lee el contexto para saber qué adjetivo posesivo usar.</p>
+                    <p class="counter" id="counter2">Pregunta 1 de 8</p>
+                </div>
+                
+                <div id="possessiveQuestions"></div>
+                
+                <button id="btnCheckSection2" disabled>Verificar respuesta</button>
+                <button id="btnNextSection2" class="btn-next" disabled>Siguiente sección</button>
+            </div>
+        </section>
+
+        <!-- Sección 3: Verbo To Be -->
+        <section class="section" id="section3">
+            <div class="card">
+                <h2>Sección 3: Verbo To Be</h2>
+                <div class="instructions">
+                    <h3>Instrucciones:</h3>
+                    <p>Completa cada oración con la forma correcta del verbo "to be" (am, is, are) según corresponda. Ten en cuenta si la oración es afirmativa, negativa o interrogativa.</p>
+                    <p class="counter" id="counter3">Pregunta 1 de 15</p>
+                </div>
+                
+                <div id="tobeQuestions"></div>
+                
+                <button id="btnCheckSection3" disabled>Verificar respuesta</button>
+                <button id="btnNextSection3" class="btn-next" disabled>Siguiente sección</button>
+            </div>
+        </section>
+
+        <!-- Sección 4: Presente Simple -->
+        <section class="section" id="section4">
+            <div class="card">
+                <h2>Sección 4: Presente Simple</h2>
+                <div class="instructions">
+                    <h3>Instrucciones:</h3>
+                    <p>Selecciona la opción en inglés que corresponde a la oración en español. Busca la opción que describe una rutina (presente simple).</p>
+                    <p class="counter" id="counter4">Pregunta 1 de 15</p>
+                </div>
+                
+                <div id="simplePresentQuestions"></div>
+                
+                <button id="btnCheckSection4" disabled>Verificar respuesta</button>
+                <button id="btnNextSection4" class="btn-next" disabled>Siguiente sección</button>
+            </div>
+        </section>
+
+        <!-- Sección 5: Juego de Memoria -->
+        <section class="section" id="section5">
+            <div class="card">
+                <h2>Sección 5: Juego de Memoria</h2>
+                <div class="instructions">
+                    <h3>Instrucciones:</h3>
+                    <p>Encuentra los pares de cada verbo en inglés con su traducción al español. Tienes 5 minutos para completar el juego. Haz clic en una tarjeta para voltearla, luego haz clic en otra para encontrar su par.</p>
+                </div>
+                
+                <div class="timer" id="timer">05:00</div>
+                <div class="matching-game" id="matchingGame"></div>
+                
+                <button id="btnNextSection5" class="btn-next" disabled>Ver resultados finales</button>
+            </div>
+        </section>
+
+        <!-- Sección de Resultados -->
+        <section class="section" id="sectionResults">
+            <div class="card">
+                <h2>Resultados Finales</h2>
+                <div class="result">
+                    <h3>¡Juego Completado!</h3>
+                    <div class="score" id="finalScore">0.0</div>
+                    <p>Tu calificación final es:</p>
+                    
+                    <div id="resultsDetails">
+                        <!-- Los resultados por sección se mostrarán aquí -->
+                    </div>
+                    
+                    <button id="btnRestart" style="margin-top: 30px;">Jugar de nuevo</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Variables globales del juego
+        let currentSection = 1;
+        let scores = {
+            section1: { correct: false, score: 0 },
+            section2: { correct: 0, total: 0, score: 0 },
+            section3: { correct: 0, total: 0, score: 0 },
+            section4: { correct: 0, total: 0, score: 0 },
+            section5: { matches: 0, total: 0, time: 0, score: 0 }
+        };
+        
+        // Palabras clave para la sección 1
+        const cyberspaceKeywords = [
+            "internet", "digital", "virtual", "red", "conexión", "información", 
+            "computadora", "tecnología", "cibernético", "datos", "comunicación",
+            "mundo", "espacio", "online", "web", "redes", "seguridad", "sistema"
+        ];
+        
+        // Datos para la sección 2: Adjetivos posesivos
+        const possessiveQuestions = [
+            {
+                context: "I'm talking about a book that belongs to me.",
+                sentence: "This is _____ book.",
+                answer: "my"
+            },
+            {
+                context: "You have a new car. It belongs to you.",
+                sentence: "Is that _____ new car?",
+                answer: "your"
+            },
+            {
+                context: "John has a dog. The dog belongs to him.",
+                sentence: "_____ dog is very friendly.",
+                answer: "His"
+            },
+            {
+                context: "Mary has a cat. The cat belongs to her.",
+                sentence: "_____ cat is sleeping on the sofa.",
+                answer: "Her"
+            },
+            {
+                context: "We have a house. The house belongs to us.",
+                sentence: "_____ house is near the school.",
+                answer: "Our"
+            },
+            {
+                context: "They have a garden. The garden belongs to them.",
+                sentence: "_____ garden has many flowers.",
+                answer: "Their"
+            },
+            {
+                context: "The cat is playing. The toy belongs to the cat.",
+                sentence: "The cat is playing with _____ toy.",
+                answer: "its"
+            },
+            {
+                context: "I'm talking about my friend and me. We have a project.",
+                sentence: "_____ project is about the environment.",
+                answer: "Our"
+            },
+            {
+                context: "You and your brother have bicycles.",
+                sentence: "Are these _____ bicycles?",
+                answer: "your"
+            },
+            {
+                context: "My sister has a laptop. It belongs to her.",
+                sentence: "She always brings _____ laptop to school.",
+                answer: "her"
+            },
+            {
+                context: "My parents have a car. It belongs to them.",
+                sentence: "_____ car is blue.",
+                answer: "Their"
+            },
+            {
+                context: "I have a brother. His name is Peter.",
+                sentence: "_____ brother is a student.",
+                answer: "My"
+            },
+            {
+                context: "The school has a library. The library belongs to the school.",
+                sentence: "_____ library is very big.",
+                answer: "Its"
+            },
+            {
+                context: "You have a phone. It belongs to you.",
+                sentence: "Is this _____ phone?",
+                answer: "your"
+            },
+            {
+                context: "My friends have a football. It belongs to them.",
+                sentence: "_____ football is new.",
+                answer: "Their"
+            }
+        ];
+        
+        // Datos para la sección 3: Verbo To Be
+        const toBeQuestions = [
+            {
+                sentence: "I _____ a student.",
+                answer: "am",
+                type: "positive"
+            },
+            {
+                sentence: "She _____ not a doctor.",
+                answer: "is",
+                type: "negative"
+            },
+            {
+                sentence: "_____ you from Mexico?",
+                answer: "Are",
+                type: "interrogative"
+            },
+            {
+                sentence: "We _____ in the classroom.",
+                answer: "are",
+                type: "positive"
+            },
+            {
+                sentence: "He _____ my brother.",
+                answer: "is",
+                type: "positive"
+            },
+            {
+                sentence: "They _____ not at home.",
+                answer: "are",
+                type: "negative"
+            },
+            {
+                sentence: "_____ she your teacher?",
+                answer: "Is",
+                type: "interrogative"
+            },
+            {
+                sentence: "It _____ a beautiful day.",
+                answer: "is",
+                type: "positive"
+            },
+            {
+                sentence: "I _____ not hungry.",
+                answer: "am",
+                type: "negative"
+            },
+            {
+                sentence: "_____ they your friends?",
+                answer: "Are",
+                type: "interrogative"
+            },
+            {
+                sentence: "You _____ a good person.",
+                answer: "are",
+                type: "positive"
+            },
+            {
+                sentence: "He _____ not here today.",
+                answer: "is",
+                type: "negative"
+            },
+            {
+                sentence: "_____ I late for class?",
+                answer: "Am",
+                type: "interrogative"
+            },
+            {
+                sentence: "We _____ happy to see you.",
+                answer: "are",
+                type: "positive"
+            },
+            {
+                sentence: "The cat _____ sleeping on the bed.",
+                answer: "is",
+                type: "positive"
+            },
+            {
+                sentence: "They _____ not students at this school.",
+                answer: "are",
+                type: "negative"
+            },
+            {
+                sentence: "_____ it your book?",
+                answer: "Is",
+                type: "interrogative"
+            },
+            {
+                sentence: "You _____ not in my class.",
+                answer: "are",
+                type: "negative"
+            },
+            {
+                sentence: "She _____ a very talented musician.",
+                answer: "is",
+                type: "positive"
+            },
+            {
+                sentence: "_____ we ready to start?",
+                answer: "Are",
+                type: "interrogative"
+            }
+        ];
+        
+        // Datos para la sección 4: Presente Simple
+        const simplePresentQuestions = [
+            {
+                spanish: "Yo voy a la escuela todos los días.",
+                options: [
+                    "I go to school every day.",
+                    "I went to school yesterday.",
+                    "I will go to school tomorrow.",
+                    "I am going to school now."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Ella no come carne.",
+                options: [
+                    "She does not eat meat.",
+                    "She is not eating meat.",
+                    "She did not eat meat.",
+                    "She will not eat meat."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Nosotros estudiamos inglés los martes.",
+                options: [
+                    "We study English on Tuesdays.",
+                    "We studied English yesterday.",
+                    "We are studying English now.",
+                    "We will study English tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Ellos trabajan en una oficina.",
+                options: [
+                    "They work in an office.",
+                    "They worked in an office.",
+                    "They are working in an office.",
+                    "They will work in an office."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Yo no juego fútbol los fines de semana.",
+                options: [
+                    "I do not play soccer on weekends.",
+                    "I am not playing soccer now.",
+                    "I did not play soccer yesterday.",
+                    "I will not play soccer tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Él vive en una casa grande.",
+                options: [
+                    "He lives in a big house.",
+                    "He lived in a big house.",
+                    "He is living in a big house.",
+                    "He will live in a big house."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Nosotros comemos frutas todos los días.",
+                options: [
+                    "We eat fruits every day.",
+                    "We ate fruits yesterday.",
+                    "We are eating fruits now.",
+                    "We will eat fruits tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Ella no lee el periódico por la mañana.",
+                options: [
+                    "She does not read the newspaper in the morning.",
+                    "She is not reading the newspaper now.",
+                    "She did not read the newspaper yesterday.",
+                    "She will not read the newspaper tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Yo camino al parque los domingos.",
+                options: [
+                    "I walk to the park on Sundays.",
+                    "I walked to the park yesterday.",
+                    "I am walking to the park now.",
+                    "I will walk to the park tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Ellos no ven televisión por la noche.",
+                options: [
+                    "They do not watch TV at night.",
+                    "They are not watching TV now.",
+                    "They did not watch TV yesterday.",
+                    "They will not watch TV tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Él bebe café todas las mañanas.",
+                options: [
+                    "He drinks coffee every morning.",
+                    "He drank coffee yesterday morning.",
+                    "He is drinking coffee now.",
+                    "He will drink coffee tomorrow morning."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Nosotros no hablamos francés en clase.",
+                options: [
+                    "We do not speak French in class.",
+                    "We are not speaking French now.",
+                    "We did not speak French yesterday.",
+                    "We will not speak French tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Ella escribe en su diario cada noche.",
+                options: [
+                    "She writes in her diary every night.",
+                    "She wrote in her diary last night.",
+                    "She is writing in her diary now.",
+                    "She will write in her diary tomorrow night."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Yo limpio mi habitación los sábados.",
+                options: [
+                    "I clean my room on Saturdays.",
+                    "I cleaned my room last Saturday.",
+                    "I am cleaning my room now.",
+                    "I will clean my room next Saturday."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Ellos no escuchan música clásica.",
+                options: [
+                    "They do not listen to classical music.",
+                    "They are not listening to music now.",
+                    "They did not listen to music yesterday.",
+                    "They will not listen to music tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Él toma el autobús a la escuela.",
+                options: [
+                    "He takes the bus to school.",
+                    "He took the bus to school yesterday.",
+                    "He is taking the bus to school now.",
+                    "He will take the bus to school tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Nosotros cocinamos la cena juntos.",
+                options: [
+                    "We cook dinner together.",
+                    "We cooked dinner together yesterday.",
+                    "We are cooking dinner together now.",
+                    "We will cook dinner together tomorrow."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Ella no entiende la lección.",
+                options: [
+                    "She does not understand the lesson.",
+                    "She is not understanding the lesson.",
+                    "She did not understand the lesson.",
+                    "She will not understand the lesson."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Yo practico deportes los viernes.",
+                options: [
+                    "I practice sports on Fridays.",
+                    "I practiced sports last Friday.",
+                    "I am practicing sports now.",
+                    "I will practice sports next Friday."
+                ],
+                correct: 0
+            },
+            {
+                spanish: "Ellos visitan a sus abuelos cada mes.",
+                options: [
+                    "They visit their grandparents every month.",
+                    "They visited their grandparents last month.",
+                    "They are visiting their grandparents now.",
+                    "They will visit their grandparents next month."
+                ],
+                correct: 0
+            }
+        ];
+        
+        // Datos para la sección 5: Juego de memoria
+        const memoryVerbs = [
+            { english: "Do", spanish: "Hacer" },
+            { english: "Say", spanish: "Decir" },
+            { english: "Go", spanish: "Ir" },
+            { english: "Get", spanish: "Obtener" },
+            { english: "Make", spanish: "Hacer" },
+            { english: "Know", spanish: "Saber" },
+            { english: "Think", spanish: "Pensar" },
+            { english: "Take", spanish: "Tomar" },
+            { english: "See", spanish: "Ver" },
+            { english: "Come", spanish: "Venir" },
+            { english: "Want", spanish: "Querer" },
+            { english: "Look", spanish: "Mirar" }
+        ];
+        
+        // Variables específicas de cada sección
+        let currentQuestionIndex2 = 0;
+        let currentQuestionIndex3 = 0;
+        let currentQuestionIndex4 = 0;
+        let selectedPossessiveQuestions = [];
+        let selectedToBeQuestions = [];
+        let selectedSimplePresentQuestions = [];
+        let memoryCards = [];
+        let selectedCard = null;
+        let matchedPairs = 0;
+        let timerInterval;
+        let timeLeft = 300; // 5 minutos en segundos
+        
+        // Inicialización del juego
+        document.addEventListener('DOMContentLoaded', function() {
+            initGame();
+            setupEventListeners();
+        });
+        
+        function initGame() {
+            updateProgressBar();
+            selectRandomQuestions();
+        }
+        
+        function selectRandomQuestions() {
+            // Seleccionar 8 preguntas aleatorias para la sección 2
+            selectedPossessiveQuestions = [...possessiveQuestions]
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 8);
+            
+            // Seleccionar 15 preguntas aleatorias para la sección 3
+            selectedToBeQuestions = [...toBeQuestions]
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 15);
+            
+            // Seleccionar 15 preguntas aleatorias para la sección 4
+            selectedSimplePresentQuestions = [...simplePresentQuestions]
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 15);
+            
+            // Inicializar el juego de memoria
+            initMemoryGame();
+        }
+        
+        function initMemoryGame() {
+            // Duplicar y mezclar las cartas
+            memoryCards = [];
+            memoryVerbs.forEach(verb => {
+                memoryCards.push({ text: verb.english, type: 'english', pair: verb.spanish });
+                memoryCards.push({ text: verb.spanish, type: 'spanish', pair: verb.english });
+            });
+            
+            // Mezclar las cartas
+            memoryCards = memoryCards.sort(() => Math.random() - 0.5);
+            scores.section5.total = memoryVerbs.length;
+        }
+        
+        function setupEventListeners() {
+            // Botones de la sección 1
+            document.getElementById('btnCheckSection1').addEventListener('click', checkSection1);
+            document.getElementById('btnNextSection1').addEventListener('click', () => goToSection(2));
+            
+            // Botones de la sección 2
+            document.getElementById('btnCheckSection2').addEventListener('click', checkSection2);
+            document.getElementById('btnNextSection2').addEventListener('click', () => goToSection(3));
+            
+            // Botones de la sección 3
+            document.getElementById('btnCheckSection3').addEventListener('click', checkSection3);
+            document.getElementById('btnNextSection3').addEventListener('click', () => goToSection(4));
+            
+            // Botones de la sección 4
+            document.getElementById('btnCheckSection4').addEventListener('click', checkSection4);
+            document.getElementById('btnNextSection4').addEventListener('click', () => goToSection(5));
+            
+            // Botones de la sección 5
+            document.getElementById('btnNextSection5').addEventListener('click', showResults);
+            
+            // Botón para reiniciar
+            document.getElementById('btnRestart').addEventListener('click', restartGame);
+        }
+        
+        function updateProgressBar() {
+            // Actualizar la línea de progreso
+            const progressPercent = ((currentSection - 1) / 5) * 100;
+            document.getElementById('progressLine').style.width = `${progressPercent}%`;
+            
+            // Actualizar los pasos
+            for (let i = 1; i <= 5; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (i < currentSection) {
+                    step.className = 'step completed';
+                } else if (i === currentSection) {
+                    step.className = 'step active';
+                } else {
+                    step.className = 'step';
+                }
+            }
+        }
+        
+        function goToSection(sectionNumber) {
+            // Ocultar sección actual
+            document.getElementById(`section${currentSection}`).classList.remove('active');
+            
+            // Actualizar sección actual
+            currentSection = sectionNumber;
+            
+            // Mostrar nueva sección
+            document.getElementById(`section${currentSection}`).classList.add('active');
+            
+            // Actualizar barra de progreso
+            updateProgressBar();
+            
+            // Cargar contenido de la sección
+            loadSectionContent(sectionNumber);
+        }
+        
+        function loadSectionContent(sectionNumber) {
+            switch(sectionNumber) {
+                case 1:
+                    // No se necesita carga adicional
+                    break;
+                case 2:
+                    loadSection2();
+                    break;
+                case 3:
+                    loadSection3();
+                    break;
+                case 4:
+                    loadSection4();
+                    break;
+                case 5:
+                    loadSection5();
+                    break;
+            }
+        }
+        
+        // ===== SECCIÓN 1 =====
+        function checkSection1() {
+            const answer = document.getElementById('cyberspaceAnswer').value.toLowerCase();
+            const feedback = document.getElementById('cyberspaceFeedback');
+            
+            // Contar palabras clave encontradas
+            let keywordCount = 0;
+            const foundKeywords = [];
+            
+            cyberspaceKeywords.forEach(keyword => {
+                if (answer.includes(keyword.toLowerCase())) {
+                    keywordCount++;
+                    foundKeywords.push(keyword);
+                }
+            });
+            
+            if (keywordCount >= 3) {
+                feedback.textContent = `¡Correcto! Encontraste ${keywordCount} palabras clave: ${foundKeywords.join(', ')}.`;
+                feedback.className = 'feedback correct';
+                scores.section1.correct = true;
+                scores.section1.score = 2; // Puntaje máximo para esta sección
+                document.getElementById('btnNextSection1').disabled = false;
+            } else {
+                feedback.textContent = `Respuesta insuficiente. Necesitas al menos 3 palabras clave relacionadas con cyberespacio. Encontraste ${keywordCount}. Intenta incluir palabras como: internet, digital, virtual, red, tecnología, etc.`;
+                feedback.className = 'feedback incorrect';
+                scores.section1.correct = false;
+                scores.section1.score = 0;
+                document.getElementById('btnNextSection1').disabled = true;
+            }
+        }
+        
+        // ===== SECCIÓN 2 =====
+        function loadSection2() {
+            currentQuestionIndex2 = 0;
+            scores.section2.correct = 0;
+            scores.section2.total = selectedPossessiveQuestions.length;
+            
+            showQuestionSection2();
+        }
+        
+        function showQuestionSection2() {
+            const container = document.getElementById('possessiveQuestions');
+            const question = selectedPossessiveQuestions[currentQuestionIndex2];
+            
+            document.getElementById('counter2').textContent = `Pregunta ${currentQuestionIndex2 + 1} de ${selectedPossessiveQuestions.length}`;
+            
+            container.innerHTML = `
+                <div class="question">
+                    <div class="context">${question.context}</div>
+                    <div class="question-text">${question.sentence}</div>
+                    <input type="text" id="possessiveAnswer" placeholder="Escribe el adjetivo posesivo aquí...">
+                    <div id="possessiveFeedback" class="feedback"></div>
+                </div>
+            `;
+            
+            document.getElementById('possessiveAnswer').addEventListener('input', function() {
+                document.getElementById('btnCheckSection2').disabled = this.value.trim() === '';
+            });
+            
+            document.getElementById('btnCheckSection2').disabled = true;
+            document.getElementById('btnNextSection2').disabled = true;
+        }
+        
+        function checkSection2() {
+            const userAnswer = document.getElementById('possessiveAnswer').value.trim().toLowerCase();
+            const correctAnswer = selectedPossessiveQuestions[currentQuestionIndex2].answer.toLowerCase();
+            const feedback = document.getElementById('possessiveFeedback');
+            
+            if (userAnswer === correctAnswer) {
+                feedback.textContent = '¡Correcto!';
+                feedback.className = 'feedback correct';
+                scores.section2.correct++;
+            } else {
+                feedback.textContent = `Incorrecto. La respuesta correcta es "${correctAnswer}".`;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            // Habilitar siguiente pregunta o siguiente sección
+            if (currentQuestionIndex2 < selectedPossessiveQuestions.length - 1) {
+                setTimeout(() => {
+                    currentQuestionIndex2++;
+                    showQuestionSection2();
+                }, 1500);
+            } else {
+                // Calcular puntaje para esta sección
+                scores.section2.score = (scores.section2.correct / scores.section2.total) * 2;
+                document.getElementById('btnNextSection2').disabled = false;
+                document.getElementById('btnCheckSection2').disabled = true;
+            }
+        }
+        
+        // ===== SECCIÓN 3 =====
+        function loadSection3() {
+            currentQuestionIndex3 = 0;
+            scores.section3.correct = 0;
+            scores.section3.total = selectedToBeQuestions.length;
+            
+            showQuestionSection3();
+        }
+        
+        function showQuestionSection3() {
+            const container = document.getElementById('tobeQuestions');
+            const question = selectedToBeQuestions[currentQuestionIndex3];
+            
+            document.getElementById('counter3').textContent = `Pregunta ${currentQuestionIndex3 + 1} de ${selectedToBeQuestions.length}`;
+            
+            container.innerHTML = `
+                <div class="question">
+                    <div class="question-text">${question.sentence}</div>
+                    <input type="text" id="tobeAnswer" placeholder="Escribe am, is o are...">
+                    <div id="tobeFeedback" class="feedback"></div>
+                </div>
+            `;
+            
+            document.getElementById('tobeAnswer').addEventListener('input', function() {
+                document.getElementById('btnCheckSection3').disabled = this.value.trim() === '';
+            });
+            
+            document.getElementById('btnCheckSection3').disabled = true;
+            document.getElementById('btnNextSection3').disabled = true;
+        }
+        
+        function checkSection3() {
+            const userAnswer = document.getElementById('tobeAnswer').value.trim().toLowerCase();
+            const correctAnswer = selectedToBeQuestions[currentQuestionIndex3].answer.toLowerCase();
+            const feedback = document.getElementById('tobeFeedback');
+            
+            if (userAnswer === correctAnswer) {
+                feedback.textContent = '¡Correcto!';
+                feedback.className = 'feedback correct';
+                scores.section3.correct++;
+            } else {
+                feedback.textContent = `Incorrecto. La respuesta correcta es "${correctAnswer}".`;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            // Habilitar siguiente pregunta o siguiente sección
+            if (currentQuestionIndex3 < selectedToBeQuestions.length - 1) {
+                setTimeout(() => {
+                    currentQuestionIndex3++;
+                    showQuestionSection3();
+                }, 1500);
+            } else {
+                // Calcular puntaje para esta sección
+                scores.section3.score = (scores.section3.correct / scores.section3.total) * 2;
+                document.getElementById('btnNextSection3').disabled = false;
+                document.getElementById('btnCheckSection3').disabled = true;
+            }
+        }
+        
+        // ===== SECCIÓN 4 =====
+        function loadSection4() {
+            currentQuestionIndex4 = 0;
+            scores.section4.correct = 0;
+            scores.section4.total = selectedSimplePresentQuestions.length;
+            
+            showQuestionSection4();
+        }
+        
+        function showQuestionSection4() {
+            const container = document.getElementById('simplePresentQuestions');
+            const question = selectedSimplePresentQuestions[currentQuestionIndex4];
+            
+            document.getElementById('counter4').textContent = `Pregunta ${currentQuestionIndex4 + 1} de ${selectedSimplePresentQuestions.length}`;
+            
+            let optionsHTML = '';
+            question.options.forEach((option, index) => {
+                optionsHTML += `
+                    <div class="option" data-index="${index}">
+                        ${option}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = `
+                <div class="question">
+                    <div class="question-text">${question.spanish}</div>
+                    <div class="options">
+                        ${optionsHTML}
+                    </div>
+                    <div id="simplePresentFeedback" class="feedback"></div>
+                </div>
+            `;
+            
+            // Agregar event listeners a las opciones
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Deseleccionar todas las opciones
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Seleccionar la opción clickeada
+                    this.classList.add('selected');
+                    document.getElementById('btnCheckSection4').disabled = false;
+                });
+            });
+            
+            document.getElementById('btnCheckSection4').disabled = true;
+            document.getElementById('btnNextSection4').disabled = true;
+        }
+        
+        function checkSection4() {
+            const selectedOption = document.querySelector('.option.selected');
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = selectedSimplePresentQuestions[currentQuestionIndex4].correct;
+            const feedback = document.getElementById('simplePresentFeedback');
+            
+            // Mostrar retroalimentación
+            if (selectedIndex === correctIndex) {
+                selectedOption.classList.add('correct');
+                feedback.textContent = '¡Correcto! Esta opción describe una rutina en presente simple.';
+                feedback.className = 'feedback correct';
+                scores.section4.correct++;
+            } else {
+                selectedOption.classList.add('incorrect');
+                document.querySelectorAll('.option')[correctIndex].classList.add('correct');
+                feedback.textContent = 'Incorrecto. La opción correcta es la que describe una rutina en presente simple.';
+                feedback.className = 'feedback incorrect';
+            }
+            
+            // Deshabilitar todas las opciones
+            document.querySelectorAll('.option').forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+            
+            // Habilitar siguiente pregunta o siguiente sección
+            if (currentQuestionIndex4 < selectedSimplePresentQuestions.length - 1) {
+                setTimeout(() => {
+                    currentQuestionIndex4++;
+                    showQuestionSection4();
+                }, 2000);
+            } else {
+                // Calcular puntaje para esta sección
+                scores.section4.score = (scores.section4.correct / scores.section4.total) * 2;
+                document.getElementById('btnNextSection4').disabled = false;
+                document.getElementById('btnCheckSection4').disabled = true;
+            }
+        }
+        
+        // ===== SECCIÓN 5 =====
+        function loadSection5() {
+            const container = document.getElementById('matchingGame');
+            container.innerHTML = '';
+            
+            // Crear las cartas
+            memoryCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card-match';
+                cardElement.textContent = '?';
+                cardElement.setAttribute('data-index', index);
+                cardElement.setAttribute('data-text', card.text);
+                cardElement.setAttribute('data-pair', card.pair);
+                cardElement.setAttribute('data-type', card.type);
+                
+                cardElement.addEventListener('click', () => selectMemoryCard(cardElement));
+                container.appendChild(cardElement);
+            });
+            
+            // Iniciar temporizador
+            startTimer();
+            
+            scores.section5.matches = 0;
+            matchedPairs = 0;
+            selectedCard = null;
+            document.getElementById('btnNextSection5').disabled = true;
+        }
+        
+        function selectMemoryCard(cardElement) {
+            // Si la carta ya está emparejada o seleccionada, no hacer nada
+            if (cardElement.classList.contains('matched') || cardElement.classList.contains('selected')) {
+                return;
+            }
+            
+            // Mostrar la carta
+            cardElement.textContent = cardElement.getAttribute('data-text');
+            cardElement.classList.add('selected');
+            
+            // Si no hay carta seleccionada, guardar esta como seleccionada
+            if (!selectedCard) {
+                selectedCard = cardElement;
+                return;
+            }
+            
+            // Si hay una carta seleccionada, verificar si hacen par
+            const firstCard = selectedCard;
+            const secondCard = cardElement;
+            
+            // Verificar si hacen par
+            if (
+                (firstCard.getAttribute('data-text') === secondCard.getAttribute('data-pair') &&
+                 firstCard.getAttribute('data-pair') === secondCard.getAttribute('data-text')) ||
+                (firstCard.getAttribute('data-text') === secondCard.getAttribute('data-text') &&
+                 firstCard.getAttribute('data-type') !== secondCard.getAttribute('data-type'))
+            ) {
+                // Es un par
+                setTimeout(() => {
+                    firstCard.classList.remove('selected');
+                    secondCard.classList.remove('selected');
+                    firstCard.classList.add('matched');
+                    secondCard.classList.add('matched');
+                    
+                    matchedPairs++;
+                    scores.section5.matches = matchedPairs;
+                    
+                    // Verificar si se completó el juego
+                    if (matchedPairs === scores.section5.total) {
+                        clearInterval(timerInterval);
+                        scores.section5.time = 300 - timeLeft;
+                        // Calcular puntaje basado en tiempo y pares encontrados
+                        const timeScore = Math.max(0, (300 - scores.section5.time) / 30); // Máximo 10 puntos por tiempo
+                        const matchScore = (matchedPairs / scores.section5.total) * 2; // Máximo 2 puntos por pares
+                        scores.section5.score = timeScore + matchScore;
+                        document.getElementById('btnNextSection5').disabled = false;
+                    }
+                    
+                    selectedCard = null;
+                }, 500);
+            } else {
+                // No es un par, voltear de nuevo
+                setTimeout(() => {
+                    firstCard.textContent = '?';
+                    secondCard.textContent = '?';
+                    firstCard.classList.remove('selected');
+                    secondCard.classList.remove('selected');
+                    selectedCard = null;
+                }, 1000);
+            }
+        }
+        
+        function startTimer() {
+            timeLeft = 300; // 5 minutos
+            updateTimerDisplay();
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endMemoryGame();
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const timerElement = document.getElementById('timer');
+            
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Cambiar color según el tiempo restante
+            timerElement.className = 'timer';
+            if (timeLeft <= 60) {
+                timerElement.classList.add('danger');
+            } else if (timeLeft <= 120) {
+                timerElement.classList.add('warning');
+            }
+        }
+        
+        function endMemoryGame() {
+            // Voltear todas las cartas
+            document.querySelectorAll('.card-match').forEach(card => {
+                card.textContent = card.getAttribute('data-text');
+            });
+            
+            // Calcular puntaje
+            scores.section5.time = 300;
+            scores.section5.score = (matchedPairs / scores.section5.total) * 2; // Solo pares, sin bonificación de tiempo
+            
+            // Habilitar el botón de siguiente
+            document.getElementById('btnNextSection5').disabled = false;
+        }
+        
+        // ===== RESULTADOS FINALES =====
+        function showResults() {
+            // Ir a la sección de resultados
+            document.getElementById(`section${currentSection}`).classList.remove('active');
+            document.getElementById('sectionResults').classList.add('active');
+            
+            // Calcular puntaje final
+            const totalScore = 
+                scores.section1.score + 
+                scores.section2.score + 
+                scores.section3.score + 
+                scores.section4.score + 
+                scores.section5.score;
+            
+            // Escalar a calificación de 1 a 10
+            const finalGrade = Math.min(10, (totalScore / 10) * 10).toFixed(1);
+            
+            // Mostrar calificación final
+            document.getElementById('finalScore').textContent = finalGrade;
+            
+            // Mostrar detalles por sección
+            const resultsDetails = document.getElementById('resultsDetails');
+            resultsDetails.innerHTML = `
+                <div class="section-score">
+                    <span>Sección 1: Cyberespacio</span>
+                    <span>${scores.section1.correct ? '2.0' : '0.0'}/2.0</span>
+                </div>
+                <div class="section-score">
+                    <span>Sección 2: Adjetivos Posesivos</span>
+                    <span>${scores.section2.correct}/${scores.section2.total} (${scores.section2.score.toFixed(1)}/2.0)</span>
+                </div>
+                <div class="section-score">
+                    <span>Sección 3: Verbo To Be</span>
+                    <span>${scores.section3.correct}/${scores.section3.total} (${scores.section3.score.toFixed(1)}/2.0)</span>
+                </div>
+                <div class="section-score">
+                    <span>Sección 4: Presente Simple</span>
+                    <span>${scores.section4.correct}/${scores.section4.total} (${scores.section4.score.toFixed(1)}/2.0)</span>
+                </div>
+                <div class="section-score">
+                    <span>Sección 5: Juego de Memoria</span>
+                    <span>${scores.section5.matches}/${scores.section5.total} pares (${scores.section5.score.toFixed(1)}/2.0)</span>
+                </div>
+            `;
+            
+            // Actualizar barra de progreso para mostrar completado
+            currentSection = 6;
+            updateProgressBar();
+        }
+        
+        function restartGame() {
+            // Reiniciar variables
+            currentSection = 1;
+            scores = {
+                section1: { correct: false, score: 0 },
+                section2: { correct: 0, total: 0, score: 0 },
+                section3: { correct: 0, total: 0, score: 0 },
+                section4: { correct: 0, total: 0, score: 0 },
+                section5: { matches: 0, total: 0, time: 0, score: 0 }
+            };
+            
+            // Limpiar respuestas anteriores
+            document.getElementById('cyberspaceAnswer').value = '';
+            document.getElementById('cyberspaceFeedback').className = 'feedback';
+            document.getElementById('btnNextSection1').disabled = true;
+            
+            // Seleccionar nuevas preguntas aleatorias
+            selectRandomQuestions();
+            
+            // Ir a la primera sección
+            document.getElementById('sectionResults').classList.remove('active');
+            goToSection(1);
+            
+            // Detener temporizador si está activo
+            clearInterval(timerInterval);
+        }
+    </script>
+</body>
+</html>
